@@ -1,0 +1,1 @@
+在命令界面，翻屏  shift+pageup/pagedown
