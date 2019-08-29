@@ -1,0 +1,25 @@
+手机号码：
+座机号码：
+邮箱地址：
+中文：
+整数：
+小数：
+2位小数：
+
+在一个页面中判断文件的链接。
+'/["|\']([^"|\']*.(png|gif|excel))["|\']/';
+结果：
+      //www.baidu.com/img/bd_logo.png
+      http://s1.bdstatic.com/r/www/cache/static/global/img/gs_237f015b.gif
+      https://sclick.baidu.com/w.gif
+
+比如excel/png等
+    有多种形式呈现
+        <img src="http://www.baidu.com/a.png">
+        <img src="//www.baidu.com/a.png">
+        <img src="www.baidu.com/a.png">
+        <a href="http:www.baidu.com/a.excel">下载</a>
+    初步想法。比如获取png的链接。判断png前面第一个"或'到png的字符串就是一个完整的链接。
+        如果能实现。此方法适用于搜索所有的文件。
+        至于//www.baidu.com/a.png. /".*?:(*[png])/
+
