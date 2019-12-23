@@ -1,4 +1,7 @@
 
 
-git官网
-		https://git-scm.com/docs/gitignore
+git官网 https://git-scm.com/docs/gitignore
+docker官网 
+php官网
+mysql官网
+redis官网
