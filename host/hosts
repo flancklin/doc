@@ -1,0 +1,39 @@
+#
+127.0.0.1 localhost
+::1 localhost
+
+
+127.0.0.1 tpl.ok-admin.com
+
+################stream##begin########################
+#    account项目
+127.0.0.1 lcs.ab.com
+127.0.0.1 lcs.ar.com
+127.0.0.1 lcs.af.com
+#    exit项目
+127.0.0.1 lcs.ea.com
+127.0.0.1 lcs.eb.com
+127.0.0.1 lcs.ef.com
+127.0.0.1 lcs.er.com
+#    alilog项目
+127.0.0.1 lcs.logf.com
+#    pioneer项目
+127.0.0.1 lcs.pb.com
+127.0.0.1 lcs.pf.com
+127.0.0.1 lcs.ps.com
+#   collection项目
+127.0.0.1 lcs.ca.com
+127.0.0.1 lcs.cb.com
+127.0.0.1 lcs.cf.com
+127.0.0.1 lcs.cr.com
+################stream##end########################
+
+################flancklin##begin########################
+127.0.0.1 lf.tp3.com
+127.0.0.1 lf.yii2-funb.com
+127.0.0.1 lf.yii2-funf.com
+################stream##end########################
+
+
+#磨刀本地查看
+192.168.10.6 windows10.microdone.cn
