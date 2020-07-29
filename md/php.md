@@ -49,10 +49,18 @@
 
 ### 1、数据类型
 
+>4种标量：boolean、integer、float、string
+>
+>3种复合：array、object、callback
+>
+>2种特殊：resource、NULL
+>
+>1种不是数据类型：NaN
+
 | 序号 | 类型     | 举例                     | 备注                                                         |
 | ---- | -------- | ------------------------ | ------------------------------------------------------------ |
 | 1    | boolean  | true\|false\|TRUE\|FALSE | 不区分大小写                                                 |
-| 2    | integer  | -1\|0\|1                 | 支持2/8/10/16进制                                            |
+| 2    | integer  | -1\|0\|1                 | 支持2/8/10/16进制<br>10转2进制：`decbin($var)`<br/>10转8进制：`decoct($var)`<br/>10转16进制：`dechex($var)`<br/>2转10进制：`bindec($var)`<br/>8转10进制：`octdec($var)`<br/>16转10进制：`hexdec($var)`<br/>任意进制转换：`base_convert($number, $from, $to)` |
 | 3    | float    | -1.0\|0.0\|1.0           |                                                              |
 | 4    | string   | '123'\|'abcd'            | [string](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/language.types.string.html) 最大可以达到 2GB。<br>==可以当作array进行字符修改与获取== |
 | 5    | null     | null\|NULL               | 仅定义默认为null；<br>变量被unset()<br>==都会有警告提示 PHP Notice== |
@@ -96,7 +104,7 @@
 
 ##### b、string
 
-字符串==可以当作array==进行修改和读取单个字符
+###### (I)、字符串==可以当作array==进行修改和读取单个字符
 
 >```php
 >//(汉字在utf-8中占三位，这样读取会乱码)
@@ -105,7 +113,7 @@
 >echo $var4;//结果为1bc
 >```
 
-字符串的四种定义方法：
+###### (II)、字符串的四种定义方法：
 
 >```php
 >//1.单引号
@@ -124,14 +132,16 @@
 
 ##### c、array
 
-定义方式有两种
+==array中key严格区分大小写==            `['a'=>1, 'A'=>2]`数组中由两个不同元素
+
+###### (I)、定义方式有两种
 
 >```php
 >$var = array(1,'a');
 >$var = [1, 'a'];
 >```
 
-关联数组与非关联数组
+###### (II)、关联与非关联数组
 
 >```php
 >//非关联数组（索引数组）    key由0逐一递增
@@ -163,7 +173,7 @@
 >  );//结果为[1=>'d']
 >  ```
 
-把object强转化为array
+###### (III)、把object强转化为array
 
 >```php
 >class Base {
@@ -268,30 +278,80 @@
 
 ##### a、命名规则
 
->`[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*`    `$this`这是一个特殊
+>`[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*`    ==`$this`==这是一个特殊
 
-声明(定义) 赋值   使用
+==区分大小写==
 
 ##### b、预定义变量
 
-| 命令名称                | 作用                     | 其他 |
-| ----------------------- | ------------------------ | ---- |
-| `$GLOBALS`              | 全局作用域的可用全部变量 |      |
-| `$_SERVER`              | 服务器和执行环境信息     |      |
-| `$_GET`                 | http-get                 |      |
-| `$_POST`                | http-post                |      |
-| `$_FILES`               | http上传文件             |      |
-| `$_COOKIE`              | cookie                   |      |
-| `$_SESSION`             | session                  |      |
-| `$_REQUEST`             | http-request             |      |
-| `$_ENV`                 | 环境变量                 |      |
-| `$php_errormsg`         | 前一个错误信息           |      |
-| `$HTTP_RAW_POST_DATA`   | 原生post数据             |      |
-| `$http_response_header` | http响应头               |      |
-| `$argc`                 | 传递给脚本的参数个数     |      |
-| `$argv`                 | 传递给脚本的参数数组     |      |
+| 序号 | 命令名称                | 分类         | 作用                            | 其他                         |
+| ---- | ----------------------- | ------------ | ------------------------------- | ---------------------------- |
+| 1    | `$GLOBALS`              | 超全局变量   | 全局作用域的可用全部变量        |                              |
+| 2    | `$_ENV`                 | 超全局变量-E | shell环境变量                   | 由shell提供                  |
+| 3    | `$_SERVER`              | 超全局变量-S | web服务器和执行环境信息         | 由web服务器提供              |
+| 4    | `$_REQUEST`             | 超全局变量   | `$_GET` + `$_POST` + `$_COOKIE` | php.ini的request_order="GPC" |
+| 5    | `$_GET`                 | 超全局变量-G | http-get                        |                              |
+| 6    | `$_POST`                | 超全局变量-P | http-post                       |                              |
+| 7    | `$_COOKIE`              | 超全局变量-C | cookie值                        |                              |
+| 8    | `$_SESSION`             | 超全局变量   | session                         |                              |
+| 9    | `$_FILES`               | 超全局变量   | http上传文件                    |                              |
+| 10   | `$php_errormsg`         |              | 前一个错误信息                  | ==7.2.0删==                  |
+| 11   | `$HTTP_RAW_POST_DATA`   |              | 原生post数据                    | ==5.6.0删==                  |
+| 12   | `$http_response_header` |              | http响应头(局部作用域)          | 注意报错：未定义变量         |
+| 13   | `$argc`                 |              | 传递给脚本的参数个数            | php.ini的register_argc_argv  |
+| 14   | `$argv`                 |              | 传递给脚本的参数数组            |                              |
 
+* ==超全局变量意味着它们在一个脚本的全部作用域中都可以被调用==
+* 奇葩：`$GLOBALS['GLOBALS']['GLOBALS']['GLOBALS']`和`$GLOBALS`完全一样，而且不是错
+* `$GLOBALS`中包含了全部的超全局变量(9种，包括它自己)
+* php.ini中==variables_order==控制`$_ENV` `$_GET` `$_POST` `$_COOKIE` `$_SERVER`是否为空。EGPCS<br>正式环境建议`$_ENV`设为空，需要的时候使用getenv()调用
 
+###### (I)、`$_GLOBALS`
+
+>必定包含9个超全局变量，含自己
+
+###### (II)、`$_ENV`
+
+>具体包含哪些值。由运行环境中的shell提供。不同shell，提供的列表值不同。
+
+|字段|含义|举例|备注|
+
+###### (III)、`$_SERVER`
+
+>==具体值列表依web服务器及其配置而定==
+>
+>举例：http://lcs.ca.com/index.php/test/a?p1=1&p2=2
+
+| 分类      | 字段              | 含义            | 举例                   | 备注              |
+| --------- | ----------------- | --------------- | ---------------------- | ----------------- |
+| url       | REQUEST_SCHEME    | web协议         | http                   |                   |
+|           | HTTPS             | 是否开启https   | on                     |                   |
+|           | REQUEST_METHOD    | 请求方式        | GET                    |                   |
+|           | HTTP_HOST         | 域名            | lcs.ca.com             |                   |
+|           | PHP_SELF          | 文件名          | /index.php             |                   |
+|           | REQUEST_URI       |                 | /index.php/test/a?p1=1 |                   |
+|           | QUERY_STRING      | get参数         | p1=1&p2=2              |                   |
+| 协议      | GATEWAY_INTERFACE | CGI版本         | CGI/1.1                |                   |
+|           | SERVER_PROTOCOL   | http版本        | HTTP/1.1               |                   |
+| web服务器 | SERVER_NAME       | 主机名          | lcs.ca.com             | web服务器中配置的 |
+|           | DOCUMENT_ROOT     | web.config.root | index.php的绝对路径    |                   |
+|           | SERVER_SOFTWARE   | web服务器       | nginx/apache           |                   |
+| 浏览器    | HTTP_USER_AGENT   | 浏览器型号      |                        |                   |
+
+###### (IV)、`$http_response_header `
+
+>具有较强的==局部==作用域
+>
+>```php
+>function get_contents() {
+>  file_get_contents("http://example.com");
+>  var_dump($http_response_header);//有值
+>}
+>get_contents();
+>var_dump($http_response_header);//null  这里会报错，提示未定义
+>```
+>
+>
 
 ##### c、特殊变量(可变变量)
 
@@ -320,6 +380,12 @@
 ##### a、命名规则
 
 >`[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*`
+>
+>==区分大小写==
+>
+>习惯常量标识全部大写，比如：`define("PHP_INT_MAX", 222)`
+
+
 
 ##### b、预定义常量
 
@@ -327,16 +393,22 @@
 
 ##### c、特殊常量(魔术常量)
 
-| 常量名称        | 作用             | 其他 |
-| --------------- | ---------------- | ---- |
-| `__LINE__`      | 文件中当前行号   |      |
-| `__FILE__`      | 所在文件(含路径) |      |
-| `__DIR__`       | 所在目录         |      |
-| `__FUNCTION__`  |                  |      |
-| `__CLASS__`     |                  |      |
-| `__TEAIT__`     |                  |      |
-| `__METHOD__`    |                  |      |
-| `__NAMESPACE__` |                  |      |
+>这里都是根据==物理存储位置==决定的，与继承、引入文件等无关
+>
+>日志log记录原理是利用了函数debug_backtrace 
+>
+>==魔术变量==不区分大小写
+
+| 常量名称        | 作用                  | 其他                      |
+| --------------- | --------------------- | ------------------------- |
+| `__LINE__`      | 文件中当前行号        | 8                         |
+| `__FILE__`      | 所在文件(含路径)      | C:\code\c.php             |
+| `__DIR__`       | 所在目录              | C:\code                   |
+| `__FUNCTION__`  | 所在函数/方法         | getFunction               |
+| `__CLASS__`     | 所在类(带命名空间)    | ttttt\sssss\Aa            |
+| `__TEAIT__`     | 所在trait(带命名空间) |                           |
+| `__METHOD__`    | 所在方法(带命名空间)  | ttttt\sssss\Bb::getMethod |
+| `__NAMESPACE__` | 所在空间              | ttttt\sssss               |
 
 
 
@@ -344,31 +416,31 @@
 
 ### 运算符优先级
 
-| 结合方向 | 运算符                                                       | 附加信息                                                     |
-| -------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| 无       | clone new                                                    | [clone](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.oop5.cloning.html) 和 [new](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.oop5.basic.html#language.oop5.basic.new) |
-| 右       | \*\*                                                         | [算术运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.arithmetic.html) |
-| 右       | *++*          *--*          *~*          *(int)*          *(float)*   <br>    *(string)*          *(array)*          *(object)*          *(bool)*          *@* | [类型](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.types.html)、[递增／递减](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.increment.html)、[错误控制](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.errorcontrol.html) |
-| 无       | *instanceof*                                                 | [类型](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.types.html) |
-| 右       | *!*                                                          | [逻辑运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.logical.html) |
-| 左       | ***          */*          *%*                                | [算术运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.arithmetic.html) |
-| 左       | *+*          *-*          *.*                                | [算术运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.arithmetic.html) 和 [字符串运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.string.html) |
-| 左       | *<<*          *>>*                                           | [位运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.bitwise.html) |
-| 无       | *<*          *<=*          *>*          *>=*                 | [比较运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.comparison.html) |
-| 无       | *==*          *!=*          *===*          *!==*          *<>*          *<=>* | [比较运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.comparison.html) |
-| 左       | *&*                                                          | [位运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.bitwise.html) 和 [引用](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.references.html) |
-| 左       | *^*                                                          | [位运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.bitwise.html) |
-| 左       | *\|*                                                         | [位运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.bitwise.html) |
-| 左       | *&&*                                                         | [逻辑运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.logical.html) |
-| 左       | *\|\|*                                                       | [逻辑运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.logical.html) |
-| 右       | *??*                                                         | [null 合并运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.comparison.html#language.operators.comparison.coalesce) |
-| 左       | *? :*                                                        | [三元运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.comparison.html#language.operators.comparison.ternary) |
-| 右       | *=*          *+=*          *-=*          *\*=*          *\*\*=* <br>*/=*          *.=*          *%=*          *&=*          *\|=*  <br> *^=*          *<<=*          *>>=* | [赋值运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.assignment.html) |
-| 右       | *yield from*                                                 | [yield from](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.generators.syntax.html#control-structures.yield.from) |
-| 右       | *yield*                                                      | [yield](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.generators.syntax.html#control-structures.yield) |
-| 左       | *and*                                                        | [逻辑运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.logical.html) |
-| 左       | *xor*                                                        | [逻辑运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.logical.html) |
-| 左       | *or*                                                         | [逻辑运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.logical.html) |
+| 结合方向 | 优先级 | 运算符                                                       | 附加信息                                                     |
+| -------- | ------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 无       | 1      | clone new                                                    | [clone](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.oop5.cloning.html) 和 [new](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.oop5.basic.html#language.oop5.basic.new) |
+| 右       | 2      | \*\*                                                         | [算术运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.arithmetic.html) |
+| 右       | 3      | *++*          *--*          *~*          *(int)*          *(float)*   <br>    *(string)*          *(array)*          *(object)*          *(bool)*          *@* | [类型](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.types.html)、[递增／递减](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.increment.html)、[错误控制](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.errorcontrol.html) |
+| 无       | 4      | *instanceof*                                                 | [类型](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.types.html) |
+| 右       | 5      | *!*                                                          | [逻辑运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.logical.html) |
+| 左       | 6      | *          */*          *%*                                  | [算术运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.arithmetic.html) |
+| 左       | 7      | *+*          *-*          *.*                                | [算术运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.arithmetic.html) 和 [字符串运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.string.html) |
+| 左       | 8      | *<<*          *>>*                                           | [位运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.bitwise.html) |
+| 无       | 9      | *<*          *<=*          *>*          *>=*                 | [比较运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.comparison.html) |
+| 无       | 10     | *==*          *!=*          *===*          *!==*          *<>*          *<=>* | [比较运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.comparison.html) |
+| 左       | 11     | *&*                                                          | [位运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.bitwise.html) 和 [引用](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.references.html) |
+| 左       | 12     | *^*                                                          | [位运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.bitwise.html) |
+| 左       | 13     | *\|*                                                         | [位运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.bitwise.html) |
+| 左       | 14     | *&&*                                                         | [逻辑运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.logical.html) |
+| 左       | 15     | *\|\|*                                                       | [逻辑运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.logical.html) |
+| 右       | 16     | *??*                                                         | [null 合并运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.comparison.html#language.operators.comparison.coalesce) |
+| 左       | 17     | *? :*                                                        | [三元运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.comparison.html#language.operators.comparison.ternary) |
+| 右       | 18     | *=*          *+=*          *-=*          *\*=*          *\*\*=* <br>*/=*          *.=*          *%=*          *&=*          *\|=*  <br> *^=*          *<<=*          *>>=* | [赋值运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.assignment.html) |
+| 右       | 19     | *yield from*                                                 | [yield from](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.generators.syntax.html#control-structures.yield.from) |
+| 右       | 20     | *yield*                                                      | [yield](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.generators.syntax.html#control-structures.yield) |
+| 左       | 21     | *and*                                                        | [逻辑运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.logical.html) |
+| 左       | 22     | *xor*                                                        | [逻辑运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.logical.html) |
+| 左       | 23     | *or*                                                         | [逻辑运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.logical.html) |
 
 ### 1、算术运算符
 
@@ -377,19 +449,163 @@
 >$y=2;
 >```
 
-| 符号 | 作用       | 举例        | 备注 |
-| ---- | ---------- | ----------- | ---- |
-| -    | 取反       | `-$x=-4`    |      |
-| -    | 减号       | `$x-$y=2`   |      |
-| +    | 加号       | `$x+$y=6`   |      |
-| *    | 乘号       | `$x*$y=8`   |      |
-| /    | 除号       | `$x/$y=2`   |      |
-| %    | 求余(取模) | `$x%$y=0`   |      |
-| **   | 求幂       | `$x**$y=16` |      |
+| 序号 | 符号 | 作用       | 举例                                    | 备注                                            |
+| ---- | ---- | ---------- | --------------------------------------- | ----------------------------------------------- |
+| 1    | **   | 求幂       | `$x**$y=16`                             |                                                 |
+| 2    | *    | 乘号       | `$x*$y=8`                               |                                                 |
+| 3    | /    | 除号       | `$x/$y=2`                               |                                                 |
+| 4    | %    | 求余(取模) | `$x%$y=0`                               |                                                 |
+| 5    | -    | 取反       | `-$x=-4`                                | `-2-2=-4`                                       |
+| 6    | -    | 减号       | `$x-$y=2`                               |                                                 |
+| 7    | +    | 加号       | `$x+$y=6`                               |                                                 |
+| 8    | ++   | 递增       | `echo ++$x;`输出5<br>`echo $x++;`输出4  | `++`在前，先+1再运算；<br>`++`在后，先运算再+1  |
+| 9    | --   | 递减       | `echo --$x;`输出3<br/>`echo $x--;`输出4 | `--`在前，先-1再运算；<br/>`--`在后，先运算再-1 |
+
+>==递增递减不影响布尔值。递减 NULL 值也没有效果，但是递增 NULL 的结果是 1。==
+>
+>```php
+>$a=true;
+>var_dump(++$a);//true
+>$a=true;
+>var_dump(--$a);//true
+>
+>$a=null;
+>var_dump(++$a);//1
+>$a=null;
+>var_dump(--$a);//null
+>
+>$a=null;
+>var_dump($a++);//null
+>var_dump($a);//1
+>$a=null;
+>var_dump($a--);//null
+>var_dump($a);//null
+>```
+>
+>
 
 ### 2、比较运算符
 
-文档>附录>php类型比较表
+==文档>附录>php类型比较表==
+
+| 序号 | 符号 | 作用     | 举例                                   | 备注                 |
+| ---- | ---- | -------- | -------------------------------------- | -------------------- |
+| 1    | ==   | 等于     | `(1=='1')=true`                        |                      |
+| 2    | ===  | 全等     | `(1==='1')=false`                      |                      |
+| 3    | !=   | 不等     | `(1!='1')=false`                       |                      |
+| 4    | !==  | 不全等   | `(1!=='1')=true`                       |                      |
+| 5    | <    | 小于     |                                        |                      |
+| 6    | >    | 大于     |                                        |                      |
+| 7    | <=   | 小于等于 |                                        |                      |
+| 8    | \>=  | 大于等于 |                                        |                      |
+| 9    | <=>  | 全比较   | `(3<=>1)=1` `(1<=>3)=-1 `  `(1<=>1)=0` | 用`==`且==php7.0.0== |
+
+### 3、逻辑运算符
+
+| 序号 | 符号 | 作用 | 举例        | 备注                                     |
+| ---- | ---- | ---- | ----------- | ---------------------------------------- |
+| 1    | and  | 且   |             |                                          |
+| 2    | or   | 或   |             |                                          |
+| 3    | xor  | 异或 | `$a xor $b` | `$a`和`$b`有且只有一个为true，结果才true |
+| 4    | !    | 非   |             |                                          |
+| 5    | &&   | 且   |             |                                          |
+| 6    | \|\| | 或   |             |                                          |
+
+### 4、位运算符
+
+| 序号 | 符号 | 作用                                  | 举例              | 备注                                               |
+| ---- | ---- | ------------------------------------- | ----------------- | -------------------------------------------------- |
+| 1    | &    | 且。相应位同1则1，否则为0             | `101&110=100`     |                                                    |
+| 2    | \|   | 或。相应位有1则1，否则为0             | `101|110=111`     |                                                    |
+| 3    | ^    | 异或。相应位有且只有一个1则1，否则为0 | `101^110=011`     |                                                    |
+| 4    | ~    | 取反                                  | `~101=010`        | 二进101等于整数5                                   |
+| 5    | <<   | 左移                                  | `1101<<3=1101000` | 相当于直接加3个0.<br>从整数的角度：13*2**3         |
+| 6    | \>>  | 右移                                  | `1101>>3=1`       | 相当于删掉最后3位<br>从整数角度：`intval(13/2**3)` |
+
+>位运算==非只有二进制才能使用，其他进制也可以==
+>
+>```php
+>//十进制
+>$a=3;
+>$b=4;
+>echo $a<<$b;//3*2**4=3*16=48
+>```
+
+### 5、字符串运算符
+
+>```php
+>$a = 'a';
+>$b = 'b';
+>```
+
+| 序号 | 符号 | 作用       | 举例                   | 备注                          |
+| ---- | ---- | ---------- | ---------------------- | ----------------------------- |
+| 1    | .    | 连接字符串 | `echo $a.$b;`输出ab    |                               |
+| 2    | .=   | 连接字符串 | `echo $a .= $b;`输出ab | `$a.=$b`和`$b =$a.$b`完全相同 |
+
+### 6、数组运算符
+
+| 序号 | 符号 | 作用         | 举例 | 备注                                            |
+| ---- | ---- | ------------ | ---- | ----------------------------------------------- |
+| 1    | +    | 合并数组     |      | `+`与`array_merge()`相反                        |
+| 2    | ==   | 判断是否相等 |      |                                                 |
+| 3    | ===  | 判断是否相等 |      | 判断k-v对的顺序以及v的类型(==不考虑key的类型==) |
+| 4    | !=   | 判断是否相等 |      |                                                 |
+| 5    | <>   | 判断是否相等 |      |                                                 |
+| 6    | !==  | 判断是否相等 |      | 判断k-v对的顺序以及v的类型(==不考虑key的类型==) |
+
+
+
+>`+`和`array_merge()`相反。
+>
+>当出现相同的key时。
+>
+>* `+`保留==第一次出现==的那个。
+>* `array_merge()`保留==最后一次出现==那个
+>
+>```php
+>$a = ['b' => 'b'];
+>$b = ['b2' => 'b', 'b'=> 'bv'];
+>var_dump($a+$b);//['b' => 'b', 'b2' => 'b']
+>var_dump($b+$a);//['b2' => 'b', 'b' => 'bv']
+>
+>$x = [2 => 10, 3=> 20];
+>$y = [3 => 20, 2 => 10];//换了顺序
+>$z = ['2' => '10', 3 => 20];//改了key-value的类型
+>$o = ['2' => 10, 3 => 20];//改了key的类型
+>var_dump($x==$y);//true
+>var_dump($x==$z);//true
+>var_dump($x==$o);//true
+>
+>var_dump($x===$y);//false
+>var_dump($x===$z);//false
+>var_dump($x===$o);//true
+>
+>var_dump($x<>$y);//false
+>var_dump($x<>$z);//false
+>var_dump($x<>$o);//false
+>
+>var_dump($x!=$y);//false
+>var_dump($x!=$z);//false
+>var_dump($x!=$o);//false
+>
+>var_dump($x!==$y);//true
+>var_dump($x!==$z);//true
+>var_dump($x!==$o);//false
+>```
+>
+>
+
+### 7、特殊运算符
+
+| 序号 | 符号       | 作用             | 举例                         | 备注                                             |
+| ---- | ---------- | ---------------- | ---------------------------- | ------------------------------------------------ |
+| 1    | =          | 赋值             | `$x=1;`                      |                                                  |
+| 2    | @          | 任何错误都被忽略 | `$x=@$_GET['x'];`            |                                                  |
+| 3    | \`...`     | 执行运算符       | *echo \`ls -al\`;*           | php.ini的safe_mode<br>关闭了`shell_exec()`时无效 |
+| 4    | instanceof | 判断类型         | `$var instanceof $className` | className带命名空间                              |
+
+
 
 ## (三)、流程控制
 
@@ -476,6 +692,102 @@
 
 ## (四)、函数
 
+### 1、命名规则
+
+>`[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*`
+>
+>==不区分大小写==
+>
+>```php
+>function myfun(){ echo "hello world!";}
+>```
+>
+>
+
+
+
+### 2、函数定义
+
+#### (1)、普通定义
+
+>```php
+>function myfun(){ echo "hello world!";}
+>```
+
+#### (2)、条件定义
+
+>```php
+>$flag = rand(0, 1);
+>if($flag){
+>    function myFun(){ echo "hello world!";}
+>}
+>if($flag) {
+>    myFun();//正常调用
+>}else{
+>    myFun();//报错，myFun未定义
+>}
+>```
+
+#### (3)、函数中定义
+
+>```php
+>function outFun(){
+>    function innerFun(){
+>        echo 'hello world!';
+>    }
+>}
+>//innerFun();//这里会报错，innerFun未定义
+>outFun();
+>innerFun();//正常调用
+>```
+
+#### (4)、定义可变数量参数的函数
+
+>即：定义函数的时候，参数个数不确定。比如`array_merge($arr1, $arr2, $arr3)`
+>
+>`func_num_args()`获取参数的个数
+>
+>`func_get_args()`获取全部参数
+>
+>`func_get_arg($int)`获取第`$int`个参数。从0计数
+>
+>```php
+>function myFun(...$params){//三个点号标识可以无限个参数。参数名和参数值以键值对放在$params中
+>    var_dump($params);//['a', 'b', 'c', 'd', 'e', 'f']
+>    var_dump(func_num_args());//6
+>    var_dump(func_get_args());//['a', 'b', 'c', 'd', 'e', 'f']
+>    var_dump(func_get_arg(2));//c
+>}
+>myFun('a', 'b', 'c', 'd', 'e', 'f');
+>```
+>
+>
+
+### 3、函数重载
+
+>php不支持函数重载
+>
+>```php
+>function myFun(){echo "hello world!";}
+>function myFun($p1, $p2){echo "{$p1}--hello world!--{$p2}";}//报错，myFun已定义
+>```
+
+### 4、递归函数
+
+>php建议递归的层次不要超过100-200层。==可能造成堆栈崩溃==
+>
+>```php
+>function myFun($i = 0){
+>    if($i < 20){
+>        myFun($i++);//递归
+>    }
+>}
+>```
+>
+>
+>
+>
+
 ## (五)、对象
 
 对象是特殊的数据类型。
@@ -492,7 +804,50 @@
 
 ## (一)、引用
 
+# php.ini
+
+| 分类           | ini中key           | ini中value | 作用                   | 举例                                                         | 版本记录    |
+| -------------- | ------------------ | ---------- | ---------------------- | ------------------------------------------------------------ | ----------- |
+| 文件格式       | short_open_tag     |            | `<?..?>`               |                                                              |             |
+|                | asp_tags           |            | `<%...%>`              |                                                              | ==7.0.0删== |
+| 超全局变量     | variables_order    | EGPCS      | 设置超全局变量是否为空 | `$_ENV`     E<br>`$_GET`     G<br/> `$_POST`   P<br/>`$_COOKIE`C<br/> `$_SERVER` S |             |
+|                | request_order      | GPC        | `$_REQUEST`            | get/post/cookie                                              |             |
+| 预定义变量     | track_errors       | boolean    | `$php_errosmsg`        |                                                              | ==7.2.0删== |
+|                | register_argc_argv | boolean    | `$argc` `$argv`        |                                                              |             |
+| 执行运算符\`\` | safe_mode          | boolean    | 是否开启安全模式       |                                                              |             |
+
+
+
 # 疑难杂症
+
+# 大小写问题
+
+| 功能         | 区分大小写 | 举例                                            |
+| ------------ | ---------- | ----------------------------------------------- |
+| 变量         | 严格区分   | `$var`和`$vaR`是两个变量                        |
+| 常量         | 严格区分   | `define('aBc',1)`和`define('abc', 1)`时两个常量 |
+| 魔术常量     | 不区分     | `___CLASS__`和`__class__`相同                   |
+| array中的key | 严格区分   | `['a'=>1, 'A'=>2]`数组中由两个不同元素          |
+| 函数名       | 不区分     | `function aa`和`function Aa`相同                |
+
+# `==`与`===`问题
+
+| 涉及场景        | 什么等 | 举例 | 备注 |
+| --------------- | ------ | ---- | ---- |
+| 判断运算符`<=>` | `==`   |      |      |
+| switch..case    |        |      |      |
+
+1、判断运算符`<=>`
+
+>```php
+>echo 3<=>1;//1
+>echo 1<=>3;//-1
+>echo 1<=>1;//0
+>
+>echo 3<=>'1';//1
+>echo 1<=>'3';//-1
+>echo 1<=>'1';//0
+>```
 
 ## call_user_func/call_user_func_array()
 
@@ -520,8 +875,12 @@
 
 
 ```php
-$var=function(){return 5;}
-//$var是什么类型
+//问题：$var是什么类型
+$var=function(){return 5;};
+var_dump(gettype($var));//object
+var_dump($var instanceof Closure);//true
+//说明$var是callback类型
+echo $var+1;//6
 ```
 
 ## 理解continue和breake
