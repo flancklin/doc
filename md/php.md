@@ -367,10 +367,16 @@
 
 ##### d、特殊变量(静态变量)
 
+>设置值仅支持：
 >
+>* [boolean|integer|float|string|null|array]+已定义的常量。
+>
+>* 不支持调用，回调等方式，不支持heredoc。
 >
 >```php
 >static $var=2;//???
+>
+>//如何调用？
 >```
 >
 >
@@ -690,7 +696,7 @@
 
 (4)、echo
 
-## (四)、函数
+## (四)、function
 
 ### 1、命名规则
 
@@ -790,7 +796,173 @@
 
 ## (五)、对象
 
-对象是特殊的数据类型。
+### 概念
+
+#### (1)、访问控制
+
+>public          可以被任意访问
+>
+>protected   可以被当前类以及其子类调用
+>
+>private        仅限当前类调用
+>
+>当未定义访问控制时，默认是public
+>
+>仅属性(字段)、方法(函数)支持访问控制，类常量不需要
+>
+>```php
+>public $var;
+>public function myFun(){}
+>const myCOnstant = '111';//不需要访问控制
+>```
+>
+>
+
+#### (2)、static(静态)
+
+>仅属性(字段)、方法(函数)支持设置static(静态)，类常量不需要
+>
+>设置了static，不论是属性还是方法，一旦调用，就会存在内存中，直到本次请求结束
+>
+>设置了static的属性和方法，==调用方式[self|parent|className]::$var，不能用\$this调用。==
+>
+>设置值仅支持：
+>
+>* [boolean|integer|float|string|null|array]+已定义的常量。
+>
+>* 不支持调用，回调等方式，不支持heredoc。
+
+
+
+>```php
+>public static $var;
+>public static function myFun(){}
+>```
+
+### 1、class
+
+| 组成   | 定义                                       | 备注 |
+| ------ | ------------------------------------------ | ---- |
+| 属性   | [public\|private\|protected]+[static]+$var |      |
+| 类常量 | const+constName                            |      |
+| 方法   |                                            |      |
+
+#### (1)、class的组成成分
+
+##### a、属性(字段)
+
+###### (I)、如何定义属性
+
+>1. 访问控制  public/private/protected/无
+>2.  是否静态 static/无
+>
+>```php
+>$property;
+>public $property;
+>public static $property;
+>```
+
+
+
+###### (II)、定义属性并赋值举例：
+
+>* 错误举例
+>
+>  ```php
+>  $property = 1+2;
+>  $property = 'a' .'b';
+>  $property = $property2;            //不可以赋值变量，但可以赋值常量
+>  $property = self::myFun();
+>  $property = $this->myFun();
+>  $property = bcadd('1', '2');
+>  $property = <<<label     
+>  	abcd
+>  	label;
+>  ```
+>
+>* 正确举例
+>
+>  ```php
+>  $property;               //不赋值也是可以的
+>  $property = 'abcd';      //直接赋原始值
+>  $property = PHP_INT_MAX; //赋值常量
+>  $property = ['a', 'b'];  //赋值数组 
+>  $property = <<<'label'     //php >= 5.3.0
+>  	abcd
+>  	label;
+>  ```
+
+###### (III)、调用方式
+
+>```php
+>//类内部调用
+>echo $this->property;//$property         $object->property
+>echo self::$property;//static $property  [self | parent | className]
+>```
+>
+>
+
+##### b、类常量
+
+###### (I)、定义规则：
+
+>1. 声明定义时必须赋值
+>2. 类常量名称==不能使用\$==
+>3. 不能加访问控制
+>4. 类常量的值必须是一个==定值==;不能是类属性，不能是变量，不能是数学运算或函数调用结果
+>
+>```php
+>const myConstant='abcd';
+>const myConstant=['a','b','c'];
+>const myConstant=<<<'label'//php>=5.3.0
+>    abcd
+>    label;
+>```
+>
+>
+
+###### (II)、调用方式
+
+>```php
+>echo self::myConstant;
+>echo className::myConstant;
+>```
+
+##### c、方法
+
+访问控制(可见性)
+
+>即 public、private、protected
+>
+>==若没有标明访问控制，默认public==
+
+###### (I)、构造函数、析构函数
+
+>```php
+>//不能被继承？？？
+>```
+>
+>
+
+###### (II)、final方法
+
+#### (2)、特殊class
+
+##### a、抽象类
+
+##### b、匿名类
+
+##### c、final类
+
+### 2、interface
+
+### 3、trait
+
+### 4、对象继承问题
+
+## (六)、特殊语法
+
+### 1、引用
 
 # 三、预定义
 
@@ -800,9 +972,39 @@
 
 
 
-# 四、特殊语法
+# 四、常用功能扩展
 
-## (一)、引用
+>其实所谓的功能扩展部分，完全是==函数的调用==了。没有新的语法规则了。
+
+## (一)、cookie与seesion
+
+## (二)、文件上传
+
+### 1、post上传
+
+## (三)、数学精度计算
+
+## (四)、http请求
+
+## (五)、邮件发送
+
+## 国际时间换算
+
+## 认证
+
+http认证  文档>特点>用PHP进行http认证
+
+Oauth 文档>函数参考>web服务>OAuth
+
+## 反射reflection
+
+## 生成验证图
+
+## 操作mysql
+
+链接pdo，增删改查
+
+
 
 # php.ini
 
@@ -816,10 +1018,6 @@
 |                | register_argc_argv | boolean    | `$argc` `$argv`        |                                                              |             |
 | 执行运算符\`\` | safe_mode          | boolean    | 是否开启安全模式       |                                                              |             |
 
-
-
-# 疑难杂症
-
 # 大小写问题
 
 | 功能         | 区分大小写 | 举例                                            |
@@ -829,6 +1027,11 @@
 | 魔术常量     | 不区分     | `___CLASS__`和`__class__`相同                   |
 | array中的key | 严格区分   | `['a'=>1, 'A'=>2]`数组中由两个不同元素          |
 | 函数名       | 不区分     | `function aa`和`function Aa`相同                |
+| 类属性       |            |                                                 |
+| 类常量       |            |                                                 |
+| 类方法       |            |                                                 |
+| 类名         |            |                                                 |
+| 命名空间     |            |                                                 |
 
 # `==`与`===`问题
 
@@ -836,6 +1039,7 @@
 | --------------- | ------ | ---- | ---- |
 | 判断运算符`<=>` | `==`   |      |      |
 | switch..case    |        |      |      |
+| in_array()      |        |      |      |
 
 1、判断运算符`<=>`
 
