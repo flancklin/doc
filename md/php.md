@@ -77,6 +77,8 @@
 >$var9='';
 >```
 
+#### 细说数据类型
+
 ##### a、integer和int的精度与溢出问题。
 
 * 如果给定的一个数超出了 [integer](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/language.types.integer.html) 的范围，将会被解释为    [float](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/language.types.float.html)。
@@ -303,6 +305,16 @@
 >
 >
 
+##### d、特殊变量(静态变量)
+
+>
+>
+>```php
+>static $var=2;//???
+>```
+>
+>
+
 #### (2)、常量
 
 ##### a、命名规则
@@ -330,7 +342,7 @@
 
 ## (二)、运算符
 
-### 1、运算符优先级
+### 运算符优先级
 
 | 结合方向 | 运算符                                                       | 附加信息                                                     |
 | -------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -358,7 +370,7 @@
 | 左       | *xor*                                                        | [逻辑运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.logical.html) |
 | 左       | *or*                                                         | [逻辑运算符](mk:@MSITStore:C:\Users\fff\Desktop\php_enhanced_zh.chm::/res/language.operators.logical.html) |
 
-### 2、算术运算符
+### 1、算术运算符
 
 >```php
 >$x=4;
@@ -375,29 +387,100 @@
 | %    | 求余(取模) | `$x%$y=0`   |      |
 | **   | 求幂       | `$x**$y=16` |      |
 
+### 2、比较运算符
 
+文档>附录>php类型比较表
 
 ## (三)、流程控制
 
 ### 1、循环
 
-for / while等
+#### (1)、for
+
+#### (2)、while
+
+#### (3)、do...while
+
+#### (4)、foreach
+
+(5)、
+
+(6)、
 
 ### 2、判断
 
-if等
+#### (1)、if...[elseif]...[else]
 
-### 3、异常
+>
+>
+>```php
+>if(true){
+>    echo "I am true";
+>}else{
+>    echo "I am false";
+>}
+>
+>/**********************/
+>
+>$var= rand(0,2);
+>if($var == 0){
+>    echo "I am 0";
+>}elseif($var == 1){   //1、elseif可以无限个
+>    echo "I am 1";
+>}else if($var == 2){//2、else和if既可以挨着也可以中间有空格
+>    echo "I am 2";
+>}else{
+>    echo "不可能，总共才012"；
+>}
+>
+>/********替代语法格式**************/
+>
+>if($var == 0):
+>	echo "I am 0";
+>elseif($var == 1):
+>	echo "I am 1";
+>else if($var == 2)://这里不支持else与if中间有空格，若有将无法编译
+>	echo "I am 2";
+>else:
+>	echo "不可能，总共才012";
+>endif;
+>```
+>
+>
 
-### 4、跳转
+#### (2)、switch
 
-goto
+### 3、引入文件
 
-# 三、对象
+#### (1)、include/include_once
+
+#### (2)、require/require_once
+
+### 4、异常
+
+### 5、流程跳出和中断
+
+#### (1)、continue
+
+#### (2)、breake
+
+### 6、其他
+
+(1)、goto
+
+(2)、declare
+
+(3)、return
+
+(4)、echo
+
+## (四)、函数
+
+## (五)、对象
 
 对象是特殊的数据类型。
 
-# 四、预定义
+# 三、预定义
 
 (一)、预定义数据载体
 
@@ -405,7 +488,7 @@ goto
 
 
 
-# 五、特殊语法
+# 四、特殊语法
 
 ## (一)、引用
 
@@ -441,3 +524,34 @@ $var=function(){return 5;}
 //$var是什么类型
 ```
 
+## 理解continue和breake
+
+>
+>
+>```php
+>//如何正确理解continue和breake
+>
+>//1、在正常代码中会怎样
+>
+>echo 'a'.PHP_EOL;
+>continue;
+>echo 'b'.PHP_EOL;
+>break;
+>
+>//2、在if、switch中会怎样(非循环控制体)
+>
+>if(true){
+>    echo "c".PHP_EOL;
+>    continue;
+>	echo 'd'.PHP_EOL;
+>	break;
+>}
+>
+>
+>
+>
+>
+>
+>```
+>
+>
