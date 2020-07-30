@@ -45,9 +45,9 @@
 
 # 二、语法
 
-## (一)、数据
+## (一)、数据类型
 
-### 1、数据类型
+### 1、类型列表
 
 >4种标量：boolean、integer、float、string
 >
@@ -85,9 +85,9 @@
 >$var9='';
 >```
 
-#### 细说数据类型
+### 2、细说数据类型
 
-##### a、integer和int的精度与溢出问题。
+#### (1)、integer和int的精度与溢出问题。
 
 * 如果给定的一个数超出了 [integer](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/language.types.integer.html) 的范围，将会被解释为    [float](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/language.types.float.html)。
 
@@ -102,9 +102,9 @@
 
 
 
-##### b、string
+#### (2)、string
 
-###### (I)、字符串==可以当作array==进行修改和读取单个字符
+##### a、字符串==可以当作array==进行修改和读取单个字符
 
 >```php
 >//(汉字在utf-8中占三位，这样读取会乱码)
@@ -113,7 +113,7 @@
 >echo $var4;//结果为1bc
 >```
 
-###### (II)、字符串的四种定义方法：
+##### b、字符串的四种定义方法：
 
 >```php
 >//1.单引号
@@ -130,18 +130,18 @@
 >    label;
 >```
 
-##### c、array
+#### (3)、array
 
 ==array中key严格区分大小写==            `['a'=>1, 'A'=>2]`数组中由两个不同元素
 
-###### (I)、定义方式有两种
+##### a、定义方式有两种
 
 >```php
 >$var = array(1,'a');
 >$var = [1, 'a'];
 >```
 
-###### (II)、关联与非关联数组
+##### b、关联与非关联数组
 
 >```php
 >//非关联数组（索引数组）    key由0逐一递增
@@ -173,7 +173,7 @@
 >  );//结果为[1=>'d']
 >  ```
 
-###### (III)、把object强转化为array
+##### c、把object强转化为array
 
 >```php
 >class Base {
@@ -219,7 +219,7 @@
 >
 >==这些前缀的前后都各有一个 NULL 字符。这会导致一些不可预知的行为==
 
-##### d、resource
+#### (4)、resource
 
 释放资源
 
@@ -229,7 +229,7 @@
 
 
 
-#### (1)、类型强转换
+### 3、类型强转换
 
 
 
@@ -247,7 +247,7 @@
 
 
 
-#### (3)、数据类型的系统参数
+### 4、数据类型的相关常量
 
 | 序号 | 类型     | 相关常量                                                     |
 | ---- | -------- | ------------------------------------------------------------ |
@@ -262,161 +262,6 @@
 | 9    | resource |                                                              |
 
 #### 
-
-### 2、数据载体
-
-| 载体名称 | 大小写   | 举例                         | 备注         |
-| -------- | -------- | ---------------------------- | ------------ |
-| 变量     | 严格区分 | `$var='v1';`<br>`$vaR='v2';` |              |
-| 常量     | 严格区分 | `define("FOO","vvv");`       | 习惯统一大写 |
-
-
-
-承载数据的东西。比如变量、常量等
-
-#### (1)、变量
-
-##### a、命名规则
-
->`[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*`    ==`$this`==这是一个特殊
-
-==区分大小写==
-
-##### b、预定义变量
-
-| 序号 | 命令名称                | 分类         | 作用                            | 其他                         |
-| ---- | ----------------------- | ------------ | ------------------------------- | ---------------------------- |
-| 1    | `$GLOBALS`              | 超全局变量   | 全局作用域的可用全部变量        |                              |
-| 2    | `$_ENV`                 | 超全局变量-E | shell环境变量                   | 由shell提供                  |
-| 3    | `$_SERVER`              | 超全局变量-S | web服务器和执行环境信息         | 由web服务器提供              |
-| 4    | `$_REQUEST`             | 超全局变量   | `$_GET` + `$_POST` + `$_COOKIE` | php.ini的request_order="GPC" |
-| 5    | `$_GET`                 | 超全局变量-G | http-get                        |                              |
-| 6    | `$_POST`                | 超全局变量-P | http-post                       |                              |
-| 7    | `$_COOKIE`              | 超全局变量-C | cookie值                        |                              |
-| 8    | `$_SESSION`             | 超全局变量   | session                         |                              |
-| 9    | `$_FILES`               | 超全局变量   | http上传文件                    |                              |
-| 10   | `$php_errormsg`         |              | 前一个错误信息                  | ==7.2.0删==                  |
-| 11   | `$HTTP_RAW_POST_DATA`   |              | 原生post数据                    | ==5.6.0删==                  |
-| 12   | `$http_response_header` |              | http响应头(局部作用域)          | 注意报错：未定义变量         |
-| 13   | `$argc`                 |              | 传递给脚本的参数个数            | php.ini的register_argc_argv  |
-| 14   | `$argv`                 |              | 传递给脚本的参数数组            |                              |
-
-* ==超全局变量意味着它们在一个脚本的全部作用域中都可以被调用==
-* 奇葩：`$GLOBALS['GLOBALS']['GLOBALS']['GLOBALS']`和`$GLOBALS`完全一样，而且不是错
-* `$GLOBALS`中包含了全部的超全局变量(9种，包括它自己)
-* php.ini中==variables_order==控制`$_ENV` `$_GET` `$_POST` `$_COOKIE` `$_SERVER`是否为空。EGPCS<br>正式环境建议`$_ENV`设为空，需要的时候使用getenv()调用
-
-###### (I)、`$_GLOBALS`
-
->必定包含9个超全局变量，含自己
-
-###### (II)、`$_ENV`
-
->具体包含哪些值。由运行环境中的shell提供。不同shell，提供的列表值不同。
-
-|字段|含义|举例|备注|
-
-###### (III)、`$_SERVER`
-
->==具体值列表依web服务器及其配置而定==
->
->举例：http://lcs.ca.com/index.php/test/a?p1=1&p2=2
-
-| 分类      | 字段              | 含义            | 举例                   | 备注              |
-| --------- | ----------------- | --------------- | ---------------------- | ----------------- |
-| url       | REQUEST_SCHEME    | web协议         | http                   |                   |
-|           | HTTPS             | 是否开启https   | on                     |                   |
-|           | REQUEST_METHOD    | 请求方式        | GET                    |                   |
-|           | HTTP_HOST         | 域名            | lcs.ca.com             |                   |
-|           | PHP_SELF          | 文件名          | /index.php             |                   |
-|           | REQUEST_URI       |                 | /index.php/test/a?p1=1 |                   |
-|           | QUERY_STRING      | get参数         | p1=1&p2=2              |                   |
-| 协议      | GATEWAY_INTERFACE | CGI版本         | CGI/1.1                |                   |
-|           | SERVER_PROTOCOL   | http版本        | HTTP/1.1               |                   |
-| web服务器 | SERVER_NAME       | 主机名          | lcs.ca.com             | web服务器中配置的 |
-|           | DOCUMENT_ROOT     | web.config.root | index.php的绝对路径    |                   |
-|           | SERVER_SOFTWARE   | web服务器       | nginx/apache           |                   |
-| 浏览器    | HTTP_USER_AGENT   | 浏览器型号      |                        |                   |
-
-###### (IV)、`$http_response_header `
-
->具有较强的==局部==作用域
->
->```php
->function get_contents() {
->  file_get_contents("http://example.com");
->  var_dump($http_response_header);//有值
->}
->get_contents();
->var_dump($http_response_header);//null  这里会报错，提示未定义
->```
->
->
-
-##### c、特殊变量(可变变量)
-
->即变量的名称是可变的变量
->
->```php
->$a = 'var';
->$$a = 'value';
->echo $var;//value
->```
->
->
-
-##### d、特殊变量(静态变量)
-
->设置值仅支持：
->
->* [boolean|integer|float|string|null|array]+已定义的常量。
->
->* 不支持调用，回调等方式，不支持heredoc。
->
->```php
->static $var=2;//???
->
->//如何调用？
->```
->
->
-
-#### (2)、常量
-
-##### a、命名规则
-
->`[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*`
->
->==区分大小写==
->
->习惯常量标识全部大写，比如：`define("PHP_INT_MAX", 222)`
-
-
-
-##### b、预定义常量
-
-这个有很多
-
-##### c、特殊常量(魔术常量)
-
->这里都是根据==物理存储位置==决定的，与继承、引入文件等无关
->
->日志log记录原理是利用了函数debug_backtrace 
->
->==魔术变量==不区分大小写
-
-| 常量名称        | 作用                  | 其他                      |
-| --------------- | --------------------- | ------------------------- |
-| `__LINE__`      | 文件中当前行号        | 8                         |
-| `__FILE__`      | 所在文件(含路径)      | C:\code\c.php             |
-| `__DIR__`       | 所在目录              | C:\code                   |
-| `__FUNCTION__`  | 所在函数/方法         | getFunction               |
-| `__CLASS__`     | 所在类(带命名空间)    | ttttt\sssss\Aa            |
-| `__TEAIT__`     | 所在trait(带命名空间) |                           |
-| `__METHOD__`    | 所在方法(带命名空间)  | ttttt\sssss\Bb::getMethod |
-| `__NAMESPACE__` | 所在空间              | ttttt\sssss               |
-
-
 
 ## (二)、运算符
 
@@ -696,7 +541,218 @@
 
 (4)、echo
 
-## (四)、function
+## (四)、变量和常量
+
+| 载体名称 | 大小写   | 举例                         | 备注         |
+| -------- | -------- | ---------------------------- | ------------ |
+| 变量     | 严格区分 | `$var='v1';`<br>`$vaR='v2';` |              |
+| 常量     | 严格区分 | `define("FOO","vvv");`       | 习惯统一大写 |
+
+### 1、变量
+
+#### (1)、命名规则
+
+>`[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*`    ==`$this`==这是一个特殊
+
+==区分大小写==
+
+#### (2)、声明定义和初始化
+
+#### (3)、预定义变量
+
+| 序号 | 命令名称                | 分类         | 作用                            | 其他                         |
+| ---- | ----------------------- | ------------ | ------------------------------- | ---------------------------- |
+| 1    | `$GLOBALS`              | 超全局变量   | 全局作用域的可用全部变量        |                              |
+| 2    | `$_ENV`                 | 超全局变量-E | shell环境变量                   | 由shell提供                  |
+| 3    | `$_SERVER`              | 超全局变量-S | web服务器和执行环境信息         | 由web服务器提供              |
+| 4    | `$_REQUEST`             | 超全局变量   | `$_GET` + `$_POST` + `$_COOKIE` | php.ini的request_order="GPC" |
+| 5    | `$_GET`                 | 超全局变量-G | http-get                        |                              |
+| 6    | `$_POST`                | 超全局变量-P | http-post                       |                              |
+| 7    | `$_COOKIE`              | 超全局变量-C | cookie值                        |                              |
+| 8    | `$_SESSION`             | 超全局变量   | session                         |                              |
+| 9    | `$_FILES`               | 超全局变量   | http上传文件                    |                              |
+| 10   | `$php_errormsg`         |              | 前一个错误信息                  | ==7.2.0删==                  |
+| 11   | `$HTTP_RAW_POST_DATA`   |              | 原生post数据                    | ==5.6.0删==                  |
+| 12   | `$http_response_header` |              | http响应头(局部作用域)          | 注意报错：未定义变量         |
+| 13   | `$argc`                 |              | 传递给脚本的参数个数            | php.ini的register_argc_argv  |
+| 14   | `$argv`                 |              | 传递给脚本的参数数组            |                              |
+
+* ==超全局变量意味着它们在一个脚本的全部作用域中都可以被调用==
+* 奇葩：`$GLOBALS['GLOBALS']['GLOBALS']['GLOBALS']`和`$GLOBALS`完全一样，而且不是错
+* `$GLOBALS`中包含了全部的超全局变量(9种，包括它自己)
+* php.ini中==variables_order==控制`$_ENV` `$_GET` `$_POST` `$_COOKIE` `$_SERVER`是否为空。EGPCS<br>正式环境建议`$_ENV`设为空，需要的时候使用getenv()调用
+
+##### a、`$_GLOBALS`
+
+>必定包含9个超全局变量，含自己
+
+##### b、`$_ENV`
+
+>具体包含哪些值。由运行环境中的shell提供。不同shell，提供的列表值不同。
+
+|字段|含义|举例|备注|
+
+##### c、`$_SERVER`
+
+>==具体值列表依web服务器及其配置而定==
+>
+>举例：http://lcs.ca.com/index.php/test/a?p1=1&p2=2
+
+| 分类      | 字段              | 含义            | 举例                   | 备注              |
+| --------- | ----------------- | --------------- | ---------------------- | ----------------- |
+| url       | REQUEST_SCHEME    | web协议         | http                   |                   |
+|           | HTTPS             | 是否开启https   | on                     |                   |
+|           | REQUEST_METHOD    | 请求方式        | GET                    |                   |
+|           | HTTP_HOST         | 域名            | lcs.ca.com             |                   |
+|           | PHP_SELF          | 文件名          | /index.php             |                   |
+|           | REQUEST_URI       |                 | /index.php/test/a?p1=1 |                   |
+|           | QUERY_STRING      | get参数         | p1=1&p2=2              |                   |
+| 协议      | GATEWAY_INTERFACE | CGI版本         | CGI/1.1                |                   |
+|           | SERVER_PROTOCOL   | http版本        | HTTP/1.1               |                   |
+| web服务器 | SERVER_NAME       | 主机名          | lcs.ca.com             | web服务器中配置的 |
+|           | DOCUMENT_ROOT     | web.config.root | index.php的绝对路径    |                   |
+|           | SERVER_SOFTWARE   | web服务器       | nginx/apache           |                   |
+| 浏览器    | HTTP_USER_AGENT   | 浏览器型号      |                        |                   |
+
+##### d、`$http_response_header `
+
+>具有较强的==局部==作用域
+>
+>```php
+>function get_contents() {
+>file_get_contents("http://example.com");
+>var_dump($http_response_header);//有值
+>}
+>get_contents();
+>var_dump($http_response_header);//null  这里会报错，提示未定义
+>```
+>
+>
+
+#### (4)、特殊变量
+
+##### a、可变变量
+
+>即变量的名称是可变的变量
+>
+>```php
+>$a = 'var';
+>$$a = 'value';
+>echo $var;//value
+>```
+>
+>
+
+##### b、静态变量static
+
+###### (I)、静态变量的加载规则
+
+>静态变量存在其作用域，不是任意地方定义全局使用。比如：函数内的`static $a`和函数外的`static $a`，在定义值和取值时都没有歧义
+>
+>static是怎么运行的？
+>
+>* 为什么函数外的`static $a`是999，不是在die后面吗？
+>* 为什么函数内的`static $a`是30起步，`if(false)`不会执行的啊？
+>* * static的定义和初始化并不是按php语法规则来的      ==静态声明是在编译时解析的==
+> * * 推测是按文件的加载过程来的。当加载文件的时候，逐行扫描，遇到static，则放在对应的堆栈/hash中。比如这个文件,假设用hash
+>   * 开始扫描文件
+>   * 1、第1行的`static $a`，==函数外==，ash中不存在，存入hash。最终hash值：['a' => 100]
+>   * 2、第3行的`static $a`，==函数内==，在hash中也不存在，存入hash。最终hash值：['a' => 100, 'myFun.a' => 1]
+>   * 3、第5行的`static $a`，==函数内==，在hash中存在，更新hash中的值。最终hash值：['a' => 100, 'myFun.a' => 20]
+>   * 4、第8行的`static $a`，==函数内==，在hash中存在，更新hash中的值。最终hash值：['a' => 100, 'myFun.a' => 30]
+>   * 5、第18行的`static $a`，==函数外==，在hash中存在，更新hash中的值。最终hash值：['a' => 110, 'myFun.a' => 30]
+>   * 6、第20行的`static $a`，==函数外==，在hash中存在，更新hash中的值。最终hash值：['a' => 999, 'myFun.a' => 30]
+>   * 该文件扫描完成，继续下一个文件。继续存入hash中，或更新hash中的值。知道整个文件系统加载完。
+>   * 这里为什么有 a和myfun.a，这个是作用域的效果。如果是类的静态属性，则是namespace+className+变量名
+>
+>```php
+>static $a = 100;
+>function myFun(){
+>   static $a = 1;
+>   if($a > 2){
+>       static $a = 20;
+>   }
+>   if(false){
+>       static $a = 30;
+>   }
+>   var_dump($a);
+>   ++$a;
+>}
+>var_dump($a);//999
+>myFun();//30
+>myFun();//31
+>var_dump($a);//999
+>
+>static $a=110;
+>die;
+>static $a=999;
+>```
+>
+>
+
+###### (II)、静态变量的初始化
+
+>正确的初始化举例
+>
+>* ```php
+>  static $a;                    //不初始化，默认是null
+>  static $a = null;             //null类型   
+>  static $a = false;            //boolean类型
+>  static $a = 100;              //integer类型
+>  static $a = 100.23;           //float类型
+>  static $a = ['a' => 'a'];     //array类型
+>  static $a = "abcd";           //string类型
+>                                //string的nowdoc
+>  static $a = <<<'label-1'        
+>  abcd
+>  label-1;
+>                                //string的heredoc
+>  static $a=<<<label-2            
+>  abcd
+>  label-2;
+>  static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
+>  ```
+>
+>错误的初始化举例
+>
+>* ```php
+>  static $a = bcadd(1,2);                 //不可以调用函数
+>  static $a = function(){echo 'hello!';}  //不可以callback
+>  static $a = new stdClass();             //不可以object
+>  ```
+
+### 2、常量
+
+#### (1)、命名规则
+
+>`[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*`
+>
+>==区分大小写==
+>
+>习惯常量标识全部大写，比如：`define("PHP_INT_MAX", 222)`
+
+#### (2)、声明定义和初始化
+
+#### (3)、特殊常量(魔术常量)
+
+>这里都是根据==物理存储位置==决定的，与继承、引入文件等无关
+>
+>日志log记录原理是利用了函数debug_backtrace 
+>
+>==魔术变量==不区分大小写
+
+| 常量名称        | 作用                  | 其他                      |
+| --------------- | --------------------- | ------------------------- |
+| `__LINE__`      | 文件中当前行号        | 8                         |
+| `__FILE__`      | 所在文件(含路径)      | C:\code\c.php             |
+| `__DIR__`       | 所在目录              | C:\code                   |
+| `__FUNCTION__`  | 所在函数/方法         | getFunction               |
+| `__CLASS__`     | 所在类(带命名空间)    | ttttt\sssss\Aa            |
+| `__TEAIT__`     | 所在trait(带命名空间) |                           |
+| `__METHOD__`    | 所在方法(带命名空间)  | ttttt\sssss\Bb::getMethod |
+| `__NAMESPACE__` | 所在空间              | ttttt\sssss               |
+
+## (五)、function
 
 ### 1、命名规则
 
@@ -712,7 +768,9 @@
 
 
 
-### 2、函数定义
+### 2、声明定义和初始化
+
+函数没有初始化。仅是为了让标题统一
 
 #### (1)、普通定义
 
@@ -769,7 +827,9 @@
 >
 >
 
-### 3、函数重载
+### 3、重载和递归
+
+#### (1)、函数重载
 
 >php不支持函数重载
 >
@@ -778,7 +838,7 @@
 >function myFun($p1, $p2){echo "{$p1}--hello world!--{$p2}";}//报错，myFun已定义
 >```
 
-### 4、递归函数
+#### (2)、递归函数
 
 >php建议递归的层次不要超过100-200层。==可能造成堆栈崩溃==
 >
@@ -794,7 +854,7 @@
 >
 >
 
-## (五)、对象
+## (六)、对象
 
 ### 概念
 
@@ -838,6 +898,8 @@
 >public static $var;
 >public static function myFun(){}
 >```
+
+#### (3)、final
 
 ### 1、class
 
@@ -960,9 +1022,39 @@
 
 ### 4、对象继承问题
 
-## (六)、特殊语法
+## (七)、其他语法
 
 ### 1、引用
+
+>
+>
+>```php
+>$a =1;
+>$b= &$a;
+>
+>function myFyn(&$param){
+>    
+>}
+>
+>foreach($array as &$key => &$value){
+>    
+>}
+>
+>function &get_instance_ref() {
+>    static $obj;
+>
+>    echo 'Static object: ';
+>    var_dump($obj);
+>    if (!isset($obj)) {
+>        // 将一个引用赋值给静态变量
+>        $obj = &new stdclass;
+>    }
+>    $obj->property++;
+>    return $obj;
+>}
+>```
+>
+>
 
 # 三、预定义
 
