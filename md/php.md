@@ -81,7 +81,7 @@
 >$var5=null;         //null
 >$var6=array(1,'1'); //array 有两种定义方式 array()和[]
 >$var7= new stdClass();//object
->$var8=function(){echo "hello world";}//callback
+>$var8=function(){return 5;}//callback
 >$var9='';
 >```
 
@@ -115,19 +115,65 @@
 
 ##### b、字符串的四种定义方法：
 
+单引号-nowdoc和双引号-heredoc
+
+* 单引号和nowdoc不支持解释变量，也不支持转义符(除了转义单引号)
+
 >```php
->//1.单引号
->$var = 'abc';//不可解释变量和转义符(转义符只能转义单引号)
->//2.双引号
->$var = "abc";
->//3.nowdoc
->$var=<<<'label'//完全和单引号差不多
->    abc
->    label;
->//4.heredoc
+>$var = 'string';
+>$var = "string";
+>$var=<<<'label'
+>string
+>label;
 >$var=<<<label
->    abc
+>    string
 >    label;
+>```
+
+##### c、关于nowdoc和heredoc
+
+###### (I)、规则
+
+* 只能包含字母、数字和下划线。不能以数字开头。
+* 开始标志和结束标志必须单独占一行，且不算入字符串内容。
+* 开始标志行、结束标志行不得有其他任何内容：包括空、注释等，有则出错。字符串内容出现注释，会被当作字符串
+* 结束标志行只含有结束标志和[结束分号]，不论其前还是其后，哪怕多一个空格都是错
+* 结束标志行不能是该文件的最后一行。(哪怕后面再空一行也不会报错)
+
+###### (II)、错误举例
+
+> ```php
+> //标志命名错误。仅含数字、字母和下划线
+> $var1=<<<label-1
+> string
+> label-1;
+> //开始标志后面多了一个空格
+> $var2=<<<label 
+> string
+> label;
+> //结束标志行的逗号后面多了一个空格
+> $var3=<<<lable
+> string
+> lable; 
+> //开始标志行、结束标志行，不得有其他任何内容。包括空、注释等
+> $var4=<<<label//我是注释
+> string
+> label;
+> //结束标志行不可为当前文件的最后一行
+> $var5=<<<label
+> string
+> label;
+> ```
+
+
+
+>这个是对的
+>
+>```php
+>define('myConstant', <<<label
+>string
+>label
+>);
 >```
 
 #### (3)、array
@@ -541,7 +587,7 @@
 
 (4)、echo
 
-## (四)、变量和常量
+## (四)、变量和常量(都区分大小写)
 
 | 载体名称 | 大小写   | 举例                         | 备注         |
 | -------- | -------- | ---------------------------- | ------------ |
@@ -558,41 +604,80 @@
 
 #### (2)、声明定义和初始化
 
-#### (3)、预定义变量
+> ​	百无禁忌，什么值都可拿来初始化变量。至少当前如此
+>
+> ```php
+> $a;                    //不初始化，默认是null
+> $a = null;             //null类型
+> $a = false;            //boolean类型
+> $a = 100;              //integer类型
+> $a = 100.23;           //float类型
+> $a = ['a' => 'a'];     //array类型
+> $a = PHP_VERSION;      //调用已定义的常量
+> $a = "abcd";           //string类型
+> //string的nowdoc
+> $a = <<<'label'
+> abcd
+> label;
+> //string的heredoc
+> $a=<<<label
+> abcd
+> label;
+> $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
+> $a = bcadd(1,2);       //掉函数
+> $a = function(){return 5;};//callback
+> $a = new stdClass();       //object  
+> ```
+>
+> 
 
-| 序号 | 命令名称                | 分类         | 作用                            | 其他                         |
-| ---- | ----------------------- | ------------ | ------------------------------- | ---------------------------- |
-| 1    | `$GLOBALS`              | 超全局变量   | 全局作用域的可用全部变量        |                              |
-| 2    | `$_ENV`                 | 超全局变量-E | shell环境变量                   | 由shell提供                  |
-| 3    | `$_SERVER`              | 超全局变量-S | web服务器和执行环境信息         | 由web服务器提供              |
-| 4    | `$_REQUEST`             | 超全局变量   | `$_GET` + `$_POST` + `$_COOKIE` | php.ini的request_order="GPC" |
-| 5    | `$_GET`                 | 超全局变量-G | http-get                        |                              |
-| 6    | `$_POST`                | 超全局变量-P | http-post                       |                              |
-| 7    | `$_COOKIE`              | 超全局变量-C | cookie值                        |                              |
-| 8    | `$_SESSION`             | 超全局变量   | session                         |                              |
-| 9    | `$_FILES`               | 超全局变量   | http上传文件                    |                              |
-| 10   | `$php_errormsg`         |              | 前一个错误信息                  | ==7.2.0删==                  |
-| 11   | `$HTTP_RAW_POST_DATA`   |              | 原生post数据                    | ==5.6.0删==                  |
-| 12   | `$http_response_header` |              | http响应头(局部作用域)          | 注意报错：未定义变量         |
-| 13   | `$argc`                 |              | 传递给脚本的参数个数            | php.ini的register_argc_argv  |
-| 14   | `$argv`                 |              | 传递给脚本的参数数组            |                              |
+#### (4)、特殊变量
+
+##### a、预定义变量
+
+| 序号 | 命令名称                | 分类         | 作用                            | 其他                                                         |
+| ---- | ----------------------- | ------------ | ------------------------------- | ------------------------------------------------------------ |
+| 1    | `$GLOBALS`              | 超全局变量   | 全局作用域的可用全部变量        |                                                              |
+| 2    | `$_ENV`                 | 超全局变量-E | shell环境变量                   | 由shell提供                                                  |
+| 3    | `$_SERVER`              | 超全局变量-S | web服务器和执行环境信息         | 由web服务器提供                                              |
+| 4    | `$_REQUEST`             | 超全局变量   | `$_GET` + `$_POST` + `$_COOKIE` | php.ini的request_order="GPC"                                 |
+| 5    | `$_GET`                 | 超全局变量-G | http-get                        |                                                              |
+| 6    | `$_POST`                | 超全局变量-P | http-post                       |                                                              |
+| 7    | `$_COOKIE`              | 超全局变量-C | cookie值                        |                                                              |
+| 8    | `$_SESSION`             | 超全局变量   | session                         | 必须开启session才有这个变量。<br>否则报未定义。详细看session扩展 |
+| 9    | `$_FILES`               | 超全局变量   | http上传文件                    |                                                              |
+| 10   | `$php_errormsg`         |              | 前一个错误信息                  | ==7.2.0删==                                                  |
+| 11   | `$HTTP_RAW_POST_DATA`   |              | 原生post数据                    | ==5.6.0删==                                                  |
+| 12   | `$http_response_header` |              | http响应头(局部作用域)          | 注意报错：未定义变量                                         |
+| 13   | `$argc`                 |              | 传递给脚本的参数个数            | php.ini的register_argc_argv                                  |
+| 14   | `$argv`                 |              | 传递给脚本的参数数组            |                                                              |
 
 * ==超全局变量意味着它们在一个脚本的全部作用域中都可以被调用==
 * 奇葩：`$GLOBALS['GLOBALS']['GLOBALS']['GLOBALS']`和`$GLOBALS`完全一样，而且不是错
 * `$GLOBALS`中包含了全部的超全局变量(9种，包括它自己)
 * php.ini中==variables_order==控制`$_ENV` `$_GET` `$_POST` `$_COOKIE` `$_SERVER`是否为空。EGPCS<br>正式环境建议`$_ENV`设为空，需要的时候使用getenv()调用
 
-##### a、`$_GLOBALS`
+###### (I)、`$_GLOBALS`
 
 >必定包含9个超全局变量，含自己
 
-##### b、`$_ENV`
+往globals中塞数
+
+>```php
+>global $varxxx;//这里只有声明，不准初始化赋值
+>$varxxx= 'xxx';
+>
+>var_dump($GLOBALS);
+>var_dump($GLOBALS['varxxx']);//xxx
+>```
+
+###### (||)、`$_ENV`
 
 >具体包含哪些值。由运行环境中的shell提供。不同shell，提供的列表值不同。
 
 |字段|含义|举例|备注|
 
-##### c、`$_SERVER`
+###### (III)、`$_SERVER`
 
 >==具体值列表依web服务器及其配置而定==
 >
@@ -614,7 +699,7 @@
 |           | SERVER_SOFTWARE   | web服务器       | nginx/apache           |                   |
 | 浏览器    | HTTP_USER_AGENT   | 浏览器型号      |                        |                   |
 
-##### d、`$http_response_header `
+###### (IV)、`$http_response_header `
 
 >具有较强的==局部==作用域
 >
@@ -629,9 +714,9 @@
 >
 >
 
-#### (4)、特殊变量
 
-##### a、可变变量
+
+##### b、可变变量
 
 >即变量的名称是可变的变量
 >
@@ -643,7 +728,7 @@
 >
 >
 
-##### b、静态变量static
+##### c、静态变量static
 
 ###### (I)、静态变量的加载规则
 
@@ -663,7 +748,7 @@
 >   * 5、第18行的`static $a`，==函数外==，在hash中存在，更新hash中的值。最终hash值：['a' => 110, 'myFun.a' => 30]
 >   * 6、第20行的`static $a`，==函数外==，在hash中存在，更新hash中的值。最终hash值：['a' => 999, 'myFun.a' => 30]
 >   * 该文件扫描完成，继续下一个文件。继续存入hash中，或更新hash中的值。知道整个文件系统加载完。
->   * 这里为什么有 a和myfun.a，这个是作用域的效果。如果是类的静态属性，则是namespace+className+变量名
+>   * 这里为什么有 a和myfun.a，这个是作用域的效果。如果是类的静态属性，则是namespace.className.变量名
 >
 >```php
 >static $a = 100;
@@ -695,31 +780,33 @@
 >正确的初始化举例
 >
 >* ```php
->  static $a;                    //不初始化，默认是null
->  static $a = null;             //null类型   
->  static $a = false;            //boolean类型
->  static $a = 100;              //integer类型
->  static $a = 100.23;           //float类型
->  static $a = ['a' => 'a'];     //array类型
->  static $a = "abcd";           //string类型
->                                //string的nowdoc
->  static $a = <<<'label-1'        
->  abcd
->  label-1;
->                                //string的heredoc
->  static $a=<<<label-2            
->  abcd
->  label-2;
->  static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
->  ```
+> static $a;                    //不初始化，默认是null
+> static $a = null;             //null类型   
+> static $a = false;            //boolean类型
+> static $a = 100;              //integer类型
+> static $a = 100.23;           //float类型
+> static $a = ['a' => 'a'];     //array类型
+> static $a = PHP_VERSION;      //调用已定义的常量
+> static $a = "abcd";           //string类型
+>                               //string的nowdoc
+> static $a = <<<'label'
+> abcd
+> label;
+>                               //string的heredoc
+> static $a=<<<label
+> abcd
+> label;
+> static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
+> ```
+> ```
 >
 >错误的初始化举例
 >
 >* ```php
->  static $a = bcadd(1,2);                 //不可以调用函数
->  static $a = function(){echo 'hello!';}  //不可以callback
->  static $a = new stdClass();             //不可以object
->  ```
+> static $a = bcadd(1,2);                 //不可以调用函数
+> static $a = function(){echo 'hello!';}  //不可以callback
+> static $a = new stdClass();             //不可以object
+> ```
 
 ### 2、常量
 
@@ -727,15 +814,96 @@
 
 >`[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*`
 >
->==区分大小写==
+>* ==区分大小写==      习惯常量标识全部大写，比如：`define("PHP_INT_MAX", 222)`
 >
->习惯常量标识全部大写，比如：`define("PHP_INT_MAX", 222)`
+>* ==同一个常量只能被定义一次==
+>
+>* ==常量一旦定义，不能修改其值。==  没法修改值，没法删除常量
+
+
+
+>```php
+>define('myConstant', 100);
+>define('myConstant', 88);//报错
+>myConstant=99;//报错
+>```
+>
+>
 
 #### (2)、声明定义和初始化
 
+##### a、用define定义
+
+>```php
+>define('myConstant', null);
+>define('myConstant', false);
+>define('myConstant', 100);
+>define('myConstant', 100.23);
+>define('myConstant', ['a' => 'a']);//5.6错误,7.0.0正确
+>define('myConstant', PHP_VERSION);
+>define('myConstant', 'abcd');
+>define('myConstant', <<<'label'
+>string
+>label
+>);
+>define('myConstant', <<<label
+>string2
+>label
+>);
+>define('myConstant', 1+2);
+>define('myConstant', bcadd(1,2));//5/7都支持
+>define('myConstant',function(){return 5;});//不支持
+>define('myConstant', new stdClass());//不支持
+>```
+
+##### b、用const定义
+
+>```php
+>const myConstant = null;
+>const myConstant = false;
+>const myConstant = 100;
+>const myConstant = 100.23;
+>const myConstant = ['a' => 'a'];//在5.6中也是支持的
+>const myConstant = PHP_VERSION;
+>const myConstant = 'abcd';
+>const myConstant = <<<'label'
+>string
+>label;
+>const myConstant = <<<label
+>string2
+>label;
+>const myConstant =  1+2;
+>const myConstant =  bcadd(1,2);//5/7都不支持
+>const myConstant = function(){return 5;};//不支持
+>const myConstant =  new stdClass());//不支持
+>```
+
+##### c、用define还是const?
+
+###### (I)、define和const定义的常量，是同一个东西吗？
+
+>```php
+>const myConstant = 100;
+>define('myConstant', 100);//报错，说重复定义了
+>```
+>
+>* define和const定义的常量，是同一东西
+
+###### (II)、define和const用哪个好？
+
+| 情况   | define    | const    |
+| ------ | --------- | -------- |
+| array  | 7.0才支持 | 一直支持 |
+| 调函数 | 一直支持  | 不支持   |
+| 类常量 | 不支持    | 支持     |
+
+>* 综上给出建议：
+>* * 对象之内用const
+>  * 对象之外用define
+
 #### (3)、特殊常量(魔术常量)
 
->这里都是根据==物理存储位置==决定的，与继承、引入文件等无关
+>结果值都是根据==魔术常量在代码的物理存储位置==决定的，与继承、引入文件、解释编译等无关
 >
 >日志log记录原理是利用了函数debug_backtrace 
 >
@@ -752,7 +920,7 @@
 | `__METHOD__`    | 所在方法(带命名空间)  | ttttt\sssss\Bb::getMethod |
 | `__NAMESPACE__` | 所在空间              | ttttt\sssss               |
 
-## (五)、function
+## (五)、function(不区分大小写)
 
 ### 1、命名规则
 
@@ -783,12 +951,12 @@
 >```php
 >$flag = rand(0, 1);
 >if($flag){
->    function myFun(){ echo "hello world!";}
+>    	function myFun(){ echo "hello world!";}
 >}
 >if($flag) {
->    myFun();//正常调用
+>    	myFun();//正常调用
 >}else{
->    myFun();//报错，myFun未定义
+>    	myFun();//报错，myFun未定义
 >}
 >```
 
@@ -796,9 +964,9 @@
 
 >```php
 >function outFun(){
->    function innerFun(){
->        echo 'hello world!';
->    }
+>        function innerFun(){
+>            echo 'hello world!';
+>        }
 >}
 >//innerFun();//这里会报错，innerFun未定义
 >outFun();
@@ -817,10 +985,10 @@
 >
 >```php
 >function myFun(...$params){//三个点号标识可以无限个参数。参数名和参数值以键值对放在$params中
->    var_dump($params);//['a', 'b', 'c', 'd', 'e', 'f']
->    var_dump(func_num_args());//6
->    var_dump(func_get_args());//['a', 'b', 'c', 'd', 'e', 'f']
->    var_dump(func_get_arg(2));//c
+>    	var_dump($params);//['a', 'b', 'c', 'd', 'e', 'f']
+>    	var_dump(func_num_args());//6
+>    	var_dump(func_get_args());//['a', 'b', 'c', 'd', 'e', 'f']
+>    	var_dump(func_get_arg(2));//c
 >}
 >myFun('a', 'b', 'c', 'd', 'e', 'f');
 >```
@@ -900,6 +1068,8 @@
 >```
 
 #### (3)、final
+
+#### (4)、命名空间
 
 ### 1、class
 
@@ -1070,6 +1240,123 @@
 
 ## (一)、cookie与seesion
 
+### 1、cookie
+
+#### (1)、存入cookie
+
+>setcookie和setrawcookie
+>
+>* setcookie发送的value会被URL 编码（urlencode）。
+>* setrawcookie发送明文value，不会被编码
+>
+>==支持发送数组==
+>
+>```php
+>//涉及函数
+>//setcookie( string $name[, string $value = ""[, int $expire = 0[, string $path = ""[, string $domain = ""[, bool $secure = false[, bool $httponly = false]]]]]] ) : bool
+>//setrawcookie( string $name[, string $value[, int $expire = 0[, string $path[, string $domain[, bool $secure = false[, bool $httponly = false]]]]]] ) : bool
+>
+>setcookie("cookie_key", 'index.php?a=1&b=2');          //设置cookie。浏览器看到的是：index.php%3Fa%3D1%26b%3D2
+>setcookie("cookie_key2", 'value2', time() + 7 * 86400);//设置cookie一周有效
+>setcookie("cookie_arr[k1]", 'v1');
+>setcookie("cookie_arr[k2]", 'v2');
+>setrawcookie("cookie_raw_key", 'index2.php?a=1&b=2');   //明文value。浏览器看到的是：index2.php?a=1&b=2
+>
+>var_dump($_COOKIE);
+>/*
+>[
+>    'cookie_key' => 'index.php?a=1&b=2',
+>    'cookie_key2' => 'value2',
+>    'cookie_arr' => [
+>        'k1' => 'v1',
+>        'k2' => 'v2'
+>    ],
+>    'cookie_raw_key' => 'index.php?a=1&b=2'
+>]
+>*/
+>```
+>
+>| 参数       | 含义                                                         |
+>| ---------- | ------------------------------------------------------------ |
+>| \$name     | cookie的key                                                  |
+>| \$value    | cookie的value                                                |
+>| \$expire   | 1、\$expire=0，关闭浏览器，cookie则失效。不关闭一直存在<br>2、过一周过期？\$expire = time()+7*86400 |
+>| \$path     |                                                              |
+>| \$domain   | cookie对指定域名有效                                         |
+>| \$secure   |                                                              |
+>| \$httponly | httponly                                                     |
+
+#### (2)、从cookie中获取
+
+>```php
+>//获取当前的全部cookie
+>$_COOKIE;
+>//获取某个key的cookie
+>$_COOKIE['key'];//如果key不存在，将被警告未定义
+>
+>//如果在php.ini中 request_order的值包含 ‘C’,则还可以这样调
+>$_REQUEST;
+>$_REQUEST['key'];
+>```
+
+### 2、session
+
+>开启session：
+>
+>* session.auto_start = 1和session_start()不能共存，会有警告：**A session had already been started**
+>* session不论是存数还是取数，都要求session状态为active（即session.auto_start = 1或session_start()）
+>
+>和开启session相关事件
+>
+>* ==未开启session，\$_SESSION是未定义的==
+
+#### (1)、存入session
+
+>存入session或修改已存在的
+>
+>必须判断session的状态
+>
+>```php
+>if(session_status() != PHP_SESSION_ACTIVE) session_start();
+>$_SESSION['key'] ='value';
+>```
+>
+>从session中删除
+>
+>```php
+>if(session_status() != PHP_SESSION_ACTIVE) session_start();
+>if(isset($_SESSION['key'])) unset($_SESSION['key']);
+>```
+>
+>
+
+#### (2)、从session中获取
+
+>```php
+>if(session_status() != PHP_SESSION_ACTIVE) session_start();
+>return $_SESSION['key'] ?? null;//默认不存在的时候返回null
+>```
+
+
+
+#### (3)、预定义常量
+
+| 常量标识             | 数据类型 | 含义              |
+| -------------------- | -------- | ----------------- |
+| SID                  | string   | url传递session_id |
+| PHP_SESSION_DISABLED | int      |                   |
+| PHP_SESSION_NONE     | int      |                   |
+| PHP_SESSION_ACTIVE   | int      |                   |
+
+>***session_status() 被用于返回当前会话状态。***
+>
+>
+>返回值 
+>
+>◦ PHP_SESSION_DISABLED 会话是被禁用的。 
+>◦ PHP_SESSION_NONE 会话是启用的，但不存在当前会话。 
+>◦ PHP_SESSION_ACTIVE 会话是启用的，而且存在当前会话。 
+
 ## (二)、文件上传
 
 ### 1、post上传
@@ -1096,7 +1383,9 @@ Oauth 文档>函数参考>web服务>OAuth
 
 链接pdo，增删改查
 
+## 输出缓冲
 
+ob_flush
 
 # php.ini
 
@@ -1116,14 +1405,14 @@ Oauth 文档>函数参考>web服务>OAuth
 | ------------ | ---------- | ----------------------------------------------- |
 | 变量         | 严格区分   | `$var`和`$vaR`是两个变量                        |
 | 常量         | 严格区分   | `define('aBc',1)`和`define('abc', 1)`时两个常量 |
-| 魔术常量     | 不区分     | `___CLASS__`和`__class__`相同                   |
-| array中的key | 严格区分   | `['a'=>1, 'A'=>2]`数组中由两个不同元素          |
 | 函数名       | 不区分     | `function aa`和`function Aa`相同                |
+| 命名空间     |            |                                                 |
+| 类名         |            |                                                 |
 | 类属性       |            |                                                 |
 | 类常量       |            |                                                 |
 | 类方法       |            |                                                 |
-| 类名         |            |                                                 |
-| 命名空间     |            |                                                 |
+| 魔术常量     | 不区分     | `___CLASS__`和`__class__`相同                   |
+| array中的key | 严格区分   | `['a'=>1, 'A'=>2]`数组中由两个不同元素          |
 
 # `==`与`===`问题
 
@@ -1132,6 +1421,7 @@ Oauth 文档>函数参考>web服务>OAuth
 | 判断运算符`<=>` | `==`   |      |      |
 | switch..case    |        |      |      |
 | in_array()      |        |      |      |
+| empty()         |        |      |      |
 
 1、判断运算符`<=>`
 
@@ -1145,47 +1435,35 @@ Oauth 文档>函数参考>web服务>OAuth
 >echo 1<=>'1';//0
 >```
 
+# 其他问题
+
 ## call_user_func/call_user_func_array()
 
 
 
 如何调用的：
 
->
->
+
+
 >```php
 >function myfun(){}
 >
 >class MyClass{
 >	public function pubMethod(){}
->    public static function pubStaticMethod(){}
+>public static function pubStaticMethod(){}
 >}
->```
+>    ```
 >
 >
 
 
-
-## 理解一下$GLOBALS
-
-
-
-```php
-//问题：$var是什么类型
-$var=function(){return 5;};
-var_dump(gettype($var));//object
-var_dump($var instanceof Closure);//true
-//说明$var是callback类型
-echo $var+1;//6
-```
 
 ## 理解continue和breake
 
->
->
+
+
 >```php
 >//如何正确理解continue和breake
->
 >//1、在正常代码中会怎样
 >
 >echo 'a'.PHP_EOL;
@@ -1196,17 +1474,14 @@ echo $var+1;//6
 >//2、在if、switch中会怎样(非循环控制体)
 >
 >if(true){
->    echo "c".PHP_EOL;
->    continue;
+>echo "c".PHP_EOL;
+>continue;
 >	echo 'd'.PHP_EOL;
->	break;
->}
->
->
->
->
->
+>    	break;
+>    }
 >
 >```
 >
->
+>* ==( ! ) Fatal error: 'break' not in the 'loop' or 'switch' context in C:\code\index.php on line 5==
+>* 也就是说break和continue必须在==循环体==或者==switch==中
+
