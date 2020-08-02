@@ -1,47 +1,95 @@
 # 一、入门须知
 
-## (一)、文件命名
+扩展的全部都写在这里
 
-以 .php  结尾
+在代码前写文件路径
 
-## (二)、文件格式
+index.php
 
-文件名  index.php
+./flancklin/session/SessionHelper.php
 
 >```php
+><?
+>namespace flancklin\session;
+>
+>class SessionHelper {.....}
+>```
+
+8.3
+
+* 过完对象语法
+* session自定义
+* 文件上传
+* 数学精度计算
+
+8.4
+
+* http请求，get/post  https
+* 认证
+
+8.5
+
+* 发邮件
+* 发验证图片，(闪动的如何搞？)
+
+## (一)、hello world
+
+==index.php==
+
+>相关格式要求：
+>
+>* 文件格式，以.php结尾。比如：index.php
+>
+>* 文件内部格式：`<?php ..代码..?>`，后面的`?>`可省略
+>
+>* 支持单行注释和多行注释
+>
+>* 结束标志是：分号`;`。比如：`$var=1;  $var2=2;`
+>
+>  
+>
+>在linux的cli中运行   php index.php
+>
+>==<?php ..... ?\>==是文件开始和结束标志，开始标志必须有，结束标志可以省略
+>
+>* php.ini中short_open_tag改为短标签(缩写)\<? ?\>
+>* php.ini中asp_tags改为asp风格 <% %>==PHP 7.0.0. 中移除。==
+>
+>```php
 ><?php
->echo "hello world";//我是注释
->//我是注释
->/*
->我也是注释
->我也是注释
->*/
+>    //这是单行注释
+>    /**
+>    多行
+>    注释
+>  	*/
+>    
+>/*变量*******************************************/    
+>    $var = '';           //声明定义、初始化赋值
+>	$var = 'hello world';//第二次赋值
+>	echo $var;           //变量调用
+>
+>/*function*******************************************/
+>	function myFun(){    //function声明定义
+>        $var  = 'hello world22';
+>        return $var;
+>    }
+>	echo myFun();        //function调用
+>
+>/*对象(类)*******************************************/
+>	class MyClass{       //对象(类)声明定义
+>        public $var = "hello world333"; //类变量  
+>        public function myFun2(){       //类function
+>            return $this->var;
+>        }
+>    }
+>	$obj = new MyClass();//实例化对象 
+>	echo $obj->myFun2(); //调用对象function
+>	
 >```
 
 
 
-在linux的cli中运行   php index.php
 
-==<?php ..... ?\>==是文件开始和结束标志，开始标志必须有，结束标志可以省略
-
-* php.ini中short_open_tag改为短标签(缩写)\<? ?\>
-* php.ini中asp_tags改为asp风格 <% %>==PHP 7.0.0. 中移除。==
-
-
-
-## (三)、注释方式
-
-### 1、单行注释
-
-//
-
-### 2、多行注释
-
-/* ........*/
-
-## (四)、行结束标志
-
-==在PHP中以逗号作为一行的结束标志，不可省略。==
 
 # 二、语法
 
@@ -563,21 +611,15 @@
 
 #### (2)、switch
 
-### 3、引入文件
+### 3、异常
+
+### 4、引入文件
 
 #### (1)、include/include_once
 
 #### (2)、require/require_once
 
-### 4、异常
-
-### 5、流程跳出和中断
-
-#### (1)、continue
-
-#### (2)、breake
-
-### 6、其他
+### 5、其他
 
 (1)、goto
 
@@ -586,6 +628,10 @@
 (3)、return
 
 (4)、echo
+
+continue
+
+breake
 
 ## (四)、变量和常量(都区分大小写)
 
@@ -780,35 +826,37 @@
 >正确的初始化举例
 >
 >* ```php
->  static $a;                    //不初始化，默认是null
->  static $a = null;             //null类型   
->  static $a = false;            //boolean类型
->  static $a = 100;              //integer类型
->  static $a = 100.23;           //float类型
->  static $a = ['a' => 'a'];     //array类型
->  static $a = PHP_VERSION;      //调用已定义的常量
->  static $a = "abcd";           //string类型
->                              //string的nowdoc
->  static $a = <<<'label'
->  abcd
->  label;
->                              //string的heredoc
->  static $a=<<<label
->  abcd
->  label;
->  static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
->  ```
->```
+> static $a;                    //不初始化，默认是null
+> static $a = null;             //null类型   
+> static $a = false;            //boolean类型
+> static $a = 100;              //integer类型
+> static $a = 100.23;           //float类型
+> static $a = ['a' => 'a'];     //array类型
+> static $a = PHP_VERSION;      //调用已定义的常量
+> static $a = "abcd";           //string类型
+>                             //string的nowdoc
+> static $a = <<<'label'
+> abcd
+> label;
+>                             //string的heredoc
+> static $a=<<<label
+> abcd
+> label;
+> static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
+> ```
+> ```
+>
+> ```
 >
 >```
 >
 >错误的初始化举例
 >
 >* ```php
->  static $a = bcadd(1,2);                 //不可以调用函数
->  static $a = function(){echo 'hello!';}  //不可以callback
->  static $a = new stdClass();             //不可以object
->  ```
+> static $a = bcadd(1,2);                 //不可以调用函数
+> static $a = function(){echo 'hello!';}  //不可以callback
+> static $a = new stdClass();             //不可以object
+>```
 >```
 >
 >```
