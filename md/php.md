@@ -780,33 +780,38 @@
 >正确的初始化举例
 >
 >* ```php
-> static $a;                    //不初始化，默认是null
-> static $a = null;             //null类型   
-> static $a = false;            //boolean类型
-> static $a = 100;              //integer类型
-> static $a = 100.23;           //float类型
-> static $a = ['a' => 'a'];     //array类型
-> static $a = PHP_VERSION;      //调用已定义的常量
-> static $a = "abcd";           //string类型
->                               //string的nowdoc
-> static $a = <<<'label'
-> abcd
-> label;
->                               //string的heredoc
-> static $a=<<<label
-> abcd
-> label;
-> static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
-> ```
-> ```
+>  static $a;                    //不初始化，默认是null
+>  static $a = null;             //null类型   
+>  static $a = false;            //boolean类型
+>  static $a = 100;              //integer类型
+>  static $a = 100.23;           //float类型
+>  static $a = ['a' => 'a'];     //array类型
+>  static $a = PHP_VERSION;      //调用已定义的常量
+>  static $a = "abcd";           //string类型
+>                              //string的nowdoc
+>  static $a = <<<'label'
+>  abcd
+>  label;
+>                              //string的heredoc
+>  static $a=<<<label
+>  abcd
+>  label;
+>  static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
+>  ```
+>```
+>
+>```
 >
 >错误的初始化举例
 >
 >* ```php
-> static $a = bcadd(1,2);                 //不可以调用函数
-> static $a = function(){echo 'hello!';}  //不可以callback
-> static $a = new stdClass();             //不可以object
-> ```
+>  static $a = bcadd(1,2);                 //不可以调用函数
+>  static $a = function(){echo 'hello!';}  //不可以callback
+>  static $a = new stdClass();             //不可以object
+>  ```
+>```
+>
+>```
 
 ### 2、常量
 
@@ -1022,6 +1027,26 @@
 >
 >
 
+### 4、相关函数
+
+| 函数                       | 功能 | 参数 | 返回值版本 | 备注 |
+| -------------------------- | ---- | ---- | ---------- | ---- |
+| call_user_func_array       |      |      |            |      |
+| call_user_func             |      |      |            |      |
+| create_function            |      |      |            |      |
+| forword_static_call_array  |      |      |            |      |
+| forward_static_call        |      |      |            |      |
+| func_get_arg               |      |      |            |      |
+| func_get_args              |      |      |            |      |
+| func_num_args              |      |      |            |      |
+| function_exists            |      |      |            |      |
+| get_defined_functions      |      |      |            |      |
+| register_shutdown_function |      |      |            |      |
+| register_tick_function     |      |      |            |      |
+| unregister_tick_function   |      |      |            |      |
+
+
+
 ## (六)、对象
 
 ### 概念
@@ -1071,6 +1096,98 @@
 
 #### (4)、命名空间
 
+#### (5)、自动加载
+
+spl_autoload_register()
+
+__construct()
+
+#### (6)、魔术方法
+
+| 方法               | 功能 | class | trait | abstract | interface | 备注           |
+| ------------------ | ---- | ----- | ----- | -------- | --------- | -------------- |
+| `__construct(...)` |      |       |       |          |           |                |
+| `__destruct()`     |      |       |       |          |           | exit/die呢？？ |
+| `__call()`         |      |       |       |          |           |                |
+| `__callStatic()`   |      |       |       |          |           |                |
+| `__get()`          |      |       |       |          |           |                |
+| `__set()`          |      |       |       |          |           |                |
+| `__isset()`        |      |       |       |          |           |                |
+| `__unset()`        |      |       |       |          |           |                |
+| `__sleep()`        |      |       |       |          |           |                |
+| `__wakeup()`       |      |       |       |          |           |                |
+| `__toString()`     |      |       |       |          |           |                |
+| `__invoke()`       |      |       |       |          |           |                |
+| `__set_state()`    |      |       |       |          |           |                |
+| `__clone()`        |      |       |       |          |           |                |
+| `__debugInfo()`    |      |       |       |          |           |                |
+
+
+
+#### (7)继承
+
+##### a、self、parent、static
+
+>
+>
+>```php
+>class A{
+>    function static m(){ echo "I am in A;"}
+>}
+>class B extends A(){
+>    function static m(){echo "I am in B"}
+>    function varDump(){
+>        parent::m();
+>        self::m();
+>        static::m()
+>    }
+>}
+>class C extends B{
+>    function static m(){echo "I am in C"}
+>}
+>class D extends C{
+>    function static m(){echo "I am in D"}
+>}
+>
+>
+>
+>$obj = new C();
+>$obj->varDump();//A B D
+>//parent  当前物理文件的父级
+>//self    当前物理文件
+>//static  最接近当前对象的那个(这里当前对象是D)
+>```
+>
+>
+
+
+
+>
+>
+>```php
+>class A{
+>    function m(){ echo "I am in A;"}
+>}
+>class B extends A(){
+>    function m(){echo "I am in B"}
+>    function varDump(){
+>        
+>    }
+>}
+>class C extends B{
+>    function m(){echo "I am in C"}
+>}
+>class D extends C{
+>    function m(){echo "I am in D"}
+>}
+>
+>//如何在B中掉abcd
+>```
+>
+>
+
+##### 变量会被覆盖，类常量呢？
+
 ### 1、class
 
 | 组成   | 定义                                       | 备注 |
@@ -1079,11 +1196,9 @@
 | 类常量 | const+constName                            |      |
 | 方法   |                                            |      |
 
-#### (1)、class的组成成分
+#### (1)、类变量
 
-##### a、属性(字段)
-
-###### (I)、如何定义属性
+###### a、如何定义属性
 
 >1. 访问控制  public/private/protected/无
 >2.  是否静态 static/无
@@ -1096,7 +1211,7 @@
 
 
 
-###### (II)、定义属性并赋值举例：
+###### b、定义属性并赋值举例：
 
 >* 错误举例
 >
@@ -1124,7 +1239,7 @@
 >  	label;
 >  ```
 
-###### (III)、调用方式
+###### c、调用方式
 
 >```php
 >//类内部调用
@@ -1134,9 +1249,9 @@
 >
 >
 
-##### b、类常量
+#### (2)、类常量
 
-###### (I)、定义规则：
+##### a、定义规则：
 
 >1. 声明定义时必须赋值
 >2. 类常量名称==不能使用\$==
@@ -1153,14 +1268,16 @@
 >
 >
 
-###### (II)、调用方式
+##### b、调用方式
 
 >```php
 >echo self::myConstant;
 >echo className::myConstant;
 >```
+>
+>
 
-##### c、方法
+#### (3)、类function
 
 访问控制(可见性)
 
@@ -1180,17 +1297,123 @@
 
 #### (2)、特殊class
 
-##### a、抽象类
+##### a、匿名类
 
-##### b、匿名类
+>
+>
+>零时创建一个类。这个和临时创建function有点像。
+>
+>```php
+>$a = new Class{
+>    function a(){
+>        echo "I am a class";
+>    }
+>}
+>$f = function(){
+>    echo "I am a function";
+>}
+>
+>$a->a();//I am a class
+>$f();//I am a function
+>```
+>
+>
 
-##### c、final类
+##### b、final类
 
-### 2、interface
+### 2、abstract class
 
-### 3、trait
+#### (1)、定义
 
-### 4、对象继承问题
+>**定义规则**
+>
+>* 抽象类不能被实例化(仅模板，不可应用/调用)
+>* 至少有一个方法被声明为abstract(不限public、private、protected)：抽象方法
+>* 声明abstract方法，到参数就结束没有大括号{}
+>
+>
+
+```php
+abstract class MyClass{
+    public abstrct function a();//这里没有{}
+}
+```
+
+#### (2)、继承与实现
+
+>**继承规则**
+>
+>* 子类在实现具体的抽象方法，其==访问控制==应该一样或==更宽松==
+>* 子类实现抽象方法时，必须有原来的响应参数和类型，此外可以额外增加(==参数职能增不能减==)
+>
+>```php
+>abstract class A{
+>    abstract private function a($p1,$p2);
+>}
+>
+>class B extend A{
+>    public function a($p1, $p2, $px, $py){
+>        var_dump($p1,$p2,$px,$py); 
+>    }
+>}
+>```
+>
+>
+
+### 3、interface
+
+#### (1)、定义
+
+>**定义规则**
+>
+>* 类用interface关键字定义
+>* 所有的==方法全部空==的(没有具体的实现，没有{})
+>* 所有的方法==必须是公有的==
+>* 允许定义==构造方法==，同样不可具体实现
+>* ==可以定义类型量==
+>
+>
+
+#### (2)、继承与实现
+
+单继承
+
+>
+
+
+
+多继承，排重问题
+
+### 4、trait
+
+只是一种==代码复用机制==。与对象概念无关。
+
+
+
+### 相关函数
+
+| 函数                     | 功能 | 参数 | 返回值版本 | 备注 |
+| ------------------------ | ---- | ---- | ---------- | ---- |
+| `__autoload`             |      |      |            |      |
+| `call_user_method_array` |      |      |            |      |
+| `call_user_method`       |      |      |            |      |
+| `class_exists`           |      |      |            |      |
+| `get_called_class`       |      |      |            |      |
+| `get_class_methods`      |      |      |            |      |
+| `get_class_vars`         |      |      |            |      |
+| `get_class`              |      |      |            |      |
+| `get_declared_classes`   |      |      |            |      |
+| `get_declared_interface` |      |      |            |      |
+| get_object_vars          |      |      |            |      |
+| get_parent_class         |      |      |            |      |
+| interface_exists         |      |      |            |      |
+| is_a                     |      |      |            |      |
+| is_subclass_of           |      |      |            |      |
+| method_exists            |      |      |            |      |
+| property_exists          |      |      |            |      |
+| trait_exists             |      |      |            |      |
+
+
 
 ## (七)、其他语法
 
@@ -1357,13 +1580,33 @@
 >◦ PHP_SESSION_NONE 会话是启用的，但不存在当前会话。 
 >◦ PHP_SESSION_ACTIVE 会话是启用的，而且存在当前会话。 
 
+#### (4)、自定义存储
+
+加载文件时可以考虑，spl_autoload_regitster()
+
 ## (二)、文件上传
 
 ### 1、post上传
 
 ## (三)、数学精度计算
 
+| 序号 | 函数 | 功能 | 备注 |
+| ---- | ---- | ---- | ---- |
+| 1    |      | 加   |      |
+| 2    |      | 减   |      |
+| 3    |      | 乘   |      |
+| 4    |      | 除   |      |
+| 5    |      | 求余 |      |
+| 6    |      | 求幂 |      |
+|      |      |      |      |
+|      |      |      |      |
+|      |      |      |      |
+
+
+
 ## (四)、http请求
+
+curl
 
 ## (五)、邮件发送
 
@@ -1405,12 +1648,12 @@ ob_flush
 | ------------ | ---------- | ----------------------------------------------- |
 | 变量         | 严格区分   | `$var`和`$vaR`是两个变量                        |
 | 常量         | 严格区分   | `define('aBc',1)`和`define('abc', 1)`时两个常量 |
-| 函数名       | 不区分     | `function aa`和`function Aa`相同                |
+| function     | 不区分     | `function aa`和`function Aa`相同                |
 | 命名空间     |            |                                                 |
 | 类名         |            |                                                 |
-| 类属性       |            |                                                 |
+| 类变量       |            |                                                 |
 | 类常量       |            |                                                 |
-| 类方法       |            |                                                 |
+| 类function   |            |                                                 |
 | 魔术常量     | 不区分     | `___CLASS__`和`__class__`相同                   |
 | array中的key | 严格区分   | `['a'=>1, 'A'=>2]`数组中由两个不同元素          |
 
@@ -1484,4 +1727,25 @@ ob_flush
 >
 >* ==( ! ) Fatal error: 'break' not in the 'loop' or 'switch' context in C:\code\index.php on line 5==
 >* 也就是说break和continue必须在==循环体==或者==switch==中
+
+
+
+
+
+
+
+| 数据类型                              | 常量 | 变量 | 静态变量 | 类常量 | 类变量 | 类静态变量 |
+| ------------------------------------- | ---- | ---- | -------- | ------ | ------ | ---------- |
+| 不初始化                              |      |      |          |        |        |            |
+| boolean,string(单双)<br>integer,float |      |      |          |        |        |            |
+| null                                  |      |      |          |        |        |            |
+| array                                 |      |      |          |        |        |            |
+| callback                              |      |      |          |        |        |            |
+| object                                |      |      |          |        |        |            |
+| resource                              |      |      |          |        |        |            |
+| `+` `-` `*` `/` `%` `**`              |      |      |          |        |        |            |
+| bcadd(1,2)                            |      |      |          |        |        |            |
+| 常量                                  |      |      |          |        |        |            |
+| heredoc                               |      |      |          |        |        |            |
+| nowdoc                                |      |      |          |        |        |            |
 
