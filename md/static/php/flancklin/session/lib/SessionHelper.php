@@ -3,6 +3,12 @@ namespace flancklin\session;
 
 class SessionHelper{
 
+    private $handler = null;
+    function __construct($handler)
+    {
+        if($handler instanceof \SessionIdInterface) $this->handler = $handler;
+    }
+
     /**
      * 设置或修改session值
      * @param $key
@@ -43,10 +49,12 @@ class SessionHelper{
      */
     private function open(){
         if($this->isActive()) return ;
+        //php_ini:session.auto_start =1不能使用session_set_save_handler
+        //Warning: session_set_save_handler(): Cannot change save handler when session is active
+        $this->handler && session_set_save_handler($this->handler);
         if(!session_start()){
             throw new SessionStartFailException('open session failed');
         }
-
     }
 
     /**

@@ -89,7 +89,13 @@ index.php
 
 
 
+## (二)、文档文献
 
+>**官方**
+>
+>* 在线中文：https://www.php.net/manual/zh/index.php
+>
+>* chm下载：https://www.php.net/download-docs.php
 
 # 二、语法
 
@@ -105,17 +111,17 @@ index.php
 >
 >1种不是数据类型：NaN
 
-| 序号 | 类型     | 举例                     | 备注                                                         |
-| ---- | -------- | ------------------------ | ------------------------------------------------------------ |
-| 1    | boolean  | true\|false\|TRUE\|FALSE | 不区分大小写                                                 |
-| 2    | integer  | -1\|0\|1                 | 支持2/8/10/16进制<br>10转2进制：`decbin($var)`<br/>10转8进制：`decoct($var)`<br/>10转16进制：`dechex($var)`<br/>2转10进制：`bindec($var)`<br/>8转10进制：`octdec($var)`<br/>16转10进制：`hexdec($var)`<br/>任意进制转换：`base_convert($number, $from, $to)` |
-| 3    | float    | -1.0\|0.0\|1.0           |                                                              |
-| 4    | string   | '123'\|'abcd'            | [string](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/language.types.string.html) 最大可以达到 2GB。<br>==可以当作array进行字符修改与获取== |
-| 5    | null     | null\|NULL               | 仅定义默认为null；<br>变量被unset()<br>==都会有警告提示 PHP Notice== |
-| 6    | array    | array(1,'1')\|[1,'1']    | new 类名                                                     |
-| 7    | object   | new StdClass()           |                                                              |
-| 8    | callback | function(){}             | 执行:$var(参数)或者call_user_func(\$var,\$params)            |
-| 9    | resource | file_open('filename')    | get_resource_type。某些文件或连接的句柄<br>文档附录：资源类型列表。有好几十中，比如：file，mysql，odbc，curl，fpt等 |
+| 序号 | 类型     | 举例                                             | 备注                                                         |
+| ---- | -------- | ------------------------------------------------ | ------------------------------------------------------------ |
+| 1    | boolean  | true\|false\|TRUE\|FALSE                         | 不区分大小写                                                 |
+| 2    | integer  | -1\|0\|1                                         | 支持2/8/10/16进制<br>10转2进制：`decbin($var)`<br/>10转8进制：`decoct($var)`<br/>10转16进制：`dechex($var)`<br/>2转10进制：`bindec($var)`<br/>8转10进制：`octdec($var)`<br/>16转10进制：`hexdec($var)`<br/>任意进制转换：`base_convert($number, $from, $to)` |
+| 3    | float    | -1.0\|0.0\|1.0                                   |                                                              |
+| 4    | string   | '123'\|'abcd'\|heredoc\|nowdoc                   | [string](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/language.types.string.html) 最大可以达到 2GB。<br>==可以当作array进行字符修改与获取== |
+| 5    | null     | null\|NULL                                       | 仅定义默认为null；<br>变量被unset()<br>==都会有警告提示 PHP Notice== |
+| 6    | array    | array(1,'1') \| [1,'1'] \| ['k'=>'v'] \| [['a']] | 多维数组/关联数组                                            |
+| 7    | object   | new StdClass()                                   | new 类名                                                     |
+| 8    | callback | function(){}                                     | 执行:$var(参数)或者call_user_func(\$var,\$params)            |
+| 9    | resource | file_open('filename')                            | get_resource_type。某些文件或连接的句柄<br>文档附录：资源类型列表。有好几十中，比如：file，mysql，odbc，curl，fpt等 |
 
 * ==array==中得元素可以是任意数据类型，包括array,object,callback都可以
 
@@ -826,37 +832,59 @@ breake
 >正确的初始化举例
 >
 >* ```php
-> static $a;                    //不初始化，默认是null
-> static $a = null;             //null类型   
-> static $a = false;            //boolean类型
-> static $a = 100;              //integer类型
-> static $a = 100.23;           //float类型
-> static $a = ['a' => 'a'];     //array类型
-> static $a = PHP_VERSION;      //调用已定义的常量
-> static $a = "abcd";           //string类型
->                             //string的nowdoc
-> static $a = <<<'label'
-> abcd
-> label;
->                             //string的heredoc
-> static $a=<<<label
-> abcd
-> label;
-> static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
-> ```
-> ```
+>  static $a;                    //不初始化，默认是null
+>  static $a = null;             //null类型   
+>  static $a = false;            //boolean类型
+>  static $a = 100;              //integer类型
+>  static $a = 100.23;           //float类型
+>  static $a = ['a' => 'a'];     //array类型
+>  static $a = PHP_VERSION;      //调用已定义的常量
+>  static $a = "abcd";           //string类型
+>                        //string的nowdoc
+>  static $a = <<<'label'
+>  abcd
+>  label;
+>                        //string的heredoc
+>  static $a=<<<label
+>  abcd
+>  label;
+>  static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
+>  ```
+>```
 >
-> ```
+>```
+>
+>```
+>
+>```
+>
+>```
+>
+>```
+>
+>```
 >
 >```
 >
 >错误的初始化举例
 >
 >* ```php
-> static $a = bcadd(1,2);                 //不可以调用函数
-> static $a = function(){echo 'hello!';}  //不可以callback
-> static $a = new stdClass();             //不可以object
+>  static $a = bcadd(1,2);                 //不可以调用函数
+>  static $a = function(){echo 'hello!';}  //不可以callback
+>  static $a = new stdClass();             //不可以object
+>  ```
 >```
+>
+>```
+>
+>```
+>
+>```
+>
+>```
+>
+>```
+>
 >```
 >
 >```
@@ -1461,9 +1489,13 @@ abstract class MyClass{
 | property_exists          |      |      |            |      |
 | trait_exists             |      |      |            |      |
 
+## (七)、进程性指令
+
+exit();sleep();die;
 
 
-## (七)、其他语法
+
+## (八)、其他语法
 
 ### 1、引用
 
@@ -1630,25 +1662,317 @@ abstract class MyClass{
 
 #### (4)、自定义存储
 
-加载文件时可以考虑，spl_autoload_regitster()
+* ==session.auto_start =1不能使用session_set_save_handler==
+
+```html
+Warning: session_set_save_handler(): Cannot change save handler when session is active
+```
+
+* 加载文件时可以考虑，spl_autoload_regitster()
+
+>```php
+>//一、函数调用  open/close/...created_sid等都是函数
+>session_set_save_handler ($open, $close, $read, $write, $destroy, $gc, $create_sid = null, $validate_sid = null,  $update_timestamp = null);
+>//二、对象中得方法，没有继承相应接口
+>session_set_save_handler(
+>                    [$this, 'openSession'],
+>                    [$this, 'closeSession'],
+>                    [$this, 'readSession'],
+>                    [$this, 'writeSession'],
+>                    [$this, 'destroySession'],
+>                    [$this, 'gcSession']
+>                );
+>//三、对象，继承接口
+>session_set_save_handler (SessionHandlerInterface $session_handler, $register_shutdown = true);
+>    
+>```
+>
+>
+
+| 类/接口                 | 方法                                | 返回值 | 备注       |
+| ----------------------- | ----------------------------------- | ------ | ---------- |
+| SessionHandlerInterface | `open($save_path, $name)`           | bool   | 存储handle |
+|                         | `close()`                           | bool   | 存储handle |
+|                         | `write($session_id, $session_data)` | bool   | 数据       |
+|                         | `read($session_id)`                 | string | 数据       |
+|                         | `destroy($session_id)`              | bool   | 数据       |
+|                         | `gc($maxlifetime)`                  | bool   | 回收机制   |
+| SessionIdInterface      | `create_sid()`                      | string | session_id |
+
+>```php
+>$o = new \flancklin\session\SessionHelper(new \flancklin\session\SessionHandlerMySql());
+>var_dump($o->set("key","94444999"));
+>var_dump($o->get("key"));
+>
+>//物理路径：/flancklin/session/autoload.php
+>//物理路径：/flancklin/session/lib/SessionHelper.php
+>//物理路径：/flancklin/session/lib/SessionHandlerXXX.php
+>
+>```
+
+##### a、SessionHelper.php
+
+>```php
+><?php
+>namespace flancklin\session;
+>
+>class SessionHelper{
+>    private $handler = null;
+>    function __construct($handler)
+>    {
+>        if($handler instanceof \SessionIdInterface) $this->handler = $handler;
+>    }
+>    /**
+>     * 设置或修改session值
+>     * @param $key
+>     * @param $value
+>     * @throws SessionStartFailException
+>     */
+>    public function set($key, $value){
+>        $this->open();//开启sessin
+>        $_SESSION[$key] = $value;
+>    }
+>    /**
+>     * 删除某个session值
+>     * @param $key
+>     * @throws SessionStartFailException
+>     */
+>    public function delete($key){
+>        $this->open();
+>        if(isset($_SESSION[$key])) unset($_SESSION[$key]);
+>    }
+>    /**
+>     * 获取某个session值
+>     * @param $key
+>     * @param null $default
+>     * @return mixed|null
+>     * @throws SessionStartFailException
+>     */
+>    public function get($key, $default = null){
+>        $this->open();
+>        return $_SESSION[$key] ?? $default;
+>    }
+>    /**
+>     * 如果session没有开启，则开启。
+>     * 如果session原本已开启，则无需多余操作
+>     * @throws SessionStartFailException
+>     */
+>    private function open(){
+>        if($this->isActive()) return ;
+>        //php_ini:session.auto_start =1不能使用session_set_save_handler
+>        //Warning: session_set_save_handler(): Cannot change save handler when session is active
+>        $this->handler && session_set_save_handler($this->handler);
+>        if(!session_start()){
+>            throw new SessionStartFailException('open session failed');
+>        }
+>    }
+>    /**
+>     * 判断session是否已开启
+>     * @return bool
+>     */
+>    private function isActive(){
+>        return session_status() == PHP_SESSION_ACTIVE;
+>    }
+>}
+>```
+>
+>
+
+##### b、SessionHandler.php
+
+>==这个handler有个bug，刷新session_id会变。但读取数都可以了==
+>
+>```php
+><?php
+>namespace flancklin\session;;
+>
+>/**
+> * mysql表结构
+>CREATE TABLE `sessions`  (
+>`session_expires` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,
+>`session_data` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,
+>`session_id` varchar(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
+>PRIMARY KEY (`session_id`) USING BTREE
+>) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Compact;
+>
+> * Class SessionHandlerMySql
+> * @package flancklin\session
+> */
+>class SessionHandlerMySql implements \SessionHandlerInterface,\SessionIdInterface {//extends \SessionHandler {
+>    private $link;
+>    private $lifetime;
+>
+>    /**
+>     * 数据库连接handle
+>     * @param string $save_path
+>     * @param string $name
+>     * @return bool|void
+>     */
+>    public function open($save_path, $name){//Initialize session
+>        $this->lifetime=get_cfg_var('session.gc_maxlifetime');
+>        $this->link=mysqli_connect('localhost','root','','test');
+>        mysqli_query($this->link,"SET names UTF8");
+>        if($this->link){
+>            return true;
+>        }
+>        return false;
+>    }
+>    /**
+>     *关闭数据库连接handle
+>     * (有些数据库不需要，直接return true)
+>     * @return bool|void
+>     */
+>    public function close(){//Close the session
+>        mysqli_close($this->link);
+>        return true;
+>    }
+>    /**
+>     * 存储session值
+>     * @param string $session_id
+>     * @param string $session_data
+>     * @return bool|void
+>     */
+>    public function write($session_id, $session_data){//Write session data
+>        $newExp=time()+$this->lifetime;
+>        //首先查询是否存在指定的session_id,如果存在相当于更新数据，否则是第一次，则写入数据
+>        $sql="SELECT * from sessions where session_id={'$session_id'}";
+>        $result=mysqli_query($this->link,$sql);
+>        if($result && mysqli_num_rows($result)==1){
+>            $sql="UPDATE sessions set session_expires='{$newExp}',session_data='{$session_data}' 
+>                  where  session_id='{$session_id}' ";
+>        }else{
+>            $sql="INSERT into sessions values('{$session_id}','$session_data','{$newExp}')";
+>        }
+>        mysqli_query($this->link,$sql);
+>        return mysqli_affected_rows($this->link)==1;
+>    }
+>    /**
+>     * 删除session值
+>     * @param string $session_id
+>     * @return bool|void
+>     */
+>    public function destroy($session_id){//Destroy a session
+>        $sql="DELETE from sessions where session_id='{$session_id}'";
+>        mysqli_query($this->link,$sql);
+>        return mysqli_affected_rows($this->link)==1;
+>    }
+>    /**
+>     * 读取session值
+>     * @param string $session_id
+>     * @return string|void
+>     */
+>    public function read($session_id){//Read session data
+>        $sql="SELECT *from sessions where session_id='{$session_id}'
+>              and session_expires >".time();
+>        $result=mysqli_query($this->link,$sql);
+>        if(mysqli_num_rows($result)){
+>            return mysqli_fetch_array($result)['session_data'];
+>        }
+>        return "";
+>    }
+>    /**
+>     * 自动删除过期session
+>     * @param int $maxlifetime
+>     * @return bool|void
+>     */
+>    public function gc($maxlifetime){//Cleanup old sessions
+>        $sql="DELETE from sessions where session_expires<".time();
+>        mysqli_query($this->link,$sql);
+>        if(mysqli_affected_rows($this->link)>0){
+>            return true;
+>        }
+>        return false;
+>    }
+>    public function create_sid() {
+>        return rand(0,100);
+>    }
+>//    public function validateId($session_id) { }
+>//    public function updateTimestamp($session_id, $session_data) { }
+>
+>}
+>```
+>
+>
+
+##### c、autoload.php
+
+>
+>
+>```php
+><?php
+>spl_autoload_register(function ($class){
+>    $classFile = strtr($class, ['flancklin\\'.basename(__DIR__).'\\' => __DIR__.DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR]) . '.php';
+>    if(is_file($classFile)){
+>        include_once $classFile;
+>    }
+>});
+>```
+>
+>
 
 ## (二)、文件上传
 
 ### 1、post上传
 
+>核心函数
+>
+>```php
+>move_uploaded_file($tmp_name, $destination);
+>//如果目标文件已经存在，将会被覆盖。
+>```
+
+
+
+>上传单个文件
+>
+>* ‪C:\Users\EDZ\Pictures\Saved Pictures\5KHL6EHM0UQ20001.jpg
+>
+>```PHP
+>var_dump($_FILES);
+>[
+>    'file' => [
+>        'name' => '5KHL6EHM0UQ20001.jpg',          #原图片的名称
+>        'type' => 'image/jpeg',                    #原图片的格式
+>        'tmp_name' => 'C:\wamp64\tmp\php4199.tmp', #服务器上的临时文件(通常在web服务器的日志目录中) 
+>        'error' => 0,                              #上传过程是否有错
+>        'size'=>244836                             #文件的大小，单位b    
+>    ]
+>]
+>```
+>
+>这里的error具体参考值：文档 > 特点 > 文件上传处理 >  错误信息说明
+>
+>| 常量                        | 数字 | 解释                                                         |
+>| --------------------------- | ---- | ------------------------------------------------------------ |
+>| **`UPLOAD_ERR_OK`**         | 0    | 没错，成功                                                   |
+>| **`UPLOAD_ERR_INI_SIZE`**   | 1    | 超限了。php.ini 中 [upload_max_filesize](https://www.php.net/manual/zh/ini.core.php#ini.upload-max-filesize) |
+>| **`UPLOAD_ERR_FORM_SIZE`**  | 2    | 上传文件的大小超过了 HTML 表单中 *MAX_FILE_SIZE* 选项指定的值 |
+>| **`UPLOAD_ERR_PARTIAL`**    | 3    | 文件只有部分被上传                                           |
+>| **`UPLOAD_ERR_NO_FILE`**    | 4    | 没有文件被上传。                                             |
+>| **`UPLOAD_ERR_NO_TMP_DIR`** | 6    | 找不到临时文件夹                                             |
+>| **`UPLOAD_ERR_CANT_WRITE`** | 7    | 文件写入失败                                                 |
+>|                             |      |                                                              |
+>
+>
+>
+>
+
 ## (三)、数学精度计算
 
-| 序号 | 函数 | 功能 | 备注 |
-| ---- | ---- | ---- | ---- |
-| 1    |      | 加   |      |
-| 2    |      | 减   |      |
-| 3    |      | 乘   |      |
-| 4    |      | 除   |      |
-| 5    |      | 求余 |      |
-| 6    |      | 求幂 |      |
-|      |      |      |      |
-|      |      |      |      |
-|      |      |      |      |
+### 1、bc函数
+
+| 序号 | 函数                         | 功能       | 备注                     |
+| ---- | ---------------------------- | ---------- | ------------------------ |
+| 1    | `bcscale($scale)`            | 小数精度   |                          |
+| 2    | `bcadd($x, $y, $scale=0)`    | 加         | 5+3=8                    |
+| 3    | `bcsub($x, $y, $scale=0)`    | 减         | 5-3=2                    |
+| 4    | `bcmul($x, $y, $scale=0)`    | 乘         | 5*3=15                   |
+| 5    | `bcdiv($x, $y, $scale=0)`    | 除         | 5/3=1                    |
+| 6    | `bcmod($x, $y, $scale=0)`    | 求余       | 5%3=2                    |
+| 7    | `bcpow($x, $y, $scale=0)`    | 求幂       | 5**3=125                 |
+| 8    | `bcsqrt($number, $scale)`    | 开二次方根 | 根号5=2                  |
+| 9    | `bccomp($x, $y, $scale=0)`   | 比较大小   | `[1,0,-1]` bccomp(5,3)=1 |
+| 10   | `bcpowmod($x, $y, $scale=0)` |            |                          |
 
 
 
@@ -1707,12 +2031,14 @@ ob_flush
 
 # `==`与`===`问题
 
-| 涉及场景        | 什么等 | 举例 | 备注 |
-| --------------- | ------ | ---- | ---- |
-| 判断运算符`<=>` | `==`   |      |      |
-| switch..case    |        |      |      |
-| in_array()      |        |      |      |
-| empty()         |        |      |      |
+| 涉及场景        | 什么等 | 举例             | 备注 |
+| --------------- | ------ | ---------------- | ---- |
+| 判断运算符`<=>` | `==`   |                  |      |
+| switch..case    |        |                  |      |
+| in_array()      |        |                  |      |
+| empty()         |        |                  |      |
+| `$a?$b:$c`      |        |                  |      |
+| `&&` `||`       |        | `$flag && $a =1` |      |
 
 1、判断运算符`<=>`
 
