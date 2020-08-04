@@ -832,25 +832,27 @@ breake
 >正确的初始化举例
 >
 >* ```php
->  static $a;                    //不初始化，默认是null
->  static $a = null;             //null类型   
->  static $a = false;            //boolean类型
->  static $a = 100;              //integer类型
->  static $a = 100.23;           //float类型
->  static $a = ['a' => 'a'];     //array类型
->  static $a = PHP_VERSION;      //调用已定义的常量
->  static $a = "abcd";           //string类型
->                        //string的nowdoc
->  static $a = <<<'label'
->  abcd
->  label;
->                        //string的heredoc
->  static $a=<<<label
->  abcd
->  label;
->  static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
->  ```
->```
+> static $a;                    //不初始化，默认是null
+> static $a = null;             //null类型   
+> static $a = false;            //boolean类型
+> static $a = 100;              //integer类型
+> static $a = 100.23;           //float类型
+> static $a = ['a' => 'a'];     //array类型
+> static $a = PHP_VERSION;      //调用已定义的常量
+> static $a = "abcd";           //string类型
+>                       //string的nowdoc
+> static $a = <<<'label'
+> abcd
+> label;
+>                       //string的heredoc
+> static $a=<<<label
+> abcd
+> label;
+> static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
+> ```
+> ```
+>
+> ```
 >
 >```
 >
@@ -869,10 +871,10 @@ breake
 >错误的初始化举例
 >
 >* ```php
->  static $a = bcadd(1,2);                 //不可以调用函数
->  static $a = function(){echo 'hello!';}  //不可以callback
->  static $a = new stdClass();             //不可以object
->  ```
+> static $a = bcadd(1,2);                 //不可以调用函数
+> static $a = function(){echo 'hello!';}  //不可以callback
+> static $a = new stdClass();             //不可以object
+>```
 >```
 >
 >```
@@ -1404,7 +1406,7 @@ __construct()
 >**定义规则**
 >
 >* 抽象类不能被实例化(仅模板，不可应用/调用)
->* 至少有一个方法被声明为abstract(不限public、private、protected)：抽象方法
+>* ==至少有一个方法==被声明为abstract(不限public、private、protected)：抽象方法
 >* 声明abstract方法，到参数就结束没有大括号{}
 >
 >
@@ -1420,7 +1422,7 @@ abstract class MyClass{
 >**继承规则**
 >
 >* 子类在实现具体的抽象方法，其==访问控制==应该一样或==更宽松==
->* 子类实现抽象方法时，必须有原来的响应参数和类型，此外可以额外增加(==参数职能增不能减==)
+>* 子类实现抽象方法时，必须有原来的响应参数和类型，此外可以额外增加(==参数只能增不能减==)
 >
 >```php
 >abstract class A{
@@ -1537,7 +1539,7 @@ exit();sleep();die;
 
 
 
-# 四、常用功能扩展
+# 四、常用功能
 
 >其实所谓的功能扩展部分，完全是==函数的调用==了。没有新的语法规则了。
 
@@ -1642,25 +1644,7 @@ exit();sleep();die;
 
 
 
-#### (3)、预定义常量
-
-| 常量标识             | 数据类型 | 含义              |
-| -------------------- | -------- | ----------------- |
-| SID                  | string   | url传递session_id |
-| PHP_SESSION_DISABLED | int      |                   |
-| PHP_SESSION_NONE     | int      |                   |
-| PHP_SESSION_ACTIVE   | int      |                   |
-
->***session_status() 被用于返回当前会话状态。***
->
->
->返回值 
->
->◦ PHP_SESSION_DISABLED 会话是被禁用的。 
->◦ PHP_SESSION_NONE 会话是启用的，但不存在当前会话。 
->◦ PHP_SESSION_ACTIVE 会话是启用的，而且存在当前会话。 
-
-#### (4)、自定义存储
+#### (3)、自定义存储
 
 * ==session.auto_start =1不能使用session_set_save_handler==
 
@@ -1910,6 +1894,26 @@ Warning: session_set_save_handler(): Cannot change save handler when session is 
 >
 >
 
+#### (4)、预定义常量和ini配置
+
+| 常量标识             | 数据类型 | 含义              |
+| -------------------- | -------- | ----------------- |
+| SID                  | string   | url传递session_id |
+| PHP_SESSION_DISABLED | int      |                   |
+| PHP_SESSION_NONE     | int      |                   |
+| PHP_SESSION_ACTIVE   | int      |                   |
+
+>***session_status() 被用于返回当前会话状态。***
+>
+>
+>返回值 
+>
+>◦ PHP_SESSION_DISABLED 会话是被禁用的。 
+>◦ PHP_SESSION_NONE 会话是启用的，但不存在当前会话。 
+>◦ PHP_SESSION_ACTIVE 会话是启用的，而且存在当前会话。 
+
+#### 
+
 ## (二)、文件上传
 
 ### 1、post上传
@@ -1982,25 +1986,85 @@ curl
 
 ## (五)、邮件发送
 
-## 国际时间换算
+## (六)、国际时间
 
-## 认证
+时区格式？？？支持哪些？？
+
+### 1、时间戳
+
+getTime()
+
+### 2、格式化时间
+
+### 3、时间戳与格式化时间转化
+
+## (七)、认证
 
 http认证  文档>特点>用PHP进行http认证
 
 Oauth 文档>函数参考>web服务>OAuth
 
-## 反射reflection
+## (八)、反射reflection
 
-## 生成验证图
+## (九)、生成验证图
 
-## 操作mysql
+## (十)、操作mysql
 
 链接pdo，增删改查
 
-## 输出缓冲
+## (十一)、输出缓冲
 
 ob_flush
+
+# 五、设计模式
+
+**核心思想**
+
+* 对接口编程而不是对实现编程
+* 优先使用对象组合而不是继承
+
+**六大原则**
+
+| 原则     | 解释                                                     | 举例 |
+| -------- | -------------------------------------------------------- | ---- |
+| 开闭     | 对扩展开放，对修改关闭                                   |      |
+| 里氏代换 | 任何基类可出现的地方，子类一定可以出现                   |      |
+| 依赖倒转 | 针对接口编程，依赖于抽象而不依赖于具体                   |      |
+| 接口隔离 | 降低类之间的耦合                                         |      |
+| 最少知道 | 一个实体应尽量少的与其它实体相互作用，使系统模块相对独立 |      |
+| 合成复用 | 尽量使用合成、聚合方式，而不是用继承                     |      |
+
+设计模式列表5+8+12=25
+
+| 序号 | 大分类     | 设计模式                | 中文         | 场景                                                     | 备注 |
+| ---- | ---------- | ----------------------- | ------------ | -------------------------------------------------------- | ---- |
+| 1.1  | 创建模式   | factory  method         | 工厂方法模式 | 普通工厂方法模式<br>多个工厂方法模式<br>静态工厂方法模式 |      |
+| 1.2  |            | abstract factory        | 抽象工厂模式 |                                                          |      |
+| 1.3  |            | singleton               | 单例模式     |                                                          |      |
+| 1.4  |            | builder                 | 建造者模式   |                                                          |      |
+| 1.5  |            | prototype               | 原型模式     |                                                          |      |
+| 2.1  | 结构模式   | adapter                 | 适配器模式   |                                                          |      |
+| 2.2  |            | bridge                  | 桥连模式     |                                                          |      |
+| 2.3  |            | filter、criteria        | 过滤器模式   | ？？                                                     |      |
+| 2.4  |            | composite               | 组合模式     |                                                          |      |
+| 2.5  |            | decotator               | 装饰模式     |                                                          |      |
+| 2.6  |            | facade                  | 外观模式     |                                                          |      |
+| 2.7  |            | flyweight               | 享元模式     |                                                          |      |
+| 2.8  |            | proxy                   | 代理模式     |                                                          |      |
+| 3.1  | 行为型模式 | chain of responsibility | 责任链模式   |                                                          |      |
+| 3.2  |            | command                 | 命令模式     |                                                          |      |
+| 3.3  |            | interpreter             | 解释器模式   |                                                          |      |
+| 3.4  |            | iterator                | 迭代器模式   |                                                          |      |
+| 3.5  |            | mediator                | 中介者模式   |                                                          |      |
+| 3.6  |            | memento                 | 备忘录模式   |                                                          |      |
+| 3.7  |            | observer                | 观察者模式   |                                                          |      |
+| 3.8  |            | state                   | 状态模式     |                                                          |      |
+| 3.9  |            | null object             | 空对象模式   | ？？                                                     |      |
+| 3.10 |            | strategy                | 策略模式     |                                                          |      |
+| 3.11 |            | template                | 模板模式     |                                                          |      |
+| 3.12 |            | visitor                 | 访问者模式   |                                                          |      |
+
+哒、、
 
 # php.ini
 
