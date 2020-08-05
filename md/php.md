@@ -832,27 +832,29 @@ breake
 >正确的初始化举例
 >
 >* ```php
-> static $a;                    //不初始化，默认是null
-> static $a = null;             //null类型   
-> static $a = false;            //boolean类型
-> static $a = 100;              //integer类型
-> static $a = 100.23;           //float类型
-> static $a = ['a' => 'a'];     //array类型
-> static $a = PHP_VERSION;      //调用已定义的常量
-> static $a = "abcd";           //string类型
->                       //string的nowdoc
-> static $a = <<<'label'
-> abcd
-> label;
->                       //string的heredoc
-> static $a=<<<label
-> abcd
-> label;
-> static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
-> ```
-> ```
+>  static $a;                    //不初始化，默认是null
+>  static $a = null;             //null类型   
+>  static $a = false;            //boolean类型
+>  static $a = 100;              //integer类型
+>  static $a = 100.23;           //float类型
+>  static $a = ['a' => 'a'];     //array类型
+>  static $a = PHP_VERSION;      //调用已定义的常量
+>  static $a = "abcd";           //string类型
+>                      //string的nowdoc
+>  static $a = <<<'label'
+>  abcd
+>  label;
+>                      //string的heredoc
+>  static $a=<<<label
+>  abcd
+>  label;
+>  static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
+>  ```
+>```
 >
-> ```
+>```
+>
+>```
 >
 >```
 >
@@ -871,10 +873,14 @@ breake
 >错误的初始化举例
 >
 >* ```php
-> static $a = bcadd(1,2);                 //不可以调用函数
-> static $a = function(){echo 'hello!';}  //不可以callback
-> static $a = new stdClass();             //不可以object
+>  static $a = bcadd(1,2);                 //不可以调用函数
+>  static $a = function(){echo 'hello!';}  //不可以callback
+>  static $a = new stdClass();             //不可以object
+>  ```
 >```
+>
+>```
+>
 >```
 >
 >```
@@ -1921,29 +1927,125 @@ Warning: session_set_save_handler(): Cannot change save handler when session is 
 >核心函数
 >
 >```php
->move_uploaded_file($tmp_name, $destination);
+>move_uploaded_file($tmp_name, $destination):bool
 >//如果目标文件已经存在，将会被覆盖。
 >```
 
 
 
->上传单个文件
->
->* ‪C:\Users\EDZ\Pictures\Saved Pictures\5KHL6EHM0UQ20001.jpg
->
+#### (1)、上传单个文件
+
+
+
+>```html
+><form action="index.php" method="post"  enctype="multipart/form-data">
+>    <input type="file"  name="input_name"></input>
+>    <button type="submit">提交</button>
+></form>
+>```
+
+
+
 >```PHP
 >var_dump($_FILES);
 >[
->    'file' => [
->        'name' => '5KHL6EHM0UQ20001.jpg',          #原图片的名称
->        'type' => 'image/jpeg',                    #原图片的格式
->        'tmp_name' => 'C:\wamp64\tmp\php4199.tmp', #服务器上的临时文件(通常在web服务器的日志目录中) 
->        'error' => 0,                              #上传过程是否有错
->        'size'=>244836                             #文件的大小，单位b    
->    ]
+>   'input_name' => [
+>       'name' => '5KHL6EHM0UQ20001.jpg',          #原图片的名称
+>       'type' => 'image/jpeg',                    #原图片的格式
+>       'tmp_name' => 'C:\wamp64\tmp\php4199.tmp', #服务器上的临时文件(通常在web服务器的日志目录中) 
+>       'error' => 0,                              #上传过程是否有错
+>       'size'=>244836                             #文件的大小，单位b    
+>   ]
 >]
 >```
 >
+
+
+
+#### (2)、上传多个文件
+
+##### a、input的name是数组(多个input)
+
+>```html
+><form action="index.php" method="post"  enctype="multipart/form-data">
+>    <input type="file" name="input_name[a]" /><br>
+>    <input type="file" name="input_name[b]" /><br>
+>    <button type="submit">提交</button>
+></form>
+>```
+
+
+
+>```php
+>var_dump($_FILES);
+>[
+>    'input_name'=>[
+>        'name' => [
+>            'a' => 'timg (1).jpg',
+>            'b' => 'timg (2).jpg'
+>        ],
+>        'type' => [
+>            'a' => 'image/jpeg',
+>            'b' => 'image/jpeg'
+>        ],
+>        'tmp_name' => [
+>            'a' => 'C:\wamp64\tmp\phpAB9.tmp',
+>            'b' => 'C:\wamp64\tmp\phpABA.tmp'
+>        ],
+>        'error' => [
+>            'a' => 0,
+>            'b' => 0
+>        ],
+>        'size' => [
+>            'a' => 258939,
+>            'b' => 258939
+>        ]
+>    ]
+>    
+>]
+>```
+
+##### b、input带multiple
+
+> ```html
+> <form action="./index.php" method="post" enctype="multipart/form-data">
+>     <input type="file" name="input_name[]" multiple="multiple">
+>     <button type="submit">提交</button>
+> </form>
+> ```
+
+
+
+>```php
+>var_dump($_FILES);
+>[
+>    'input_name'=>[
+>        'name' => [
+>            0 => 'timg (1).jpg',
+>            1 => 'timg (2).jpg'
+>        ],
+>        'type' => [
+>            0 => 'image/jpeg',
+>            1 => 'image/jpeg'
+>        ],
+>        'tmp_name' => [
+>            0 => 'C:\wamp64\tmp\phpAB9.tmp',
+>            1 => 'C:\wamp64\tmp\phpABA.tmp'
+>        ],
+>        'error' => [
+>            0 => 0,
+>            1 => 0
+>        ],
+>        'size' => [
+>            0 => 258939,
+>            1 => 258939
+>        ]
+>    ] 
+>]
+>```
+
+
+
 >这里的error具体参考值：文档 > 特点 > 文件上传处理 >  错误信息说明
 >
 >| 常量                        | 数字 | 解释                                                         |
@@ -1951,15 +2053,11 @@ Warning: session_set_save_handler(): Cannot change save handler when session is 
 >| **`UPLOAD_ERR_OK`**         | 0    | 没错，成功                                                   |
 >| **`UPLOAD_ERR_INI_SIZE`**   | 1    | 超限了。php.ini 中 [upload_max_filesize](https://www.php.net/manual/zh/ini.core.php#ini.upload-max-filesize) |
 >| **`UPLOAD_ERR_FORM_SIZE`**  | 2    | 上传文件的大小超过了 HTML 表单中 *MAX_FILE_SIZE* 选项指定的值 |
->| **`UPLOAD_ERR_PARTIAL`**    | 3    | 文件只有部分被上传                                           |
->| **`UPLOAD_ERR_NO_FILE`**    | 4    | 没有文件被上传。                                             |
->| **`UPLOAD_ERR_NO_TMP_DIR`** | 6    | 找不到临时文件夹                                             |
->| **`UPLOAD_ERR_CANT_WRITE`** | 7    | 文件写入失败                                                 |
->|                             |      |                                                              |
->
->
->
->
+> | **`UPLOAD_ERR_PARTIAL`**    | 3    | 文件只有部分被上传                                           |
+> | **`UPLOAD_ERR_NO_FILE`**    | 4    | 没有文件被上传。                                             |
+> | **`UPLOAD_ERR_NO_TMP_DIR`** | 6    | 找不到临时文件夹                                             |
+> | **`UPLOAD_ERR_CANT_WRITE`** | 7    | 文件写入失败                                                 |
+> 
 
 ## (三)、数学精度计算
 
@@ -1982,11 +2080,199 @@ Warning: session_set_save_handler(): Cannot change save handler when session is 
 
 ## (四)、http请求
 
-curl
+### 1、curl
+
+#### (1)、核心流程
+
+>```php
+>function curlFun(){
+>    //步骤一：打开curl资源
+>    $resource = curl_init();
+>    //步骤二：设置http协议参数
+>    curl_setopt($resource, 'option', 'option-value');
+>    //步骤三：执行请求
+>    $result = curl_exec($resource);
+>    //步骤四：关闭资源
+>    curl_close($resource);
+>    return $result;
+>}
+>```
+
+
+
+#### (2)、常用选项option
+
+| 等待 | key                           | value-type   | 解释                                                         | 备注 |
+| ---- | ----------------------------- | ------------ | ------------------------------------------------------------ | ---- |
+|      | CURLOPT_URL                   | string       |                                                              |      |
+|      | CURLOPT_CUSTOMREQUEST         | string       | 请求method，get/post/head/delete等                           |      |
+|      | CURLOPT_POST                  | bool         | TRUE 时会发送 POST 请求，类型为：application/x-www-form-urlencoded |      |
+|      | CURLOPT_PUT                   | bool         | TRUE 时允许 HTTP 发送文件。要被 PUT 的文件必须在 CURLOPT_INFILE和CURLOPT_INFILESIZE 中设置 |      |
+|      | CURLOPT_HTTPHEADER            | array        | 设置 HTTP 头字段的数组。格式： array('Content-type: text/plain', 'Content-length: 100') |      |
+|      | CURLOPT_HEADER                | bool         | true:头文件的信息作为数据流输出                              |      |
+|      | CURLOPT_RETURNTRANSFER        | bool         | true:将curl_exec()获取的信息以字符串返回，而不是直接输出     |      |
+|      | CURLOPT_CONNECTTIMEOUT（_MS） | int          | 连接等待时间(秒/毫秒)                                        |      |
+|      | CURLOPT_TIMEOUT（_MS）        | int          | 允许 cURL 函数执行的最长秒数(或毫秒)                         |      |
+|      | CURLOPT_POSTFIELDS            | array/string | post的参数。array为键值对。string用ulencode风格(&)。文件路径前加@ |      |
+
+#### (3)、相关函数
+
+##### a、curl函数
+
+| 序号 | 函数                                                         | 功能                                           | 备注             |
+| ---- | ------------------------------------------------------------ | ---------------------------------------------- | ---------------- |
+| 1    | `curl_version([ int $age = CURLVERSION_NOW] ) : array`       | cURL版本号                                     |                  |
+| 2    | `curl_init([ string $url = NULL] ) : resource`               | 初始化                                         |                  |
+| 3    | `curl_copy_handle( resource $ch) : resource`                 | 复制cURL会话和选项                             |                  |
+| 4    | `curl_pause( resource $ch, int $bitmask) : int`              | 暂停和取消暂停cURL会话                         | CURLPAUSE_* 常量 |
+| 5    | `curl_reset( resource $ch) : void`                           | 重置所有选项                                   |                  |
+| 6    | `curl_setopt( resource $ch, int $option, mixed $value) : bool` | 设置选项                                       |                  |
+| 7    | `curl_setopt_array( resource $ch, array $options) : bool`    | 设置选项                                       |                  |
+| 8    | `curl_exec( resource $ch) : mixed`                           | 执行                                           |                  |
+| 9    | `curl_close( resource $ch) : void`                           | 关闭                                           |                  |
+| 10   | `curl_errno( resource $ch) : int`                            | 错误编码(上一次)                               |                  |
+| 11   | `curl_strerror( int $errornum) : string`                     | 错误码转换错误信息                             |                  |
+| 12   | `curl_error( resource $ch) : string`                         | 错误的字符串(最后一次)                         |                  |
+| 13   | `curl_getinfo( resource $ch[, int $opt = 0] ) : mixed`       | 获取cURL会话连接的信息                         |                  |
+| 14   | `curl_file_create`                                           | 此函数是该函数的别名： CURLFile::__construct() |                  |
+| 15   | `curl_escape( resource $ch, string $str) : string`           | 对str进行URL编码转化                           |                  |
+| 16   | `curl_unescape( resource $ch, string $str) : string`         | 对str进行URL编码反转化                         |                  |
+|      |                                                              |                                                |                  |
+| 1    | `curl_share_init( void) : resource`                          | 初始化一个 cURL 共享句柄                       |                  |
+| 2    | `curl_share_setopt( resource $sh, int $option, string $value) : bool` | 设置选项                                       |                  |
+| 3    | `curl_share_close( resource $sh) : void`                     | 关闭                                           |                  |
+| 4    | `curl_share_errno( resource $sh) : int`                      | 错误编码(上一次)                               |                  |
+| 5    | `curl_share_strerror( int $errornum) : string`               | 错误码转换错误信息                             |                  |
+|      |                                                              |                                                |                  |
+| 1    | `curl_multi_init( void) : resource`                          | 初始化批量cURL会话                             |                  |
+| 2    | `curl_multi_add_handle( resource $mh, resource $ch) : int`   | 追加一个cURL会话                               |                  |
+| 3    | `curl_multi_remove_handle( resource $mh, resource $ch) : int` | 删除某个cURL会话                               |                  |
+| 4    | `curl_multi_select( resource $mh[, float $timeout = 1.0] ) : int` | 阻塞直到cURL批处理连接中有活动连接。           |                  |
+| 5    | `curl_multi_setopt( resource $mh, int $option, mixed $value) : bool` | 设置选项                                       |                  |
+| 6    | `curl_multi_exec( resource $mh, int &$still_running) : int`  | 执行                                           |                  |
+| 7    | `curl_multi_close( resource $mh) : void`                     | 关闭                                           |                  |
+| 8    | `curl_multi_errno( resource $mh) : int`                      | 错误码(上一次)                                 |                  |
+| 9    | `curl_multi_strerror( int $errornum) : string`               | 错误码转换错误信息                             |                  |
+| 10   | `curl_multi_getcontent( resource $ch) : string`              | 获取输出文本。前提：returntransfer             |                  |
+| 11   | `curl_multi_info_read( resource $mh[, int &$msgs_in_queue = NULL] ) : array` | 获取当前解析的cURL的相关传输信息               |                  |
+
+##### b、curlfile类
+
+| 序号 | 方法                                                         | 功能                          | 备注 |
+| ---- | ------------------------------------------------------------ | ----------------------------- | ---- |
+| 1    | `__construct( string $filename[, string $mimetype[, string $postname]] )` | 创建 CURLFile 对象            |      |
+| 2    | `getFilename( void) : string`                                | 获取被上传文件的 文件名       |      |
+| 3    | `getMimeType( void) : string`                                | 获取被上传文件的 MIME 类型    |      |
+| 4    | `getPostFilename( void) : string`                            | 获取 POST 请求时使用的 文件名 |      |
+| 5    | `setMimeType( string $mime) : void`                          | 设置被上传文件的 MIME 类型    |      |
+| 6    | `setPostFilename( string $postname) : void`                  | 设置 POST 请求时使用的文件名  |      |
+| 7    | `__wakeup( void) : void`                                     | 反序列化句柄                  |      |
+
+#### (4）、案例
+
+##### a、网站
+
+###### (I)、访问
+
+>浏览器访问index.php。
+>
+>​                    会发现和打开www.baidu.com，界面上完全没事区别
+>
+>```php
+>$ch = curl_init();
+>curl_setopt($ch, CURLOPT_URL, "http://www.baidu.com/");
+>curl_exec($ch);
+>curl_close($ch);
+>```
+
+
+
+>多一个`curl_setopt($ch, CURLOPT_HEADER, true);`
+>
+>​	                  在界面上header被作为字符串输出了
+>
+>```php
+>curl_setopt($ch, CURLOPT_URL, "http://www.baidu.com/");
+>curl_setopt($ch, CURLOPT_HEADER, true);
+>curl_exec($ch);
+>curl_close($ch);
+>```
+>
+>HTTP/1.1 200 OK Accept-Ranges: bytes Cache-Control: no-cache Connection: keep-alive Content-Length: 14615 Content-Type: text/html Date: Wed, 05 Aug 2020 07:33:19 GMT P3p: CP=" OTI DSP COR IVA OUR IND COM " P3p: CP=" OTI DSP COR IVA OUR IND COM " Pragma: no-cache Server: BWS/1.1 Set-Cookie: BAIDUID=8B76A08F7BDCCE2F7099AACD82C0426D:FG=1; expires=Thu, 31-Dec-37 23:55:55 GMT; max-age=2147483647; path=/; domain=.baidu.com Set-Cookie: BIDUPSID=8B76A08F7BDCCE2F7099AACD82C0426D; expires=Thu, 31-Dec-37 23:55:55 GMT; max-age=2147483647; path=/; domain=.baidu.com Set-Cookie: PSTM=1596612799; expires=Thu, 31-Dec-37 23:55:55 GMT; max-age=2147483647; path=/; domain=.baidu.com Set-Cookie: BAIDUID=8B76A08F7BDCCE2F5D50F97F15326061:FG=1; max-age=31536000; expires=Thu, 05-Aug-21 07:33:19 GMT; domain=.baidu.com; path=/; version=1; comment=bd Traceid: 1596612799023825255411033233847705283481 Vary: Accept-Encoding X-Ua-Compatible: IE=Edge,chrome=1
+
+
+
+###### (II)、扒网站代码
+
+>把百度首页扒下来放在a.html文件中
+>
+>```php
+>$ch = curl_init("http://www.baidu.com/");
+>$fp = fopen("a.html", "w");//a.html不一定早已存在
+>
+>curl_setopt($ch, CURLOPT_FILE, $fp);
+>curl_setopt($ch, CURLOPT_HEADER, 0);
+>
+>curl_exec($ch);
+>curl_close($ch);
+>```
+>
+>
+
+##### b、get请求
+
+>
+>
+>```php
+>function httpGet($url, $timeout = 30)
+>{
+>    $ch = curl_init();
+>    curl_setopt($ch, CURLOPT_URL, $url);
+>    curl_setopt($ch, CURLOPT_HEADER, 0);
+>    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+>    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
+>    curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置cURL允许执行的最长秒数。
+>    $return = curl_exec($ch);
+>    curl_close($ch);
+>    return $return;
+>}
+>```
+>
+>
+
+##### c、post请求
+
+>```php
+>function httpPost($url, $data, $timeout = 30)
+>{
+>    $ch = curl_init();
+>    curl_setopt($ch, CURLOPT_URL, $url);
+>    curl_setopt($ch, CURLOPT_POST, 1);
+>    curl_setopt($ch, CURLOPT_HEADER, 0);
+>    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+>    curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+>    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+>    $result = curl_exec($ch);
+>    curl_close($ch);
+>    return $result;
+>}
+>```
 
 ## (五)、邮件发送
 
 ## (六)、国际时间
+
+| 概念 | 解释                                          | 备注 |
+| ---- | --------------------------------------------- | ---- |
+| UTC  | 世界协调时间、标准时间。==当前世界主流。==    |      |
+| GMT  | 格林尼治标准时间。曾经是世界主流              |      |
+| CST  | 中央标准时间。各国中央==在UTC基础上==自己定的 |      |
+
+* 为确保UTC与GMT相差不会超过0.9秒，在有需要的情况下会在==UTC内加上正或负闰秒==
+
+
+
+
 
 时区格式？？？支持哪些？？
 
@@ -2000,13 +2286,21 @@ getTime()
 
 ## (七)、认证
 
-http认证  文档>特点>用PHP进行http认证
+### 1、http认证  
 
-Oauth 文档>函数参考>web服务>OAuth
+文档>特点>用PHP进行http认证
+
+### 2、Oauth
+
+ 文档>函数参考>web服务>OAuth
 
 ## (八)、反射reflection
 
-## (九)、生成验证图
+## (九)、验证图和二维码
+
+### 1、验证图
+
+### 2、二维码
 
 ## (十)、操作mysql
 
