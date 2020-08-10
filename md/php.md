@@ -840,39 +840,18 @@ breake
 > static $a = ['a' => 'a'];     //array类型
 > static $a = PHP_VERSION;      //调用已定义的常量
 > static $a = "abcd";           //string类型
->                   //string的nowdoc
+>                 //string的nowdoc
 > static $a = <<<'label'
 > abcd
 > label;
->                   //string的heredoc
+>                 //string的heredoc
 > static $a=<<<label
 > abcd
 > label;
 > static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
 > ```
-> ```
 >
-> ```
 >
->```
->
->```
->
->```
->
->```
->
->```
->
->```
->
->```
->
->```
->
->```
->
->```
 >
 >```
 >
@@ -883,29 +862,7 @@ breake
 > static $a = function(){echo 'hello!';}  //不可以callback
 > static $a = new stdClass();             //不可以object
 >```
->```
 >
->```
->
->```
->
->```
->
->```
->
->```
->
->```
->
->```
->
->```
->
->```
->
->```
->
->```
 
 ### 2、常量
 
@@ -931,55 +888,7 @@ breake
 
 #### (2)、声明定义和初始化
 
-##### a、用define定义
-
->```php
->define('myConstant', null);
->define('myConstant', false);
->define('myConstant', 100);
->define('myConstant', 100.23);
->define('myConstant', ['a' => 'a']);//5.6错误,7.0.0正确
->define('myConstant', PHP_VERSION);
->define('myConstant', 'abcd');
->define('myConstant', <<<'label'
->string
->label
->);
->define('myConstant', <<<label
->string2
->label
->);
->define('myConstant', 1+2);
->define('myConstant', bcadd(1,2));//5/7都支持
->define('myConstant',function(){return 5;});//不支持
->define('myConstant', new stdClass());//不支持
->```
-
-##### b、用const定义
-
->```php
->const myConstant = null;
->const myConstant = false;
->const myConstant = 100;
->const myConstant = 100.23;
->const myConstant = ['a' => 'a'];//在5.6中也是支持的
->const myConstant = PHP_VERSION;
->const myConstant = 'abcd';
->const myConstant = <<<'label'
->string
->label;
->const myConstant = <<<label
->string2
->label;
->const myConstant =  1+2;
->const myConstant =  bcadd(1,2);//5/7都不支持
->const myConstant = function(){return 5;};//不支持
->const myConstant =  new stdClass());//不支持
->```
-
-##### c、用define还是const?
-
-###### (I)、define和const定义的常量，是同一个东西吗？
+##### (a)、define和const定义的常量，是同一个东西吗？
 
 >```php
 >const myConstant = 100;
@@ -988,13 +897,12 @@ breake
 >
 >* define和const定义的常量，是同一东西
 
-###### (II)、define和const用哪个好？
+##### (b)、define和const用哪个好？
 
 | 情况   | define    | const    |
 | ------ | --------- | -------- |
 | array  | 7.0才支持 | 一直支持 |
 | 调函数 | 一直支持  | 不支持   |
-| 类常量 | 不支持    | 支持     |
 
 >* 综上给出建议：
 >* * 对象之内用const
@@ -1145,7 +1053,13 @@ breake
 
 ### 概念
 
-#### (1)、访问控制
+#### (1)、名称规则
+
+>```php
+>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*
+>```
+
+#### (2)、访问控制
 
 >public          可以被任意访问
 >
@@ -1165,7 +1079,7 @@ breake
 >
 >
 
-#### (2)、static(静态)
+#### (3)、static(静态)
 
 >仅属性(字段)、方法(函数)支持设置static(静态)，类常量不需要
 >
@@ -1177,7 +1091,7 @@ breake
 >
 >* [boolean|integer|float|string|null|array]+已定义的常量。
 >
->* 不支持调用，回调等方式，不支持heredoc。
+>* 不支持调用，回调等方式。
 
 
 
@@ -1186,17 +1100,17 @@ breake
 >public static function myFun(){}
 >```
 
-#### (3)、final
+#### (4)、final
 
-#### (4)、命名空间
+#### (5)、命名空间
 
-#### (5)、自动加载
+#### (6)、自动加载
 
 spl_autoload_register()
 
 __construct()
 
-#### (6)、魔术方法
+#### (7)、魔术方法
 
 | 方法               | 功能 | class | trait | abstract | interface | 备注           |
 | ------------------ | ---- | ----- | ----- | -------- | --------- | -------------- |
@@ -1218,7 +1132,7 @@ __construct()
 
 
 
-#### (7)继承
+#### (8)继承
 
 ##### a、self、parent、static
 
@@ -1910,7 +1824,9 @@ Warning: session_set_save_handler(): Cannot change save handler when session is 
 >
 >
 
-#### (4)、预定义常量和ini配置
+#### (4)、系统参数
+
+##### a、预定义常量
 
 | 常量标识             | 数据类型 | 含义              |
 | -------------------- | -------- | ----------------- |
@@ -1929,6 +1845,184 @@ Warning: session_set_save_handler(): Cannot change save handler when session is 
 >◦ PHP_SESSION_ACTIVE 会话是启用的，而且存在当前会话。 
 
 #### 
+
+##### b、php.ini配置
+
+>
+>
+>下面是php.ini中session的配置说明：
+>session.save_handler = "files"
+> 存储和检索与会话关联的数据的处理器名字。默认为文件("files")。
+> 如果想要使用自定义的处理器(如基于数据库的处理器)，可用"user"。
+> 有一个使用PostgreSQL的处理器：http://sourceforge.net/projects/phpform-ext/
+>
+>
+>
+>session.save_path = "/tmp"
+> 传递给存储处理器的参数。对于files处理器，此值是创建会话数据文件的路径。
+> Windows下默认为临时文件夹路径。
+> 你可以使用"N[MODE]/path"这样模式定义该路径(N是一个整数)。
+> N表示使用N层深度的子目录，而不是将所有数据文件都保存在一个目录下。
+> [MODE]可选，必须使用8进制数，默认600(=384)，表示每个目录下最多保存的会话文件数量。
+> 这是一个提高大量会话性能的好主意。
+> 注意0: "N[MODE]/path"两边的双引号不能省略。
+> 注意1: [MODE]并不会改写进程的umask。
+> 注意2: php不会自动创建这些文件夹结构。请使用ext/session目录下的mod_files.sh脚本创建。
+> 注意3: 如果该文件夹可以被不安全的用户访问(比如默认的"/tmp")，那么将会带来安全漏洞。
+> 注意4: 当N>0时自动垃圾回收将会失效，具体参见下面有关垃圾搜集的部分。
+>
+>
+>
+>session.name = "PHPSESSID"
+>用在cookie里的会话ID标识名，只能包含字母和数字。
+>
+>
+>
+>session.auto_start = Off
+> 在客户访问任何页面时都自动初始化会话，默认禁止。
+> 因为类定义必须在会话启动之前被载入，所以若打开这个选项，你就不能在会话中存放对象。
+>
+>
+>
+>session.serialize_handler = "php"
+> 用来序列化/解序列化数据的处理器，php是标准序列化/解序列化处理器。
+> 另外还可以使用"php_binary"。当启用了WDDX支持以后，将只能使用"wddx"。
+>
+>
+>
+>session.gc_probability = 1
+>session.gc_divisor = 100
+> 定义在每次初始化会话时，启动垃圾回收程序的概率。
+> 这个收集概率计算公式如下：session.gc_probability/session.gc_divisor
+> 对会话页面访问越频繁，概率就应当越小。建议值为1/1000~5000。
+>
+>
+>
+>session.gc_maxlifetime = 1440
+> 超过此参数所指的秒数后，保存的数据将被视为'垃圾'并由垃圾回收程序清理。
+> 判断标准是最后访问数据的时间(对于FAT文件系统是最后刷新数据的时间)。
+> 如果多个脚本共享同一个session.save_path目录但session.gc_maxlifetime不同，
+> 那么将以所有session.gc_maxlifetime指令中的最小值为准。
+> 如果使用多层子目录来存储数据文件，垃圾回收程序不会自动启动。
+> 你必须使用一个你自己编写的shell脚本、cron项或者其他办法来执行垃圾搜集。
+> 比如，下面的脚本相当于设置了"session.gc_maxlifetime=1440" (24分钟)：
+> cd /path/to/sessions find -cmin +24 | xargs rm
+>
+>
+>
+>session.referer_check =
+> 如果请求头中的"Referer"字段不包含此处指定的字符串则会话ID将被视为无效。
+> 注意：如果请求头中根本不存在"Referer"字段的话，会话ID将仍将被视为有效。
+> 默认为空，即不做检查(全部视为有效)。
+>
+>
+>
+>session.entropy_file = "/dev/urandom"
+> 附加的用于创建会话ID的外部高熵值资源(文件)，
+> 例如UNIX系统上的"/dev/random"或"/dev/urandom"
+>
+>
+>
+>session.entropy_length = 0
+> 从高熵值资源中读取的字节数(建议值：16)。
+>
+>
+>
+>session.use_cookies = On
+> 是否使用cookie在客户端保存会话ID
+>
+>
+>
+>session.use_only_cookies = Off
+> 是否仅仅使用cookie在客户端保存会话ID
+> 打开这个选项可以避免使用URL传递会话带来的安全问题。
+> 但是禁用Cookie的客户端将使会话无法工作。
+>
+>
+>
+>session.cookie_lifetime = 0
+> 传递会话ID的Cookie有效期(秒)，0 表示仅在浏览器打开期间有效。
+>
+>
+>
+>session.cookie_path = "/"
+> 传递会话ID的Cookie作用路径。
+>
+>
+>
+>session.cookie_domain =
+> 传递会话ID的Cookie作用域。
+> 默认为空表示表示根据cookie规范生成的主机名。
+>
+>
+>
+>session.cookie_secure = Off
+> 是否仅仅通过安全连接(https)发送cookie。
+>
+>
+>
+>session.cookie_httponly = Off
+> 是否在cookie中添加httpOnly标志(仅允许HTTP协议访问)，
+> 这将导致客户端脚本(JavaScript等)无法访问该cookie。
+> 打开该指令可以有效预防通过XSS攻击劫持会话ID。
+>
+>
+>
+>session.cache_limiter = "nocache"
+> 设为{nocache|private|public}以指定会话页面的缓存控制模式，
+> 或者设为空以阻止在http应答头中发送禁用缓存的命令。
+>
+>
+>
+>session.cache_expire = 180
+> 指定会话页面在客户端cache中的有效期限(分钟)
+> session.cache_limiter=nocache时，此处设置无效。
+>
+>
+>
+>session.use_trans_sid = Off
+> 是否使用明码在URL中显示SID(会话ID)。
+> 默认是禁止的，因为它会给你的用户带来安全危险：
+> 1- 用户可能将包含有效sid的URL通过email/irc/QQ/MSN…途径告诉给其他人。
+> 2- 包含有效sid的URL可能会被保存在公用电脑上。
+> 3- 用户可能保存带有固定不变sid的URL在他们的收藏夹或者浏览历史纪录里面。
+> 基于URL的会话管理总是比基于Cookie的会话管理有更多的风险，所以应当禁用。
+>
+>
+>
+>session.bug_compat_42 = On
+>session.bug_compat_warn = On
+> PHP4.2之前的版本有一个未注明的"BUG"：
+> 即使在register_globals=Off的情况下也允许初始化全局session变量，
+> 如果你在PHP4.3之后的版本中使用这个特性，会显示一条警告。
+> 建议关闭该"BUG"并显示警告。
+>
+>
+>
+>session.hash_function = 0
+> 生成SID的散列算法。SHA-1的安全性更高一些
+> 0: MD5 (128 bits)
+> 1: SHA-1 (160 bits)
+> 建议使用SHA-1。
+>
+>
+>
+>session.hash_bits_per_character = 4
+> 指定在SID字符串中的每个字符内保存多少bit，
+> 这些二进制数是hash函数的运算结果。
+> 4: 0-9, a-f
+> 5: 0-9, a-v
+> 6: 0-9, a-z, A-Z, "-", ","
+> 建议值为 5
+>
+>url_rewriter.tags = "a=href,area=href,frame=src,form=,fieldset="
+> 此指令属于PHP核心部分，并不属于Session模块。
+> 指定重写哪些HTML标签来包含SID(仅当session.use_trans_sid=On时有效)
+> **form和fieldset比较特殊：
+>** 如果你包含他们，URL重写器将添加一个隐藏的"<input>"，它包含了本应当额外追加到URL上的信息。
+> 如果要符合XHTML标准，请去掉form项并在表单字段前后加上<fieldset>标记。
+> **注意：所有合法的项都需要一个等号(即使后面没有值)。
+>** 推荐值为"a=href,area=href,frame=src,input=src,form=fakeentry"。
 
 ## (二)、文件上传
 
@@ -2056,6 +2150,14 @@ Warning: session_set_save_handler(): Cannot change save handler when session is 
 
 
 
+
+
+### 2、系统参数
+
+#### (1)、系统常量
+
+
+
 >这里的error具体参考值：文档 > 特点 > 文件上传处理 >  错误信息说明
 >
 >| 常量                        | 数字 | 解释                                                         |
@@ -2063,11 +2165,18 @@ Warning: session_set_save_handler(): Cannot change save handler when session is 
 >| **`UPLOAD_ERR_OK`**         | 0    | 没错，成功                                                   |
 >| **`UPLOAD_ERR_INI_SIZE`**   | 1    | 超限了。php.ini 中 [upload_max_filesize](https://www.php.net/manual/zh/ini.core.php#ini.upload-max-filesize) |
 >| **`UPLOAD_ERR_FORM_SIZE`**  | 2    | 上传文件的大小超过了 HTML 表单中 *MAX_FILE_SIZE* 选项指定的值 |
-> | **`UPLOAD_ERR_PARTIAL`**    | 3    | 文件只有部分被上传                                           |
-> | **`UPLOAD_ERR_NO_FILE`**    | 4    | 没有文件被上传。                                             |
-> | **`UPLOAD_ERR_NO_TMP_DIR`** | 6    | 找不到临时文件夹                                             |
-> | **`UPLOAD_ERR_CANT_WRITE`** | 7    | 文件写入失败                                                 |
-> 
+>| **`UPLOAD_ERR_PARTIAL`**    | 3    | 文件只有部分被上传                                           |
+>| **`UPLOAD_ERR_NO_FILE`**    | 4    | 没有文件被上传。                                             |
+>| **`UPLOAD_ERR_NO_TMP_DIR`** | 6    | 找不到临时文件夹                                             |
+>| **`UPLOAD_ERR_CANT_WRITE`** | 7    | 文件写入失败                                                 |
+
+#### (2)、php.ini配置
+
+
+
+
+
+
 
 ## (三)、数学精度计算
 
@@ -2294,6 +2403,18 @@ getTime()
 
 ### 3、时间戳与格式化时间转化
 
+### 系统参数
+
+#### 系统常量
+
+#### php.ini配置
+
+| key             | value | 解释 | 备注 |
+| --------------- | ----- | ---- | ---- |
+| `date.timezone` |       |      |      |
+
+
+
 ## (七)、认证
 
 ### 1、http认证  
@@ -2320,93 +2441,84 @@ getTime()
 
 ob_flush
 
-# 五、设计模式
 
-**核心思想**
 
-* 对接口编程而不是对实现编程
-* 优先使用对象组合而不是继承
+# 分门别类
 
-**六大原则**
+## (一)、大小写问题
 
-| 原则     | 解释                                                     | 举例 |
-| -------- | -------------------------------------------------------- | ---- |
-| 开闭     | 对扩展开放，对修改关闭                                   |      |
-| 里氏代换 | 任何基类可出现的地方，子类一定可以出现                   |      |
-| 依赖倒转 | 针对接口编程，依赖于抽象而不依赖于具体                   |      |
-| 接口隔离 | 降低类之间的耦合                                         |      |
-| 最少知道 | 一个实体应尽量少的与其它实体相互作用，使系统模块相对独立 |      |
-| 合成复用 | 尽量使用合成、聚合方式，而不是用继承                     |      |
+| 功能           | 区分大小写 | 举例                                            |
+| -------------- | ---------- | ----------------------------------------------- |
+| linux文件系统  | 严格区分   | a.txt和A.txt是两个文件                          |
+| window文件系统 | 不区分     | a.txt和A.txt是一个文件                          |
+|                |            |                                                 |
+| 变量           | 严格区分   | `$var`和`$vaR`是两个变量                        |
+| 常量           | 严格区分   | `define('aBc',1)`和`define('abc', 1)`时两个常量 |
+| function       | 不区分     | `function aa`和`function Aa`相同                |
+| 命名空间       | 不区分     | \ff\Test()和\Ff\Test()是相同的                  |
+| 类名           | 不区分     | class aa{}和class AA{}是相同的                  |
+| 类变量         | 严格区分   | 同变量                                          |
+| 类常量         | 严格区分   | 同常量                                          |
+| 类function     | 不区分     | 同function                                      |
+| 魔术常量       | 不区分     | `___CLASS__`和`__class__`相同                   |
+| array中的key   | 严格区分   | `['a'=>1, 'A'=>2]`数组中由两个不同元素          |
 
-设计模式列表5+8+12=25
+==简单归纳：==
 
-| 序号 | 大分类     | 设计模式                | 中文         | 场景                                                     | 备注 |
-| ---- | ---------- | ----------------------- | ------------ | -------------------------------------------------------- | ---- |
-| 1.1  | 创建模式   | factory  method         | 工厂方法模式 | 普通工厂方法模式<br>多个工厂方法模式<br>静态工厂方法模式 |      |
-| 1.2  |            | abstract factory        | 抽象工厂模式 |                                                          |      |
-| 1.3  |            | singleton               | 单例模式     |                                                          |      |
-| 1.4  |            | builder                 | 建造者模式   |                                                          |      |
-| 1.5  |            | prototype               | 原型模式     |                                                          |      |
-| 2.1  | 结构模式   | adapter                 | 适配器模式   |                                                          |      |
-| 2.2  |            | bridge                  | 桥连模式     |                                                          |      |
-| 2.3  |            | filter、criteria        | 过滤器模式   | ？？                                                     |      |
-| 2.4  |            | composite               | 组合模式     |                                                          |      |
-| 2.5  |            | decotator               | 装饰模式     |                                                          |      |
-| 2.6  |            | facade                  | 外观模式     |                                                          |      |
-| 2.7  |            | flyweight               | 享元模式     |                                                          |      |
-| 2.8  |            | proxy                   | 代理模式     |                                                          |      |
-| 3.1  | 行为型模式 | chain of responsibility | 责任链模式   |                                                          |      |
-| 3.2  |            | command                 | 命令模式     |                                                          |      |
-| 3.3  |            | interpreter             | 解释器模式   |                                                          |      |
-| 3.4  |            | iterator                | 迭代器模式   |                                                          |      |
-| 3.5  |            | mediator                | 中介者模式   |                                                          |      |
-| 3.6  |            | memento                 | 备忘录模式   |                                                          |      |
-| 3.7  |            | observer                | 观察者模式   |                                                          |      |
-| 3.8  |            | state                   | 状态模式     |                                                          |      |
-| 3.9  |            | null object             | 空对象模式   | ？？                                                     |      |
-| 3.10 |            | strategy                | 策略模式     |                                                          |      |
-| 3.11 |            | template                | 模板模式     |                                                          |      |
-| 3.12 |            | visitor                 | 访问者模式   |                                                          |      |
+* 只有==变量==、==常量==以及==key==严格区分大小写，其他是未强制要求的
 
-哒、、
+## (二)、判断问题
 
-# php.ini
+>```php
+>$arr = [
+>    null, 'null',   //空
+>    0, '0',         //0
+>    false, 'false', //false
+>    '',
+>    [],
+>];
+>
+>/*********** == 判断 *********
+> 
+>null    => [0, false, '', array()],
+>'null'  => [0],
+>0       => [null, 'null', '0',false, 'false', ''],//除了[]都==
+>'0'     => [0, false],
+>false   => [null, 0, '0', '', array()],
+>'false' => [0],
+>''      => [null, 0, false, null],
+>array() => [null, false]
+>
+>
+>'null'  => [0],
+>'false' => [0],
+>'0'     => [0, false],
+>array() => [null, false]
+>''      => [null, 0, false],
+>null    => [0, false, '', array()],
+>false   => [null, 0, '0', '', array()],
+>0       => [null, 'null', '0',false, 'false', ''],//除了[]都==
+>
+>*/
+>
+>//特别注意 false != 'false'
+>
+>```
 
-| 分类           | ini中key           | ini中value | 作用                   | 举例                                                         | 版本记录    |
-| -------------- | ------------------ | ---------- | ---------------------- | ------------------------------------------------------------ | ----------- |
-| 文件格式       | short_open_tag     |            | `<?..?>`               |                                                              |             |
-|                | asp_tags           |            | `<%...%>`              |                                                              | ==7.0.0删== |
-| 超全局变量     | variables_order    | EGPCS      | 设置超全局变量是否为空 | `$_ENV`     E<br>`$_GET`     G<br/> `$_POST`   P<br/>`$_COOKIE`C<br/> `$_SERVER` S |             |
-|                | request_order      | GPC        | `$_REQUEST`            | get/post/cookie                                              |             |
-| 预定义变量     | track_errors       | boolean    | `$php_errosmsg`        |                                                              | ==7.2.0删== |
-|                | register_argc_argv | boolean    | `$argc` `$argv`        |                                                              |             |
-| 执行运算符\`\` | safe_mode          | boolean    | 是否开启安全模式       |                                                              |             |
+| 涉及场景        | 什么等 | 举例 | 备注 |
+| --------------- | ------ | ---- | ---- |
+| 判断运算符`<=>` | `==`   |      |      |
+| switch..case    | `==`   |      |      |
+| in_array()      | `==`   |      |      |
 
-# 大小写问题
 
-| 功能         | 区分大小写 | 举例                                            |
-| ------------ | ---------- | ----------------------------------------------- |
-| 变量         | 严格区分   | `$var`和`$vaR`是两个变量                        |
-| 常量         | 严格区分   | `define('aBc',1)`和`define('abc', 1)`时两个常量 |
-| function     | 不区分     | `function aa`和`function Aa`相同                |
-| 命名空间     |            |                                                 |
-| 类名         |            |                                                 |
-| 类变量       |            |                                                 |
-| 类常量       |            |                                                 |
-| 类function   |            |                                                 |
-| 魔术常量     | 不区分     | `___CLASS__`和`__class__`相同                   |
-| array中的key | 严格区分   | `['a'=>1, 'A'=>2]`数组中由两个不同元素          |
 
-# `==`与`===`问题
-
-| 涉及场景        | 什么等 | 举例             | 备注 |
-| --------------- | ------ | ---------------- | ---- |
-| 判断运算符`<=>` | `==`   |                  |      |
-| switch..case    |        |                  |      |
-| in_array()      |        |                  |      |
-| empty()         |        |                  |      |
-| `$a?$b:$c`      |        |                  |      |
-| `&&` `||`       |        | `$flag && $a =1` |      |
+| 操作  | null | 'null' | 0    | '0'  | false | 'false' | ''   | []   |
+| ----- | ---- | ------ | ---- | ---- | ----- | ------- | ---- | ---- |
+| ?:    |      | true   |      |      |       | true    |      |      |
+| empty | true |        | true | true | true  |         | true | true |
+| isset |      | true   | true | true | true  | true    | true | true |
+| &&    |      | true   |      |      |       | true    |      |      |
 
 1、判断运算符`<=>`
 
@@ -2420,7 +2532,514 @@ ob_flush
 >echo 1<=>'1';//0
 >```
 
+
+
+## (三)、exist问题
+
+| 判断的东西 | a    | b    |
+| ---------- | ---- | ---- |
+| 变量       |      |      |
+| 常量       |      |      |
+| function   |      |      |
+| class      |      |      |
+| strait     |      |      |
+| interface  |      |      |
+| 类变量     |      |      |
+| 类常量     |      |      |
+| 类function |      |      |
+
+
+
+
+
+>
+>
+>```php
+>class A{
+>const aaa_bbb =333;
+>}
+>
+>$a = 'aaa_bbb';
+>
+>//var_dump(A::$a);
+>
+>var_dump(constant("A3::".$a));
+>var_dump(defined("A3::".$a));
+>
+>var_dump(defined('\common\services\OneSignalService::TEMPLATE_'.'TEST'));die;//true
+>
+>
+>
+>use common\services\OneSignalService;
+>var_dump(defined('OneSignalService::TEMPLATE_'.'TEST'));die;//false
+>```
+>
+>
+
+
+
+## (四)、初始化赋值
+
+| 序号 | 数据类型                               | 变量 | 变量static | 常量define | 常量const |      | 类变量 | 类变量static | 类常量const |
+| ---- | -------------------------------------- | ---- | ---------- | ---------- | --------- | ---- | ------ | ------------ | ----------- |
+| 1    | 不初始化                               |      | ==支持==   | 不支持     | 不支持    |      |        | ==支持==     | 不支持      |
+| 2    | null                                   |      |            |            |           |      |        |              |             |
+| 3    | boolean,string(单双)<br/>integer,float |      |            |            |           |      |        |              |             |
+| 4    | 解释变量`"string{$x}"`                 |      | 不支持     |            | 不支持    |      | 不支持 | 不支持       | 不支持      |
+| 5    | array                                  |      |            |            |           |      |        |              |             |
+| 6    | callback                               |      | 不支持     | 不支持     | 不支持    |      | 不支持 | 不支持       | 不支持      |
+| 7    | object                                 |      | 不支持     | 不支持     | 不支持    |      | 不支持 | 不支持       | 不支持      |
+| 8    | resource                               |      | ?          | ?          | ?         |      | ?      | ?            | ?           |
+| 9    | `+` `-` `*` `/` `%` `** `(1+2)         |      |            |            |           |      |        |              |             |
+| 10   | `+` `-` `*` `/` `%` `** `(`$x`+`$y`)   |      | 不支持     |            | 不支持    |      | 不支持 | 不支持       | 不支持      |
+| 11   | bcadd(1,2)                             |      | 不支持     |            | 不支持    |      | 不支持 | 不支持       | 不支持      |
+| 12   | heredoc                                |      |            |            |           |      |        |              |             |
+| 13   | nowdoc                                 |      |            |            |           |      |        |              |             |
+| 14   | 常量                                   |      |            |            |           |      |        |              |             |
+| 15   | 类变量                                 |      | 不支持     |            | 不支持    |      | 不支持 | 不支持       | 不支持      |
+| 16   | 类静态变量                             |      | 不支持     |            | 不支持    |      | 不支持 | 不支持       | 不支持      |
+| 17   | 类常量                                 |      |            |            |           |      |        |              |             |
+| 18   | 类fuction                              |      | 不支持     |            | 不支持    |      | 不支持 | 不支持       | 不支持      |
+
+### 1、变量
+
+>```php
+>class Obj{
+>    public $oVar =111;
+>    public static $oStaticVar = 222;
+>    const O_CONST = 333;
+>
+>    public function method(){
+>        return 444;
+>    }
+>}
+>$obj = new  Obj();
+>$x = 1;
+>$y = 2;
+>$z = 3;
+>
+>
+>$a;                                     //1、仅声明不初始化
+>$a = null;                              //2、null
+>$a = false;                             //3、boolean,string(单双),integer,float
+>$a = 'string';
+>$a = "string";
+>$a = 100;
+>$a = 100.23;
+>$a = "string{$z}";                       //4、解释变量
+>$a = ['a' => 'a'];                       //5、array类型
+>$a = function(){return 5;};              //6、callback
+>$a = new stdClass();                     //7、object
+>                                         //8、resource
+>$a = 1+2;                                //9、+ - * / % **
+>$a = $x+$y;                              //10、+ - * / % **（$x+$y）
+>$a = bcadd(1,2);                         //11、bcadd()
+>                                         //12、heredoc 13、nowdoc
+>$a =<<<label
+>here-doc
+>label;
+>$a = <<<'label'
+>now-doc
+>label;
+>
+>$a = PHP_INT_MAX;                        //14、常量
+>
+>$a = $obj->oVar;                         //15、类变量
+>$a = Obj::$oStaticVar;                   //16、类静态变量
+>$a = Obj::O_CONST;                       //17、类常量
+>$a = $obj->method();                     //18、类function
+>
+>```
+>
+>
+
+### 2、变量(static)
+
+>
+>
+>```php
+>class Obj{
+>    public $oVar =111;
+>    public static $oStaticVar = 222;
+>    const O_CONST = 333;
+>
+>    public function method(){
+>        return 444;
+>    }
+>}
+>$obj = new  Obj();
+>$x = 1;
+>$y = 2;
+>$z = 3;
+>
+>static $a;                                     //1、仅声明不初始化
+>static $a = null;                              //2、null
+>static $a = false;                             //3、boolean,string(单双),integer,float
+>static $a = 'string';
+>static $a = "string";
+>static $a = 100;
+>static $a = 100.23;
+>static $a = "string{$x}";                       //4、解释变量
+>static $a = ['a' => 'a'];                       //5、array类型
+>static $a = function(){return 5;};              //6、callback
+>static $a = new stdClass();                     //7、object
+>                                                //8、resource
+>static $a = 1+2;                                //9、+ - * / % **（1+2）
+>static $a = $x+$y;                              //10、+ - * / % **（$x+$y）
+>static $a = bcadd(1,2); //11、bcadd()
+>                                                //12、heredoc 13、nowdoc
+>static $a =<<<label
+>here-doc
+>label;
+>static $a = <<<'label'
+>now-doc
+>label;
+>
+>static $a = PHP_INT_MAX;                        //14、常量
+>
+>static $a = $obj->oVar;                         //15、类变量
+>static $a = Obj::$oStaticVar;                   //16、类静态变量
+>static $a = Obj::O_CONST;                       //17、类常量
+>static $a = $obj->method();                     //18、类function
+>
+>```
+>
+>
+
+
+
+
+
+### 3、常量define()
+
+>
+>
+>```php
+>class Obj{
+>    public $oVar=111;
+>    public static  $oStaticVar =222;
+>    const O_CONST=333;
+>
+>    function method(){
+>        return 444;
+>    }
+>}
+>$obj =new  Obj();
+>
+>$x= 1;
+>$y= 2;
+>$z= 3;
+>
+>$a;                                            //1、仅声明不初始化
+>define('a', null);                              //2、null
+>define('a', false);                             //3、boolean,string(单双),integer,float
+>define('a', 'string');
+>define('a', "string");
+>define('a', 100);
+>define('a', 100.23);
+>define('a', "string{$x}");                       //4、解释变量
+>define('a', ['a' => 'a']);                       //5、array类型
+>define('a', function(){return 5;});              //6、callback
+>define('a', new stdClass());                     //7、object
+>                                                 //8、resource
+>define('a', 1+2);                                //9、+ - * / % **（1+2）
+>define('a', $x+$y);                              //10、+ - * / % **（$x+$y）
+>define('a', bcadd(1,2)); //11、bcadd()
+>                                                 //12、heredoc 13、nowdoc
+>define('a', <<<label
+>here-doc
+>label);
+>define('a', <<<'label'
+>now-doc
+>label);
+>
+>define('a', PHP_INT_MAX);                        //14、常量
+>
+>define('a', $obj->oVar);                         //15、类变量
+>define('a', Obj::$oStaticVar);                   //16、类静态变量
+>define('a', Obj::O_CONST);                       //17、类常量
+>define('a', $obj->method());                     //18、类function
+>var_dump(a);
+>```
+>
+>
+
+
+
+### 4、常量const
+
+>
+>
+>```php
+>class Obj{
+>    public $oVar =111;
+>    public const oStaticVar = 222;
+>    const O_CONST = 333;
+>
+>    public function method(){
+>        return 444;
+>    }
+>}
+>$obj = new  Obj();
+>$x = 1;
+>$y = 2;
+>$z = 3;
+>
+>const a;                                     //1、仅声明不初始化
+>const a = null;                              //2、null
+>const a = false;                             //3、boolean,string(单双),integer,float
+>const a = 'string';
+>const a = "string";
+>const a = 100;
+>const a = 100.23;
+>const a = "string{$x}";                       //4、解释变量
+>const a = ['a' => 'a'];                       //5、array类型
+>const a = function(){return 5;};              //6、callback
+>const a = new stdClass();                     //7、object
+>                                                //8、resource
+>const a = 1+2;                                //9、+ - * / % **（1+2）
+>const a = $x+$y;                              //10、+ - * / % **（$x+$y）
+>const a = bcadd(1,2); //11、bcadd()
+>                                                //12、heredoc 13、nowdoc
+>const a =<<<label
+>here-doc
+>label;
+>const a = <<<'label'
+>now-doc
+>label;
+>
+>const a = PHP_INT_MAX;                        //14、常量
+>
+>const a = $obj->oVar;                         //15、类变量
+>const a = Obj::$oStaticVar;                   //16、类静态变量
+>const a = Obj::O_CONST;                       //17、类常量
+>const a = $obj->method();                     //18、类function
+>```
+>
+>
+
+
+
+
+
+### 5、类变量
+
+>
+>
+>```php
+>class Obj{
+>    public $oVar =111;
+>    public static  $oStaticVar = 222;
+>    const O_CONST= 333;
+>
+>    public function method(){
+>        return 444;
+>    }
+>}
+>$obj = new  Obj();
+>
+>class Test{
+>public $x = 1;
+>public $y = 2;
+>public $z = 3;
+>
+>public $a;                                     //1、仅声明不初始化
+>public $a = null;                              //2、null
+>public $a = false;                             //3、boolean,string(单双),integer,float
+>public $a = 'string';
+>public $a = "string";
+>public $a = 100;
+>public $a = 100.23;
+>public $a = "string{$this->x}";                       //4、解释变量
+>public $a = ['a' => 'a'];                       //5、array类型
+>public $a = function(){return 5;};              //6、callback
+>public $a = new stdClass();                     //7、object
+>                                                //8、resource
+>public $a = 1+2;                                //9、+ - * / % **（1+2）
+>public $a = $this->x+$this->y;                              //10、+ - * / % **（$x+$y）
+>public $a = bcadd(1,2); //11、bcadd()
+>                                                //12、heredoc 13、nowdoc
+>public $a =<<<label
+>here-doc
+>label;
+>public $a = <<<'label'
+>now-doc
+>label;
+>
+>public $a = PHP_INT_MAX;                        //14、常量
+>
+>public $a = $obj->oVar;                         //15、类变量
+>public $a = Obj::$oStaticVar;                   //16、类静态变量
+>public $a = Obj::O_CONST;                       //17、类常量
+>public $a = $obj->method();                     //18、类function
+>}
+>```
+>
+>
+
+
+
+### 6、类变量(static)
+
+>
+>
+>```php
+>class Obj{
+>    public static $oVar =111;
+>    public static $oStaticVar = 222;
+>    public static $O_CONST= 333;
+>
+>    public function method(){
+>        return 444;
+>    }
+>}
+>$obj = new  Obj();
+>
+>class Test{
+>public  $x = 1;
+>public  $y = 2;
+>public  $z = 3;
+>
+>public static $a;                                     //1、仅声明不初始化
+>public static $a = null;                              //2、null
+>public static $a = false;                             //3、boolean,string(单双),integer,float
+>public static $a = 'string';
+>public static $a = "string";
+>public static $a = 100;
+>public static $a = 100.23;
+>public static $a = "string{$this->x}";                       //4、解释变量
+>public static $a = ['a' => 'a'];                       //5、array类型
+>public static $a = function(){return 5;};              //6、callback
+>public static $a = new stdClass();                     //7、object
+>                                                //8、resource
+>public static $a = 1+2;                                //9、+ - * / % **（1+2）
+>public static $a = $this->x+$this->y;                              //10、+ - * / % **（$x+$y）
+>public static $a = bcadd(1,2); //11、bcadd()
+>                                                //12、heredoc 13、nowdoc
+>public static $a =<<<label
+>here-doc
+>label;
+>public static $a = <<<'label'
+>now-doc
+>label;
+>
+>public static $a = PHP_INT_MAX;                        //14、常量
+>
+>public static $a = $obj->oVar;                         //15、类变量
+>public static $a = Obj::$oStaticVar;                   //16、类静态变量
+>public static $a = Obj::O_CONST;                       //17、类常量
+>public static $a = $obj->method();                     //18、类function
+>}
+>```
+>
+>
+
+
+
+### 7、类常量
+
+>
+>
+>```php
+>class Obj{
+>    const oVar =111;
+>    public const oStaticVar = 222;
+>    const O_const = 333;
+>
+>    public function method(){
+>        return 444;
+>    }
+>}
+>$obj = new  Obj();
+>
+>class Test{
+>public  $x = 1;
+>public  $y = 2;
+>public  $z = 3;
+>
+>const a;                                     //1、仅声明不初始化
+>const a = null;                              //2、null
+>const a = false;                             //3、boolean,string(单双),integer,float
+>const a = 'string';
+>const a = "string";
+>const a = 100;
+>const a = 100.23;
+>const a = "string{$this->x}";                       //4、解释变量
+>const a = ['a' => 'a'];                       //5、array类型
+>const a = function(){return 5;};              //6、callback
+>const a = new stdClass();                     //7、object
+>                                                //8、resource
+>const a = 1+2;                                //9、+ - * / % **（1+2）
+>const a = $this->x+$this->y;                              //10、+ - * / % **（$x+$y）
+>const a = bcadd(1,2); //11、bcadd()
+>                                                //12、heredoc 13、nowdoc
+>const a =<<<label
+>here-doc
+>label;
+>const a = <<<'label'
+>now-doc
+>label;
+>
+>const a = PHP_INT_MAX;                        //14、常量
+>
+>const a = $obj->oVar;                         //15、类变量
+>const a = Obj::$oStaticVar;                   //16、类静态变量
+>const a = Obj::O_CONST;                       //17、类常量
+>const a = $obj->method();                     //18、类function
+>}
+>```
+>
+>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# php.ini
+
+| 分类           | ini中key           | ini中value | 作用                   | 举例                                                         | 版本记录    |
+| -------------- | ------------------ | ---------- | ---------------------- | ------------------------------------------------------------ | ----------- |
+| 文件格式       | short_open_tag     |            | `<?..?>`               |                                                              |             |
+|                | asp_tags           |            | `<%...%>`              |                                                              | ==7.0.0删== |
+| 超全局变量     | variables_order    | EGPCS      | 设置超全局变量是否为空 | `$_ENV`     E<br>`$_GET`     G<br/> `$_POST`   P<br/>`$_COOKIE`C<br/> `$_SERVER` S |             |
+|                | request_order      | GPC        | `$_REQUEST`            | get/post/cookie                                              |             |
+| 预定义变量     | track_errors       | boolean    | `$php_errosmsg`        |                                                              | ==7.2.0删== |
+|                | register_argc_argv | boolean    | `$argc` `$argv`        |                                                              |             |
+| 执行运算符\`\` | safe_mode          | boolean    | 是否开启安全模式       |                                                              |             |
+
+
+
 # 其他问题
+
+##### isset 判断是否存在且不为null
+
+>```php
+>$a;
+>$b =null;
+>$c =0;
+>
+>var_dump(isset($a));//false
+>var_dump(isset($b));//false
+>var_dump(isset($c));//true
+>```
+>
+>
 
 ## call_user_func/call_user_func_array()
 
@@ -2476,45 +3095,22 @@ ob_flush
 
 
 
-| 数据类型                              | 常量 | 变量 | 静态变量 | 类常量 | 类变量 | 类静态变量 |
-| ------------------------------------- | ---- | ---- | -------- | ------ | ------ | ---------- |
-| 不初始化                              |      |      |          |        |        |            |
-| boolean,string(单双)<br>integer,float |      |      |          |        |        |            |
-| null                                  |      |      |          |        |        |            |
-| array                                 |      |      |          |        |        |            |
-| callback                              |      |      |          |        |        |            |
-| object                                |      |      |          |        |        |            |
-| resource                              |      |      |          |        |        |            |
-| `+` `-` `*` `/` `%` `**`              |      |      |          |        |        |            |
-| bcadd(1,2)                            |      |      |          |        |        |            |
-| 常量                                  |      |      |          |        |        |            |
-| heredoc                               |      |      |          |        |        |            |
-| nowdoc                                |      |      |          |        |        |            |
 
 
 
 
 
->
->
->```php
->class A{
->const aaa_bbb =333;
->}
->
->$a = 'aaa_bbb';
->
->//var_dump(A::$a);
->
->var_dump(constant("A3::".$a));
->var_dump(defined("A3::".$a));
->
->var_dump(defined('\common\services\OneSignalService::TEMPLATE_'.'TEST'));die;//true
->
->
->
->use common\services\OneSignalService;
->var_dump(defined('OneSignalService::TEMPLATE_'.'TEST'));die;//false
->```
->
->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
