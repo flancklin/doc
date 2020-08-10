@@ -840,11 +840,11 @@ breake
 > static $a = ['a' => 'a'];     //array类型
 > static $a = PHP_VERSION;      //调用已定义的常量
 > static $a = "abcd";           //string类型
->                     //string的nowdoc
+>                   //string的nowdoc
 > static $a = <<<'label'
 > abcd
 > label;
->                     //string的heredoc
+>                   //string的heredoc
 > static $a=<<<label
 > abcd
 > label;
@@ -872,6 +872,10 @@ breake
 >
 >```
 >
+>```
+>
+>```
+>
 >错误的初始化举例
 >
 >* ```php
@@ -879,6 +883,10 @@ breake
 > static $a = function(){echo 'hello!';}  //不可以callback
 > static $a = new stdClass();             //不可以object
 >```
+>```
+>
+>```
+>
 >```
 >
 >```
@@ -2501,6 +2509,12 @@ ob_flush
 >var_dump(constant("A3::".$a));
 >var_dump(defined("A3::".$a));
 >
+>var_dump(defined('\common\services\OneSignalService::TEMPLATE_'.'TEST'));die;//true
+>
+>
+>
+>use common\services\OneSignalService;
+>var_dump(defined('OneSignalService::TEMPLATE_'.'TEST'));die;//false
 >```
 >
 >
