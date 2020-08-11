@@ -832,24 +832,25 @@ breake
 >正确的初始化举例
 >
 >* ```php
-> static $a;                    //不初始化，默认是null
-> static $a = null;             //null类型   
-> static $a = false;            //boolean类型
-> static $a = 100;              //integer类型
-> static $a = 100.23;           //float类型
-> static $a = ['a' => 'a'];     //array类型
-> static $a = PHP_VERSION;      //调用已定义的常量
-> static $a = "abcd";           //string类型
->                 //string的nowdoc
-> static $a = <<<'label'
-> abcd
-> label;
->                 //string的heredoc
-> static $a=<<<label
-> abcd
-> label;
-> static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
-> ```
+>  static $a;                    //不初始化，默认是null
+>  static $a = null;             //null类型   
+>  static $a = false;            //boolean类型
+>  static $a = 100;              //integer类型
+>  static $a = 100.23;           //float类型
+>  static $a = ['a' => 'a'];     //array类型
+>  static $a = PHP_VERSION;      //调用已定义的常量
+>  static $a = "abcd";           //string类型
+>                //string的nowdoc
+>  static $a = <<<'label'
+>  abcd
+>  label;
+>                //string的heredoc
+>  static $a=<<<label
+>  abcd
+>  label;
+>  static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
+>  ```
+>```
 >
 >
 >
@@ -858,11 +859,13 @@ breake
 >错误的初始化举例
 >
 >* ```php
-> static $a = bcadd(1,2);                 //不可以调用函数
-> static $a = function(){echo 'hello!';}  //不可以callback
-> static $a = new stdClass();             //不可以object
+>  static $a = bcadd(1,2);                 //不可以调用函数
+>  static $a = function(){echo 'hello!';}  //不可以callback
+>  static $a = new stdClass();             //不可以object
+>  ```
 >```
 >
+>```
 
 ### 2、常量
 
@@ -1002,7 +1005,18 @@ breake
 >
 >
 
-### 3、重载和递归
+### 3、强制函数返回数据类型
+
+>* ==php5.6不支持==
+>
+>```php
+>//强制return float 
+>function fdiv(float $dividend, float $divisor): float { 
+>     return p\Php80::fdiv($dividend, $divisor); 
+> }
+>```
+
+### 4、重载和递归
 
 #### (1)、函数重载
 
@@ -1029,7 +1043,7 @@ breake
 >
 >
 
-### 4、相关函数
+### 5、相关函数
 
 | 函数                       | 功能 | 参数 | 返回值版本 | 备注 |
 | -------------------------- | ---- | ---- | ---------- | ---- |
@@ -1099,6 +1113,12 @@ breake
 >public static $var;
 >public static function myFun(){}
 >```
+
+##### a、后期静态绑定
+
+```php
+get_called_class
+```
 
 #### (4)、final
 
@@ -1194,7 +1214,41 @@ __construct()
 >
 >
 
-##### 变量会被覆盖，类常量呢？
+##### b、继承覆盖问题
+
+>* 变量会被覆盖
+>* 常量会被覆盖
+>* 方法继承，
+>* * 参数只能增不能减。
+>  * 增的部分必须有默认值
+>  * 比如下面的如若p2不赋默认值，则会warning
+>
+>```php
+>class A{
+>    public $a =1;
+>    const CONS =2;
+>
+>    public function fun($p1){
+>        echo "A::fun(p1)";
+>    }
+>}
+>
+>
+>class B extends A{
+>    public $a=11;
+>    const CONS = 22;
+>
+>    public function fun($p1, $p2=2){//fun($p1, $p2) Warning: Declaration of B::fun($p1, $p2) should be compatible with A::fun($p1)
+>        echo "B::fun(p1,p2)";
+>    }
+>}
+>
+>var_dump((new B())->a);//11
+>var_dump(B::CONS);//22
+>var_dump((new B())->fun(1,2));//B::fun(p1,p2)
+>```
+>
+>
 
 ### 1、class
 
@@ -2536,19 +2590,37 @@ ob_flush
 
 ## (三)、exist问题
 
-| 判断的东西 | a    | b    |
-| ---------- | ---- | ---- |
-| 变量       |      |      |
-| 常量       |      |      |
-| function   |      |      |
-| class      |      |      |
-| strait     |      |      |
-| interface  |      |      |
-| 类变量     |      |      |
-| 类常量     |      |      |
-| 类function |      |      |
+| 判断的东西 | a               | b    |
+| ---------- | --------------- | ---- |
+| 变量       |                 |      |
+| 常量       |                 |      |
+| function   |                 |      |
+| class      |                 |      |
+| strait     |                 |      |
+| interface  |                 |      |
+| 类变量     | property_exists |      |
+| 类常量     |                 |      |
+| 类function |                 |      |
+
+```php
+class_alias ($original, $alias, $autoload = TRUE);
+function_exists ($function_name);
+interface_exists ($interface_name, $autoload = true);    
+class_exists ($class_name, $autoload = true);
+trait_exists($traitname, $autoload );
+property_exists ($class, $property);
+method_exists ($object, $method_name);
+get_parent_class ($object = null);
+get_called_class ();
+get_class ($object = null);
+is_subclass_of ($object, $class_name, $allow_string = TRUE);
+is_a ($object, $class_name, $allow_string = FALSE);
+get_class_vars ($class_name);
+get_object_vars ($object);
+get_class_methods ($class_name)
 
 
+```
 
 
 
