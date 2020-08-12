@@ -200,25 +200,42 @@
 
 ## (三)、控制器controller
 
-### 1、设置默认controller和默认action
+### 1、配置与设置
+
+#### (1)、命名规则
+
+| 类容       | 举例                       | 路由解析    | 解释                                                         |
+| ---------- | -------------------------- | ----------- | ------------------------------------------------------------ |
+| controller | HelloWorldController.php   | hello-world |                                                              |
+| action     | `actionSayHello($p1, $p2)` | say-hello   | 1. 必须action开头<br>2.支持带参数。<br>参数来源可以是调用赋值，也可以是get传递 |
+
+
+
+##### a、controller
+
+##### b、action
+
+#### (2)、设置默认controller和默认action
 
 >设置默认controller和默认action的根本在于==设置默认路由==
 >
 >config/main.php
 >
 >* ```php
->  'defaultRoute' => 'hello-world',///或者hello-world/say-hello
->  ```
+> 'defaultRoute' => 'hello-world',///或者hello-world/say-hello
+> ```
 >
 >在controller中设置默认action
 >
 >* ```php
->  class HelloWorldController extends Controller{
->  	public $defaultAction = 'say-hello';//设置默认方法
->  }
+>  class HelloWorldController extends \yii\web\Controller{
+>   	public $defaultAction = 'say-hello';//设置默认方法
+>   }
 >  ```
 
-### 2、常用controller
+### 2、controller种类与使用
+
+#### (1)、种类
 
 | 分类                      | 父类                | 功能     | 备注 |
 | ------------------------- | ------------------- | -------- | ---- |
@@ -228,108 +245,163 @@
 | yii\rest\Controller       | yii\web\Controller  | api接口  |      |
 | yii\rest\ActiveController | yii\rest\Controller |          |      |
 
-#### (1)、yii\base\Controller
+#### (2)、web-controller
 
->`http://yii2.frame/frontend/web/index.php?r=hello-world/say-hello&sql=dfsfdsf`
+* **yii\web\Controller**
+
+##### a、渲染view
+
+| 方法                                      | 物理位置            | 功能                   |
+| ----------------------------------------- | ------------------- | ---------------------- |
+| `render($view, $params = [])`             | yii\base\Controller | 渲染view+layout        |
+| `public function renderContent($content)` | yii\base\Controller | 渲染layout             |
+| `renderPartial($view, $params = [])`      | yii\base\Controller | 渲染view               |
+| `renderFile($file, $params = [])`         | yii\base\Controller | 渲染file。==根本方法== |
+| `renderAjax($view, $params = [])`         | yii\web\Controller  | ajax渲染view           |
+
+>view怎么传值？支持以下：
+>
+> 
+>
+>* `renderFile()`仅支持绝对路径
+>
+>* 其他都不支持绝对路径。绝对路径会被当作string
+>
+>  
+>
+>`frontend\controllers\SiteController::actionIndex()`
+
+>|            | 方式     | 解释                                         | 举例                                          | 对应路径                                                     |
+>| ---------- | -------- | -------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------ |
+>|            | 绝对路径 | 起始目录是服务器根目录                       | `render('c:\code\index.php')`                 | ==仅renderFile()支持==，其他会被当作string                   |
+>|            | 相对路径 | 起始目录是：<br>app/module/views/controller/ | `render('../index')`                          | app/frontend/views/site/../index.php                         |
+>| 任意跨     | 别名@    | @路径+string                                 | `render('@frontend/index')`                   | app/frontend/index.php                                       |
+>|            | //       | app/+string                                  |                                               |                                                              |
+>| 跨控制器   | /        | app/module/views/+string                     | `render('/index')`<br>`render('/site/index')` | app/frontend/views/index.php<br>app/frontend/views/site/index.php |
+>| 当前控制器 | string   | app/module/views/controller/+string          | `render('index')`                             | app/frontend/views/site/index.php                            |
+>
+>源码分析：yii\base\View
 >
 >```php
->class \yii\base\Controller extends \yii\base\Component implements \yii\base\ViewContextInterface
+>protected function findViewFile($view, $context = null)
 >{
->    const EVENT_BEFORE_ACTION = 'beforeAction';
->    const EVENT_AFTER_ACTION = 'afterAction';
->    
->    @property Module[] $modules
->    @property string $route
->    @property string $uniqueId
->    @property View|\yii\web\View $view
->    @property string $viewPath
->     
->    public $module;//yii\base\Module  当前模块对象
->    public $id;//string   controllerID
->    public $action;//yii\base\Action    当前action对象
->    
->    public $request = 'request';//yii\base\Request    request对象
->    public $response = 'response';//yii\base\Response  response对象
->    
->    public $defaultAction = 'index';//string
->    public $layout;//null|string|false  默认主题
->    private $_view;//yii\base\View
->    private $_viewPath;//string
->    //构造函数
->    public function __construct($id, $module, $config = []){}
->    public function init(){}
->    //运行action
->    public function actions(){}
->    public function runAction($id, $params = []){}
->    public function run($route, $params = []){}
->    public function bindActionParams($action, $params){}
->    public function createAction($id){}
->    //前置和后置操作
->    public function beforeAction($action){}
->    public function afterAction($action, $result){}
->    //模块、控制器、路由
->    public function getModules(){}
->    public function getUniqueId(){}
->    public function getRoute(){}
->    //view
->    public function render($view, $params = []){}
->    public function renderContent($content){}
->    public function renderPartial($view, $params = []){}
->    public function renderFile($file, $params = []){}
->    public function getView(){}
->    public function setView($view){}
->    public function getViewPath(){}
->    public function setViewPath($path){}
->    public function findLayoutFile($view){}
->    
->    final protected function bindInjectedParams(\ReflectionType $type, $name, &$args, &$requestedParams){}
+>    if (strncmp($view, '@', 1) === 0) {
+>        // e.g. "@app/views/main"
+>        $file = Yii::getAlias($view);
+>    } elseif (strncmp($view, '//', 2) === 0) {
+>        // e.g. "//layouts/main"
+>        $file = Yii::$app->getViewPath() . DIRECTORY_SEPARATOR . ltrim($view, '/');
+>    } elseif (strncmp($view, '/', 1) === 0) {
+>        // e.g. "/site/index"
+>        if (Yii::$app->controller !== null) {
+>            $file = Yii::$app->controller->module->getViewPath() . DIRECTORY_SEPARATOR . ltrim($view, '/');
+>        } else {
+>            throw new InvalidCallException("Unable to locate view file for view '$view': no active controller.");
+>        }
+>    } elseif ($context instanceof ViewContextInterface) {
+>        $file = $context->getViewPath() . DIRECTORY_SEPARATOR . $view;
+>    } elseif (($currentViewFile = $this->getRequestedViewFile()) !== false) {
+>        $file = dirname($currentViewFile) . DIRECTORY_SEPARATOR . $view;
+>    } else {
+>        throw new InvalidCallException("Unable to resolve view file for view '$view': no active view context.");
+>    }
+>
+>    if (pathinfo($file, PATHINFO_EXTENSION) !== '') {
+>        return $file;
+>    }
+>    $path = $file . '.' . $this->defaultExtension;
+>    if ($this->defaultExtension !== 'php' && !is_file($path)) {
+>        $path = $file . '.php';
+>    }
+>
+>    return $path;
 >}
 >```
 >
 >
 
->| 属性和方法                                                   | type   | 功能                                              | 备注 |
->| ------------------------------------------------------------ | ------ | ------------------------------------------------- | ---- |
->| id                                                           | string | controllerID：hello world                         |      |
->| module                                                       | object | frontend模块                                      |      |
->| action                                                       | object |                                                   |      |
->| 有module，有action，为什么没有controller呢？<br>因为`$this`代表的就是controller |        |                                                   |      |
->| request                                                      | object | request对象 = Yii::$app->request                  |      |
->| response                                                     | object | response对象 = Yii::$app->response                |      |
->| defaultAction                                                | string | 默认的action                                      |      |
->| layout                                                       | string | 默认的view主题                                    |      |
->|                                                              |        |                                                   |      |
->| `__construct($id, $module, $config = [])`                    |        | `$this->id = $id;` <br>`$this->module = $module;` |      |
->| `init()`                                                     |        | 初始request和response                             |      |
->|                                                              |        |                                                   |      |
->| `getUniqueId()`                                              |        | controllerID.比如：hello-world                    |      |
->| `getRoute()`                                                 |        | 路由：hello-world/say-hello                       |      |
->| `getModules()`                                               |        | 获取模块列表 ([object,...])                       |      |
->| `createAction($id)`                                          |        | 根据say-hello生成actionSayHello                   |      |
->|                                                              |        |                                                   |      |
->| `render($view, $params = [])`                                |        |                                                   |      |
->| `renderContent($content)`                                    |        |                                                   |      |
->| `renderPartial($view, $params = [])`                         |        |                                                   |      |
->| `renderFile($file, $params = [])`                            |        |                                                   |      |
->| `getView()`                                                  | object |                                                   |      |
->| `setView($view)`                                             |        |                                                   |      |
->| `getViewPath()`                                              |        |                                                   |      |
->| `setViewPath($path)`                                         |        |                                                   |      |
->| `findLayoutFile($view)`                                      |        |                                                   |      |
->|                                                              |        |                                                   |      |
->| `beforeAction($action)`                                      |        | 前置操作                                          |      |
->| `afterAction($action, $result)`                              |        | 后置操作                                          |      |
->| `run($route, $params = [])`                                  |        | 调用runAction()                                   |      |
->| `runAction($id, $params = [])`                               |        | 执行action                                        |      |
->| `bindInjectedParams(\ReflectionType $type, $name, &$args, &$requestedParams)` |        |                                                   |      |
+##### b、跳转
+
+| 方法                                | 物理位置           | 解释                 | 备注 |
+| ----------------------------------- | ------------------ | -------------------- | ---- |
+| `redirect($url, $statusCode = 302)` | yii\web\Controller |                      |      |
+| `goHome()`                          | yii\web\Controller | 回到domain/index.php |      |
+| `goBack($defaultUrl = null)`        | yii\web\Controller | 返回上一页           |      |
+| `refresh($anchor = '')`             | yii\web\Controller | 刷新当前也           |      |
+
+> `redirect($url, $statusCode)`
+>
+>* `$url`为数组：支持在当前模块中跳转。不能跨模块
+>
+>* `$url`为string：跳指定网站、或任意跳
+>
+>  ```php
+>  //domain/index.php?r=site%2Findex2&id=12#ok
+>  return $this->redirect(['site/index2', 'id'=>12,'#'=>'ok']);
+>  
+>  //domain/site/index2    （拼装好了可以任意跳）
+>  return $this->redirect('site/index2');
+>  //http://www.baidu.com
+>  return $this->redirect('http://www.baidu.com');
+>  ```
+>
+>  
+>
+> 
+>
+> 
+>
+>* yii\helpers\BaseUrl
+>
+>```php
+>    protected static function normalizeRoute($route)
+>    {
+>        $route = Yii::getAlias((string) $route);
+>        if (strncmp($route, '/', 1) === 0) {
+>            // absolute route
+>            return ltrim($route, '/');
+>        }
+>
+>        // relative route
+>        if (Yii::$app->controller === null) {
+>            throw new InvalidArgumentException("Unable to resolve the relative route: $route. No active controller is available.");
+>        }
+>
+>        if (strpos($route, '/') === false) {
+>            // empty or an action ID
+>            return $route === '' ? Yii::$app->controller->getRoute() : Yii::$app->controller->getUniqueId() . '/' . $route;
+>        }
+>
+>        // relative to module
+>        return ltrim(Yii::$app->controller->module->getUniqueId() . '/' . $route, '/');
+>    }
+>```
+>
+>
+
+#### (3)、restfull-controller
+
+参考文档：https://www.yiichina.com/tutorial/1606
+
+* **yii\rest\Controller**
+
+* **yii\rest\ActiveController** 资源的增删改查
+
+  
+
+  
+
+#### (4)、功能
+
+| 功能          | 第一次出现物理位置  | 注释            | 备注                                                    |
+| ------------- | ------------------- | --------------- | ------------------------------------------------------- |
+| `behaviors()` | yii\base\Component  | 行为            | yii\rest\Controller加了四个havior                       |
+| `actions()`   | yii\base\Controller | 接口            | yii\rest\ActiveController添加了增删改查接口             |
+| `verbs()`     | yii\rest\Controller | http method过滤 | 来源自   yii\rest\Controller::behaviors()中的verbFilter |
 
 
 
-#### (2)、yii\web\Controller
 
-#### (3)、yii\rest\Controller
-
-#### (4)、yii\rest\ActiveController
 
 ## (四)、模型model
 
@@ -480,7 +552,7 @@ simple_expr:
 
 # 五、源码分析
 
-## (一)、基类
+## 基类
 
 ### 1、yii\base\BaseObject
 
@@ -630,7 +702,7 @@ simple_expr:
 >    public function trigger($name, Event $event = null);    //触发event
 >   
 >    //behaviors
->    public function behaviors();//定义behaviors
+>    public function behaviors();//定义behaviors  此处return []
 >
 >    public function ensureBehaviors();//确认behaviors()都在$_behaviors中
 >    public function attachBehavior($name, $behavior);//把behavior注册到$_behaviors
@@ -645,4 +717,279 @@ simple_expr:
 >```
 >
 >
+
+
+
+
+
+
+
+
+
+
+
+
+
+## (三)、controller
+
+| 分类                      | 父类                | 功能     | 备注 |
+| ------------------------- | ------------------- | -------- | ---- |
+| yii\base\Controller       | yii\base\Component  |          |      |
+| yii\console\Controller    | yii\base\Controller | cli指令  |      |
+| yii\web\Controller        | yii\base\Controller | 渲染输出 |      |
+| yii\rest\Controller       | yii\web\Controller  | api接口  |      |
+| yii\rest\ActiveController | yii\rest\Controller |          |      |
+
+#### (1)、yii\base\Controller
+
+>`http://yii2.frame/frontend/web/index.php?r=hello-world/say-hello&sql=dfsfdsf`
+>
+>```php
+>class \yii\base\Controller extends \yii\base\Component implements \yii\base\ViewContextInterface
+>{
+>const EVENT_BEFORE_ACTION = 'beforeAction';
+>const EVENT_AFTER_ACTION = 'afterAction';
+>
+>@property Module[] $modules
+>@property string $route
+>@property string $uniqueId
+>@property View|\yii\web\View $view
+>@property string $viewPath
+>
+>public $module;//yii\base\Module  当前模块对象
+>public $id;//string   controllerID
+>public $action;//yii\base\Action    当前action对象
+>
+>public $request = 'request';//yii\base\Request    request对象
+>public $response = 'response';//yii\base\Response  response对象
+>
+>public $defaultAction = 'index';//string
+>public $layout;//null|string|false  默认主题
+>private $_view;//yii\base\View
+>private $_viewPath;//string
+>//构造函数
+>public function __construct($id, $module, $config = []){}
+>public function init(){}
+>    
+>//runAction()->createAction()->actions()
+>public function actions(){}//定义接口  次数 return []; 
+>    
+>//运行action
+>public function runAction($id, $params = []){}
+>public function run($route, $params = []){}
+>public function bindActionParams($action, $params){}
+>public function createAction($id){}
+>//前置和后置操作
+>public function beforeAction($action){}
+>public function afterAction($action, $result){}
+>//模块、控制器、路由
+>public function getModules(){}
+>public function getUniqueId(){}
+>public function getRoute(){}
+>//view
+>public function render($view, $params = []){}
+>public function renderContent($content){}
+>public function renderPartial($view, $params = []){}
+>public function renderFile($file, $params = []){}
+>public function getView(){}
+>public function setView($view){}
+>public function getViewPath(){}
+>public function setViewPath($path){}
+>public function findLayoutFile($view){}
+>
+>final protected function bindInjectedParams(\ReflectionType $type, $name, &$args, &$requestedParams){}
+>}
+>```
+
+
+
+#### (2)、yii\web\Controller
+
+>
+>
+>```php
+>class \yii\web\Controller extends \yii\base\Controller{
+>    public $enableCsrfValidation = true;
+>    public $actionParams = [];
+>    
+>    public function renderAjax($view, $params = []){}
+>    public function bindActionParams($action, $params){}
+>    public function beforeAction($action){}
+>    //响应数据格式
+>    public function asJson($data){}
+>    public function asXml($data){}
+>    //跳转
+>    public function redirect($url, $statusCode = 302){}
+>    public function goHome(){}
+>    public function goBack($defaultUrl = null){}
+>    public function refresh($anchor = ''){}
+>}
+>```
+>
+>18090306878
+
+#### (3)、yii\rest\Controller
+
+>
+>
+>```php
+>class \yii\restController extends \yii\web\Controller
+>{
+>    public $serializer = 'yii\rest\Serializer';
+>    public $enableCsrfValidation = false;
+>    //绑定haviors
+>    public function behaviors(){}
+>    //后置操作把result序列化
+>    public function afterAction($action, $result){}
+>    protected function verbs(){}
+>    protected function serializeData($data){}
+>}
+>```
+>
+> 
+>
+> 
+>
+>```php
+>
+>public function behaviors()
+>{
+>    return [
+>        'contentNegotiator' => [//响应协商行为
+>            'class' => ContentNegotiator::className(),
+>            'formats' => [
+>                'application/json' => Response::FORMAT_JSON,
+>                'application/xml' => Response::FORMAT_XML,
+>            ],
+>        ],
+>        'verbFilter' => [//
+>            'class' => VerbFilter::className(),
+>            'actions' => $this->verbs(),
+>        ],
+>        'authenticator' => [
+>            'class' => CompositeAuth::className(),
+>        ],
+>        'rateLimiter' => [
+>            'class' => RateLimiter::className(),
+>        ],
+>    ];
+>}
+>
+>public function afterAction($action, $result)
+>{
+>    $result = parent::afterAction($action, $result);
+>    return $this->serializeData($result);
+>}
+>
+>protected function verbs()
+>{
+>    return [];
+>}
+>
+>
+>protected function serializeData($data)
+>{
+>    return Yii::createObject($this->serializer)->serialize($data);
+>}
+>```
+>
+>
+
+
+
+
+
+
+
+#### (4)、yii\rest\ActiveController
+
+>
+>
+>```php
+>class \yii\rest\ActiveController extends \yii\rest\Controller
+>{
+>    public $modelClass;
+>    public $updateScenario = Model::SCENARIO_DEFAULT;
+>    public $createScenario = Model::SCENARIO_DEFAULT;
+>    //初始化强制验证modelClass
+>    public function init(){}
+>    public function actions(){}//yii\base\Controller
+>    protected function verbs(){}//yii\rest\Controller
+>    public function checkAccess($action, $model = null, $params = []){}
+>}
+>```
+>
+> 
+>
+> 
+>
+>```php
+>public function init()
+>{
+>    parent::init();
+>    if ($this->modelClass === null) {
+>        throw new InvalidConfigException('The "modelClass" property must be set.');
+>    }
+>}
+>//增删改查
+>public function actions()
+>{
+>    return [
+>        'index' => [
+>            'class' => 'yii\rest\IndexAction',
+>            'modelClass' => $this->modelClass,
+>            'checkAccess' => [$this, 'checkAccess'],
+>        ],
+>        'view' => [
+>            'class' => 'yii\rest\ViewAction',
+>            'modelClass' => $this->modelClass,
+>            'checkAccess' => [$this, 'checkAccess'],
+>        ],
+>        'create' => [
+>            'class' => 'yii\rest\CreateAction',
+>            'modelClass' => $this->modelClass,
+>            'checkAccess' => [$this, 'checkAccess'],
+>            'scenario' => $this->createScenario,
+>        ],
+>        'update' => [
+>            'class' => 'yii\rest\UpdateAction',
+>            'modelClass' => $this->modelClass,
+>            'checkAccess' => [$this, 'checkAccess'],
+>            'scenario' => $this->updateScenario,
+>        ],
+>        'delete' => [
+>            'class' => 'yii\rest\DeleteAction',
+>            'modelClass' => $this->modelClass,
+>            'checkAccess' => [$this, 'checkAccess'],
+>        ],
+>        'options' => [
+>            'class' => 'yii\rest\OptionsAction',
+>        ],
+>    ];
+>}
+>
+>
+>protected function verbs()
+>{
+>    return [
+>        'index' => ['GET', 'HEAD'],
+>        'view' => ['GET', 'HEAD'],
+>        'create' => ['POST'],
+>        'update' => ['PUT', 'PATCH'],
+>        'delete' => ['DELETE'],
+>    ];
+>}
+>
+>    public function checkAccess($action, $model = null, $params = [])
+>    {
+>    }
+>```
+>
+>
+
+
+
+
+
+
 
