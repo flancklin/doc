@@ -222,16 +222,17 @@
 >config/main.php
 >
 >* ```php
-> 'defaultRoute' => 'hello-world',///或者hello-world/say-hello
-> ```
+>  'defaultRoute' => 'hello-world',///或者hello-world/say-hello
+>  ```
+>```
 >
 >在controller中设置默认action
 >
 >* ```php
->  class HelloWorldController extends \yii\web\Controller{
->   	public $defaultAction = 'say-hello';//设置默认方法
->   }
->  ```
+> class HelloWorldController extends \yii\web\Controller{
+>  	public $defaultAction = 'say-hello';//设置默认方法
+>  }
+>```
 
 ### 2、controller种类与使用
 
@@ -259,17 +260,17 @@
 | `renderFile($file, $params = [])`         | yii\base\Controller | 渲染file。==根本方法== |
 | `renderAjax($view, $params = [])`         | yii\web\Controller  | ajax渲染view           |
 
->view怎么传值？支持以下：
+###### (I)、view怎么传值？支持以下：
+
 >
-> 
 >
->* `renderFile()`仅支持绝对路径
+> * `renderFile()`仅支持绝对路径
 >
 >* 其他都不支持绝对路径。绝对路径会被当作string
 >
->  
+> 
 >
->`frontend\controllers\SiteController::actionIndex()`
+> `frontend\controllers\SiteController::actionIndex()`
 
 >|            | 方式     | 解释                                         | 举例                                          | 对应路径                                                     |
 >| ---------- | -------- | -------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------ |
@@ -279,43 +280,93 @@
 >|            | //       | app/+string                                  |                                               |                                                              |
 >| 跨控制器   | /        | app/module/views/+string                     | `render('/index')`<br>`render('/site/index')` | app/frontend/views/index.php<br>app/frontend/views/site/index.php |
 >| 当前控制器 | string   | app/module/views/controller/+string          | `render('index')`                             | app/frontend/views/site/index.php                            |
->
+
+
+
+###### (II)、找view文件
+
 >源码分析：yii\base\View
 >
 >```php
 >protected function findViewFile($view, $context = null)
 >{
->    if (strncmp($view, '@', 1) === 0) {
->        // e.g. "@app/views/main"
->        $file = Yii::getAlias($view);
->    } elseif (strncmp($view, '//', 2) === 0) {
->        // e.g. "//layouts/main"
->        $file = Yii::$app->getViewPath() . DIRECTORY_SEPARATOR . ltrim($view, '/');
->    } elseif (strncmp($view, '/', 1) === 0) {
->        // e.g. "/site/index"
->        if (Yii::$app->controller !== null) {
->            $file = Yii::$app->controller->module->getViewPath() . DIRECTORY_SEPARATOR . ltrim($view, '/');
->        } else {
->            throw new InvalidCallException("Unable to locate view file for view '$view': no active controller.");
->        }
->    } elseif ($context instanceof ViewContextInterface) {
->        $file = $context->getViewPath() . DIRECTORY_SEPARATOR . $view;
->    } elseif (($currentViewFile = $this->getRequestedViewFile()) !== false) {
->        $file = dirname($currentViewFile) . DIRECTORY_SEPARATOR . $view;
->    } else {
->        throw new InvalidCallException("Unable to resolve view file for view '$view': no active view context.");
->    }
->
->    if (pathinfo($file, PATHINFO_EXTENSION) !== '') {
->        return $file;
->    }
->    $path = $file . '.' . $this->defaultExtension;
->    if ($this->defaultExtension !== 'php' && !is_file($path)) {
->        $path = $file . '.php';
->    }
->
->    return $path;
+>if (strncmp($view, '@', 1) === 0) {
+>   // e.g. "@app/views/main"
+>   $file = Yii::getAlias($view);
+>} elseif (strncmp($view, '//', 2) === 0) {
+>   // e.g. "//layouts/main"
+>   $file = Yii::$app->getViewPath() . DIRECTORY_SEPARATOR . ltrim($view, '/');
+>} elseif (strncmp($view, '/', 1) === 0) {
+>   // e.g. "/site/index"
+>   if (Yii::$app->controller !== null) {
+>       $file = Yii::$app->controller->module->getViewPath() . DIRECTORY_SEPARATOR . ltrim($view, '/');
+>   } else {
+>       throw new InvalidCallException("Unable to locate view file for view '$view': no active controller.");
+>   }
+>} elseif ($context instanceof ViewContextInterface) {
+>   $file = $context->getViewPath() . DIRECTORY_SEPARATOR . $view;
+>} elseif (($currentViewFile = $this->getRequestedViewFile()) !== false) {
+>   $file = dirname($currentViewFile) . DIRECTORY_SEPARATOR . $view;
+>} else {
+>   throw new InvalidCallException("Unable to resolve view file for view '$view': no active view context.");
 >}
+>
+>if (pathinfo($file, PATHINFO_EXTENSION) !== '') {
+>   return $file;
+>}
+>$path = $file . '.' . $this->defaultExtension;
+>if ($this->defaultExtension !== 'php' && !is_file($path)) {
+>   $path = $file . '.php';
+>}
+>
+>return $path;
+>}
+>```
+>
+
+
+
+###### (III)、找到layout文件
+
+* yii\base\Controller
+
+>```PHP
+>public function findLayoutFile($view)
+>    {
+>        $module = $this->module;
+>        if (is_string($this->layout)) {
+>            $layout = $this->layout;
+>        } elseif ($this->layout === null) {
+>            while ($module !== null && $module->layout === null) {
+>                $module = $module->module;
+>            }
+>            if ($module !== null && is_string($module->layout)) {
+>                $layout = $module->layout;
+>            }
+>        }
+>
+>        if (!isset($layout)) {
+>            return false;
+>        }
+>
+>        if (strncmp($layout, '@', 1) === 0) {
+>            $file = Yii::getAlias($layout);
+>        } elseif (strncmp($layout, '/', 1) === 0) {
+>            $file = Yii::$app->getLayoutPath() . DIRECTORY_SEPARATOR . substr($layout, 1);
+>        } else {
+>            $file = $module->getLayoutPath() . DIRECTORY_SEPARATOR . $layout;
+>        }
+>
+>        if (pathinfo($file, PATHINFO_EXTENSION) !== '') {
+>            return $file;
+>        }
+>        $path = $file . '.' . $view->defaultExtension;
+>        if ($view->defaultExtension !== 'php' && !is_file($path)) {
+>            $path = $file . '.php';
+>        }
+>
+>        return $path;
+>    }
 >```
 >
 >
@@ -399,7 +450,13 @@
 | `actions()`   | yii\base\Controller | 接口            | yii\rest\ActiveController添加了增删改查接口             |
 | `verbs()`     | yii\rest\Controller | http method过滤 | 来源自   yii\rest\Controller::behaviors()中的verbFilter |
 
+>verbs()的执行：触发behaviors()中的VerFilter过滤器
+>
+>actions()的执行：yii\base\Controller :: runAction()->createAction()->actions()
+>
+>behaviors()的执行：yii\base\Component::`attachBehaviorInternal($name, $behavior)`
 
+>
 
 
 
@@ -521,6 +578,10 @@ simple_expr:
 ### 3、自动验证
 
 ### 4、自动完成
+
+### 5、属性标签
+
+### 6、数据导出？
 
 ## (五)、响应response
 
