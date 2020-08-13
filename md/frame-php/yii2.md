@@ -200,6 +200,18 @@
 
 ## (三)、控制器controller
 
+
+
+| 分类                      | 父类                | 功能     | 备注 |
+| ------------------------- | ------------------- | -------- | ---- |
+| yii\base\Controller       | yii\base\Component  |          |      |
+| yii\console\Controller    | yii\base\Controller | cli指令  |      |
+| yii\web\Controller        | yii\base\Controller | 渲染输出 |      |
+| yii\rest\Controller       | yii\web\Controller  | api接口  |      |
+| yii\rest\ActiveController | yii\rest\Controller |          |      |
+
+
+
 ### 1、配置与设置
 
 #### (1)、命名规则
@@ -226,6 +238,10 @@
 >  ```
 >```
 >
+>```
+>
+>```
+>
 >在controller中设置默认action
 >
 >* ```php
@@ -233,24 +249,17 @@
 >  	public $defaultAction = 'say-hello';//设置默认方法
 >  }
 >```
+>```
+>
+>```
 
-### 2、controller种类与使用
 
-#### (1)、种类
 
-| 分类                      | 父类                | 功能     | 备注 |
-| ------------------------- | ------------------- | -------- | ---- |
-| yii\base\Controller       | yii\base\Component  |          |      |
-| yii\console\Controller    | yii\base\Controller | cli指令  |      |
-| yii\web\Controller        | yii\base\Controller | 渲染输出 |      |
-| yii\rest\Controller       | yii\web\Controller  | api接口  |      |
-| yii\rest\ActiveController | yii\rest\Controller |          |      |
-
-#### (2)、web-controller
+### 2、web-controller
 
 * **yii\web\Controller**
 
-##### a、渲染view
+#### (1)、渲染view
 
 | 方法                                      | 物理位置            | 功能                   |
 | ----------------------------------------- | ------------------- | ---------------------- |
@@ -260,7 +269,7 @@
 | `renderFile($file, $params = [])`         | yii\base\Controller | 渲染file。==根本方法== |
 | `renderAjax($view, $params = [])`         | yii\web\Controller  | ajax渲染view           |
 
-###### (I)、view怎么传值？支持以下：
+##### a、view怎么传值？支持以下：
 
 >
 >
@@ -283,7 +292,7 @@
 
 
 
-###### (II)、找view文件
+##### (b)、找view文件
 
 >源码分析：yii\base\View
 >
@@ -326,7 +335,7 @@
 
 
 
-###### (III)、找到layout文件
+##### (c)、找到layout文件
 
 * yii\base\Controller
 
@@ -371,7 +380,7 @@
 >
 >
 
-##### b、跳转
+#### (2)、跳转
 
 | 方法                                | 物理位置           | 解释                 | 备注 |
 | ----------------------------------- | ------------------ | -------------------- | ---- |
@@ -430,7 +439,7 @@
 >
 >
 
-#### (3)、restfull-controller
+### 3、restfull-controller
 
 参考文档：https://www.yiichina.com/tutorial/1606
 
@@ -442,7 +451,7 @@
 
   
 
-#### (4)、功能
+### 4、behaviors+actions+verbs
 
 | 功能          | 第一次出现物理位置  | 注释            | 备注                                                    |
 | ------------- | ------------------- | --------------- | ------------------------------------------------------- |
@@ -462,7 +471,31 @@
 
 ## (四)、模型model
 
-### 1、curd操作
+| 类型    | 类                      | 父类                    | 注释 | 备注 |
+| ------- | ----------------------- | ----------------------- | ---- | ---- |
+| model   | yii\base\Model          | yii\base\Component      |      |      |
+|         | yii\db\BaseActiveRecord | yii\base\Model          |      |      |
+|         | yii\db\ActiveRecord     | yii\db\BaseActiveRecord |      |      |
+|         |                         |                         |      |      |
+| query   | yii\db\Query            | yii\base\Component      |      |      |
+|         | yii\db\ActiveQuery      | yii\db\Query            |      |      |
+|         |                         |                         |      |      |
+| command | yii\db\Command          | yii\base\Component      |      |      |
+|         |                         |                         |      |      |
+| connect | yii\db\Connection       | yii\base\Component      |      |      |
+
+>* model主要完成增删改
+>* query主要完成查询
+>* command主要完成增删改查的sql
+>* connect主要完成数据库连接
+>
+>==注意：==
+>
+>* model中也有查询，调用的都是query
+>* model和query中都调用的command，
+>* command调用的connect
+
+### 1、curd+事务
 
 #### (1)、增
 
@@ -475,6 +508,8 @@
 #### (3)、改
 
 #### (4)、查
+
+#### (5)、事务
 
 ### 2、where
 
@@ -801,7 +836,7 @@ simple_expr:
 | yii\rest\Controller       | yii\web\Controller  | api接口  |      |
 | yii\rest\ActiveController | yii\rest\Controller |          |      |
 
-#### (1)、yii\base\Controller
+### 1、yii\base\Controller
 
 >`http://yii2.frame/frontend/web/index.php?r=hello-world/say-hello&sql=dfsfdsf`
 >
@@ -864,7 +899,7 @@ simple_expr:
 
 
 
-#### (2)、yii\web\Controller
+### 2、yii\web\Controller
 
 >
 >
@@ -889,7 +924,7 @@ simple_expr:
 >
 >18090306878
 
-#### (3)、yii\rest\Controller
+### 3、yii\rest\Controller
 
 >
 >
@@ -962,7 +997,7 @@ simple_expr:
 
 
 
-#### (4)、yii\rest\ActiveController
+### 4、yii\rest\ActiveController
 
 >
 >
@@ -1050,7 +1085,340 @@ simple_expr:
 
 
 
+## (四)、model
 
+| 类型          | 类                                    | 父类                    | 注释             | 备注 |
+| ------------- | ------------------------------------- | ----------------------- | ---------------- | ---- |
+| model         | yii\base\Model                        | yii\base\Component      | validate         |      |
+|               | ==abstract==::yii\db\BaseActiveRecord | yii\base\Model          | abstract不可调用 |      |
+|               | yii\db\ActiveRecord                   | yii\db\BaseActiveRecord |                  |      |
+|               |                                       |                         |                  |      |
+| query         | yii\db\Query                          | yii\base\Component      |                  |      |
+|               | yii\db\ActiveQuery                    | yii\db\Query            |                  |      |
+|               |                                       |                         |                  |      |
+| query_builder | yii\db\QueryBuilder                   | yii\base\BaseObject     |                  |      |
+|               | yii\db\mysql\QueryBuilder             | yii\db\QueryBuilder     |                  |      |
+|               |                                       |                         |                  |      |
+| schema        | yii\db\Schema                         | yii\base\BaseObject     |                  |      |
+|               | yii\db\mysql\Schema                   | yii\db\Schema           |                  |      |
+|               |                                       |                         |                  |      |
+| command       | yii\db\Command                        | yii\base\Component      |                  |      |
+|               |                                       |                         |                  |      |
+| connect       | yii\db\Connection                     | yii\base\Component      |                  |      |
+
+### 1、model
+
+(1)、yii\base\Model
+
+>```php
+>class \yii\base\Model extends \yii\base\Component implements StaticInstanceInterface, IteratorAggregate, ArrayAccess, Arrayable
+>{
+>    use \yii\base\ArrayableTrait;
+>    use \yii\base\StaticInstanceTrait;
+>
+>    const SCENARIO_DEFAULT = 'default';             //验证场景
+>    const EVENT_BEFORE_VALIDATE = 'beforeValidate'; //验证前置事件
+>    const EVENT_AFTER_VALIDATE = 'afterValidate';   //验证后置事件
+>    
+>    private $_errors;
+>    private $_validators;
+>    private $_scenario = self::SCENARIO_DEFAULT;
+>    
+>    public function attributes(){}//返回全部字段（all public non-static properties of the class ）
+>    public function fields(){}//基于attributes()
+>    public function activeAttributes(){}//基于attributes()获取当前场景下得所有字段
+>    
+>    public function rules(){}      //验证规则(字段+条件+场景)
+>    public function scenarios(){}  //场景规则（场景->字段）
+>    public function isAttributeRequired($attribute){}//字段是否在rules中required
+>    public function isAttributeSafe($attribute){}    //字段是否在rules中sage
+>    public function isAttributeActive($attribute){}  //字段是否在rules当前scenario场景中使用
+>
+>/*
+>validate(){
+>	clearErrors();         //清空全部错误
+>	beforeValidate();      //前置操作
+>	scenarios();	       //获取当前场景
+>	getScenario();
+>	activeAttributes();	   //获取当前场景下得所有字段
+>	getActiveValidators(){ //获取验证器(对象)
+>    	getValidators() => createValidators()
+>    };
+>	validateAttributes();  //验证属性(字段)
+>	afterValidate();	   //后置操作
+>	return !hasErrors();   //返回错误
+>}
+>*/
+>    //设置rules-> 设置scenarios-> 导入数据-> 开始验证-> 返回错误
+>    public function load($data, $formName = null){}//$data(kv)或$data[$formName=>[kv]]
+>    public function getScenario(){}//获取当前场景
+>    public function setScenario($value){}//设置当前场景
+>    public function validate($attributeNames = null, $clearErrors = true){}
+>    public function beforeValidate(){}//触发前置事件
+>    public function afterValidate(){}//触发后置事件
+>    public function getActiveValidators($attribute = null){}
+>    public function getValidators(){}
+>    public function createValidators(){}
+>
+>    public function clearErrors($attribute = null){}//强清错误
+>    public function hasErrors($attribute = null){}//bool.判断(字段/全部)是否有错
+>    public function getErrors($attribute = null){}//array.返回(某个字段/全部)错误
+>    public function getFirstErrors(){}//array.返回第一个验证错误
+>    public function getFirstError($attribute){}//string.返回某个字段得第一个错误
+>    public function getErrorSummary($showAllErrors){}//以一维数组返回(true?全部：每个字段第一个)错误
+>    public function addError($attribute, $error = ''){}//塞入错误
+>    public function addErrors(array $items){}//批量塞入错误
+>    
+>    //表单(form)中显示
+>    public function formName(){}
+>    public function attributeLabels(){}//字段(中文)标识
+>	public function attributeHints(){}//字段(中文)提示信息
+>    public function getAttributeLabel($attribute){}//获取某个标识
+>    public function getAttributeHint($attribute){}//获取某个提示信息
+>    public function generateAttributeLabel($name){}//'department_name' 或者 'DepartmentName' 转成 'Department Name'
+>    
+>    public function getAttributes($names = null, $except = []){}
+>    public function setAttributes($values, $safeOnly = true){}
+>    public function onUnsafeAttribute($name, $value){}
+>    public function safeAttributes(){}
+>    public static function loadMultiple($models, $data, $formName = null){}
+>    public static function validateMultiple($models, $attributeNames = null){}
+>  
+>    public function getIterator(){}
+>    public function offsetExists($offset){}
+>    public function offsetGet($offset){}
+>    public function offsetSet($offset, $item){}
+>    public function offsetUnset($offset){}  
+>}
+>//rules
+>[
+>     // built-in "required" validator
+>     [['username', 'password'], 'required'],
+>     // built-in "string" validator customized with "min" and "max" properties
+>     ['username', 'string', 'min' => 3, 'max' => 12，'on'=>['register','login']],
+>     // built-in "compare" validator that is used in "register" scenario only
+>     ['password', 'compare', 'compareAttribute' => 'password2', 'on' => 'register'],
+>     // an inline validator defined via the "authenticate()" method in the model class
+>     ['password', 'authenticate', 'on' => 'login'],
+>     // a validator of class "DateRangeValidator"
+>     ['dateRange', 'DateRangeValidator'],
+> ];
+>//没有on表事所有场景都会验证
+>//on为string表示只是string场景才验证
+>//on为array表示，存在array中得所有场景都需要验证
+>
+>
+>
+>//scenarios()
+>[
+>     'scenario1' => ['attribute11', 'attribute12', ...],
+>     'scenario2' => ['attribute21', 'attribute22', ...],
+> ]
+>```
+>
+> 
+>
+> 
+>
+>\yii\base\ArrayableTrait
+>
+>```php
+>trait yii\base\ArrayableTrait
+>{
+>    public function fields(){}
+>    public function extraFields(){}//return [];
+>    public function toArray(array $fields = [], array $expand = [], $recursive = true){}
+>    
+>    protected function extractRootFields(array $fields){}
+>    protected function extractFieldsFor(array $fields, $rootField){}
+>    protected function resolveFields(array $fields, array $expand){}
+>}
+>```
+>
+> 
+>
+>yii\base\StaticInstanceTrait
+>
+>```php
+>trait StaticInstanceTrait
+>{
+>    private static $_instances = [];
+>    public static function instance($refresh = false)
+>}
+>```
+>
+>
+
+
+
+
+
+(2)、yii\db\BaseActiveRecord
+
+
+
+> ```php
+> abstract class \yii\db\BaseActiveRecord extends \yii\base\Model implements ActiveRecordInterface
+> {
+>     const EVENT_INIT = 'init';
+>     const EVENT_AFTER_REFRESH = 'afterRefresh';
+>     const EVENT_AFTER_FIND = 'afterFind';      //select事件
+>     const EVENT_BEFORE_INSERT = 'beforeInsert';//insert事件
+>     const EVENT_AFTER_INSERT = 'afterInsert';
+>     const EVENT_BEFORE_UPDATE = 'beforeUpdate';//update事件
+>     const EVENT_AFTER_UPDATE = 'afterUpdate';
+>     const EVENT_BEFORE_DELETE = 'beforeDelete';//delete事件
+>     const EVENT_AFTER_DELETE = 'afterDelete';
+>     
+>     private $_attributes = [];
+>     private $_oldAttributes;
+>     private $_related = [];
+>     private $_relationsDependencies = [];
+>     
+>     public static function findOne($condition){}//object|null.findByCondition()->one()
+>     public static function findAll($condition){}//[object]}null.findByCondition()->all()
+>     protected static function findByCondition($condition){}//static::find()->andWhere();
+>    
+>     public function optimisticLock(){return null;}
+>     
+>     //多了个属性判断  $this->hasAttribute($name)
+>     public function canGetProperty($name, $checkVars = true, $checkBehaviors = true){}
+>     public function canSetProperty($name, $checkVars = true, $checkBehaviors = true){}
+>     public function __get($name){}
+>     public function __set($name, $value){}
+>     public function __isset($name){}
+>     public function __unset($name){}
+>     
+>     public function hasOne($class, $link){}//createRelationQuery()
+>     public function hasMany($class, $link){}//createRelationQuery()
+>     protected function createRelationQuery($class, $link, $multiple){}
+>     
+>     public function populateRelation($name, $records){}
+>     public function isRelationPopulated($name){}
+>     public function getRelatedRecords(){}
+>     
+>     public function hasAttribute($name){}
+>     public function getAttribute($name){}
+>     public function setAttribute($name, $value){}
+>     public function getOldAttributes(){}
+>     public function setOldAttributes($values){}
+>     public function getOldAttribute($name){}
+>     public function setOldAttribute($name, $value){}
+>     public function markAttributeDirty($name){}
+>     public function isAttributeChanged($name, $identical = true){}
+>     public function getDirtyAttributes($names = null){}
+>     
+>     public function save($runValidation = true, $attributeNames = null){}//insert()和update()
+>     public function update($runValidation = true, $attributeNames = null){}//updateInternal()
+>     public function updateAttributes($attributes){}//getDirtyAttributes()和updateAll()
+>     protected function updateInternal($attributes = null){}//updateAll()
+>     public function updateCounters($counters){}//updateAllCounters()
+>     public function delete(){}//deleteAll()
+>     public function getIsNewRecord(){}
+>     public function setIsNewRecord($value){}
+>     //绑定事件
+>     public function init(){}
+>     public function afterFind(){}
+>     public function beforeSave($insert){}
+>     public function afterSave($insert, $changedAttributes){}
+>     public function beforeDelete(){}
+>     public function afterDelete(){}
+>     
+>     public function refresh(){}
+>     protected function refreshInternal($record){}
+>     public function afterRefresh(){}
+>     public function equals($record){}
+>     public function getPrimaryKey($asArray = false){}
+>     public function getOldPrimaryKey($asArray = false){}
+>     public static function populateRecord($record, $row){}
+>     public static function instantiate($row){}
+>     public function offsetExists($offset){}
+>     public function getRelation($name, $throwException = true){}
+>     public function link($name, $model, $extraColumns = []){}
+>     public function unlink($name, $model, $delete = false){}
+>     public function unlinkAll($name, $delete = false){}
+>     private function bindModels($link, $foreignModel, $primaryModel){}
+>     public static function isPrimaryKey($keys){}
+>     public function getAttributeLabel($attribute){}
+>     public function getAttributeHint($attribute){}
+>     public function fields(){}
+>     public function extraFields(){}
+>     public function offsetUnset($offset){}
+>     private function resetDependentRelations($attribute){}
+>     private function setRelationDependencies($name, $relation, $viaRelationName = null){}
+>     
+>     
+>     
+>     
+>      public static function updateAll($attributes, $condition = ''){}//未实现
+>     public static function updateAllCounters($counters, $condition = ''){}//未实现
+>     public static function deleteAll($condition = null){}//未实现
+> }
+> ```
+>
+> 
+
+(3)、yii\db\ActiveRecord
+
+>
+>
+>```php
+>class \yii\db\ActiveRecord extends \yii\db\BaseActiveRecord
+>{
+>    const OP_INSERT = 0x01;
+>    const OP_UPDATE = 0x02;
+>    const OP_DELETE = 0x04;
+>    const OP_ALL = 0x07;
+>    
+>    public function loadDefaultValues($skipIfSet = true){}
+>    public static function getDb(){}
+>    public static function findBySql($sql, $params = []){}
+>    protected static function findByCondition($condition){}
+>    protected static function filterValidAliases(Query $query){}
+>    protected static function filterCondition(array $condition, array $aliases = []){}
+>    protected static function filterValidColumnNames($db, array $aliases){}
+>    public function refresh(){}
+>    public static function updateAll($attributes, $condition = '', $params = []){}
+>    public static function updateAllCounters($counters, $condition = '', $params = []){}
+>    public static function deleteAll($condition = null, $params = []){}
+>    public static function find(){}//return Yii::createObject(ActiveQuery::className(), [get_called_class()]);
+>    public static function tableName(){}
+>    public static function getTableSchema(){}
+>    public static function primaryKey(){}
+>    public function attributes(){}
+>    public function transactions(){}
+>    public static function populateRecord($record, $row){}
+>    public function insert($runValidation = true, $attributes = null){}
+>    protected function insertInternal($attributes = null){}
+>    public function update($runValidation = true, $attributeNames = null){}
+>    public function delete(){}
+>    protected function deleteInternal(){}
+>    public function equals($record){}
+>    public function isTransactional($operation){}
+>}
+>```
+>
+>
+
+### 2、query
+
+(1)、yii\db\Query
+
+(2)、yii\db\ActiveQuery
+
+
+
+### 3、command
+
+(1)、yii\db\Command
+
+### 4、connect
+
+(1)、yii\db\Connection
+
+()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
+
+## last
 
 
 

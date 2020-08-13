@@ -832,25 +832,27 @@ breake
 >正确的初始化举例
 >
 >* ```php
->  static $a;                    //不初始化，默认是null
->  static $a = null;             //null类型   
->  static $a = false;            //boolean类型
->  static $a = 100;              //integer类型
->  static $a = 100.23;           //float类型
->  static $a = ['a' => 'a'];     //array类型
->  static $a = PHP_VERSION;      //调用已定义的常量
->  static $a = "abcd";           //string类型
->                //string的nowdoc
->  static $a = <<<'label'
->  abcd
->  label;
->                //string的heredoc
->  static $a=<<<label
->  abcd
->  label;
->  static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
->  ```
->```
+> static $a;                    //不初始化，默认是null
+> static $a = null;             //null类型   
+> static $a = false;            //boolean类型
+> static $a = 100;              //integer类型
+> static $a = 100.23;           //float类型
+> static $a = ['a' => 'a'];     //array类型
+> static $a = PHP_VERSION;      //调用已定义的常量
+> static $a = "abcd";           //string类型
+>               //string的nowdoc
+> static $a = <<<'label'
+> abcd
+> label;
+>               //string的heredoc
+> static $a=<<<label
+> abcd
+> label;
+> static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
+> ```
+> ```
+>
+> ```
 >
 >
 >
@@ -859,10 +861,10 @@ breake
 >错误的初始化举例
 >
 >* ```php
->  static $a = bcadd(1,2);                 //不可以调用函数
->  static $a = function(){echo 'hello!';}  //不可以callback
->  static $a = new stdClass();             //不可以object
->  ```
+> static $a = bcadd(1,2);                 //不可以调用函数
+> static $a = function(){echo 'hello!';}  //不可以callback
+> static $a = new stdClass();             //不可以object
+>```
 >```
 >
 >```
@@ -1075,23 +1077,69 @@ breake
 
 #### (2)、访问控制
 
->public          可以被任意访问
->
->protected   可以被当前类以及其子类调用
->
->private        仅限当前类调用
->
->当未定义访问控制时，默认是public
->
->仅属性(字段)、方法(函数)支持访问控制，类常量不需要
->
+
+
+| 关键字    | 访问       | 继承       | 备注 |
+| --------- | ---------- | ---------- | ---- |
+| public    | 允许       | 允许       |      |
+| protected | ==不==允许 | 允许       |      |
+| private   | ==不==允许 | ==不==允许 |      |
+
+
+
 >```php
->public $var;
->public function myFun(){}
->const myCOnstant = '111';//不需要访问控制
+>class Aa{
+>    public $p1=1;
+>    protected $p2=2;
+>    private $p3=3;
+>
+>    public function test1(){
+>        return "test1<br>";
+>    }
+>    protected function test2(){
+>        return "test2<br>";
+>    }
+>    private function test3(){
+>        return "test3<br>";
+>    }
+>}
+>
+>class Bb extends Aa{
+>
+>    public function t1(){
+>        return $this->test1();
+>    }
+>
+>    public function t2(){
+>        return $this->test2();
+>    }
+>
+>    public function t3(){
+>        return $this->test3();
+>    }
+>}
+>
+>
+>$obj = new Aa();
+>$obj2 = new Bb();
+>/*********属性、类变量********/
+>echo $obj->p1;
+>//echo $obj->p2;//protected调用报错
+>//echo $obj->p3;//private调用报错
+>
+>echo $obj2->p1;
+>//echo $obj2->p2;//protected调用报错
+>//echo $obj2->p3;//private调用报错
+>
+>/*********类function********/
+>echo $obj->test1();
+>//echo $obj->test2();//protected调用报错
+>//echo $obj->test3();//private调用报错
+>
+>echo $obj2->t1();
+>echo $obj2->t2();//protected可以被继承
+>echo $obj2->t3();//private继承报错
 >```
->
->
 
 #### (3)、static(静态)
 
@@ -2523,6 +2571,13 @@ ob_flush
 
 ## (二)、判断问题
 
+==**文档 -> 附录 -> php类型比较表**==
+
+* 使用 PHP 函数对变量 $x 进行比较
+* 松散比较 ==
+* 严格比较 ===
+* (1\=='php')为false (0\=='php')为true
+
 >```php
 >$arr = [
 >    null, 'null',   //空
@@ -2534,16 +2589,6 @@ ob_flush
 >
 >/*********** == 判断 *********
 > 
->null    => [0, false, '', array()],
->'null'  => [0],
->0       => [null, 'null', '0',false, 'false', ''],//除了[]都==
->'0'     => [0, false],
->false   => [null, 0, '0', '', array()],
->'false' => [0],
->''      => [null, 0, false, null],
->array() => [null, false]
->
->
 >'null'  => [0],
 >'false' => [0],
 >'0'     => [0, false],
@@ -2559,20 +2604,23 @@ ob_flush
 >
 >```
 
-| 涉及场景        | 什么等 | 举例 | 备注 |
-| --------------- | ------ | ---- | ---- |
-| 判断运算符`<=>` | `==`   |      |      |
-| switch..case    | `==`   |      |      |
-| in_array()      | `==`   |      |      |
+| 涉及场景                  | 什么等 | 举例 | 备注 |
+| ------------------------- | ------ | ---- | ---- |
+| 判断运算符`<=>`           | `==`   |      |      |
+| switch..case              | `==`   |      |      |
+| in_array()                | `==`   |      |      |
+| in_array(field, [], true) | `===`  |      |      |
 
 
 
-| 操作  | null | 'null' | 0    | '0'  | false | 'false' | ''   | []   |
-| ----- | ---- | ------ | ---- | ---- | ----- | ------- | ---- | ---- |
-| ?:    |      | true   |      |      |       | true    |      |      |
-| empty | true |        | true | true | true  |         | true | true |
-| isset |      | true   | true | true | true  | true    | true | true |
-| &&    |      | true   |      |      |       | true    |      |      |
+| 操作       | null | 'null' | 0    | '0'    | false | 'false' | ''     | []    | `var $x` |
+| ---------- | ---- | ------ | ---- | ------ | ----- | ------- | ------ | ----- | -------- |
+| gettype()  | null | string | int  | string | bool  | string  | string | array | null     |
+| ?:         |      | true   |      |        |       | true    |        |       |          |
+| empty      | true |        | true | true   | true  |         | true   | true  | true     |
+| isset      |      | true   | true | true   | true  | true    | true   | true  |          |
+| &&         |      | true   |      |        |       | true    |        |       |          |
+| `if($var)` |      | true   |      |        |       | true    |        |       |          |
 
 1、判断运算符`<=>`
 
