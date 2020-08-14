@@ -242,6 +242,10 @@
 >
 >```
 >
+>```
+>
+>```
+>
 >在controller中设置默认action
 >
 >* ```php
@@ -249,6 +253,10 @@
 >  	public $defaultAction = 'say-hello';//设置默认方法
 >  }
 >```
+>```
+>
+>```
+>
 >```
 >
 >```
@@ -508,6 +516,44 @@
 #### (3)、改
 
 #### (4)、查
+
+`$Q = new Query()`
+
+`$AQ = new ActiveQuery()`
+
+| sql功能    | yii2支持                                                     | 备注                             |
+| ---------- | ------------------------------------------------------------ | -------------------------------- |
+| distinct   | `$Q->distinct($value=true)`                                  |                                  |
+| 修饰字段   | `$Q->select([字段], $option)`                                | option比如SQL_CALC_FOUND_ROWS    |
+| 字段       |                                                              |                                  |
+| table      | `$Q->from($tables)`                                          | tables可string可array            |
+| alias      | `$Q->from(['table u'])`<br>`$Q->from('table');$AQ->alias('u')` |                                  |
+| where      | `$Q->where($condition)`<br>`$Q->andWhere($condition)`<br> `$Q->orWhere($condition)`<br/>`$Q->filterWhere($condition)`<br/>`$Q->andFilterWhere($condition)`<br/>`$Q->orFilterWhere($condition)`<br/> | filter当k-v中v为空，则会被过滤掉 |
+| group      | `$Q->groupBy($columns)`<br>`$Q->addGroupBy($columns)`        |                                  |
+| having     | `$Q->having($condition,$params=[])`<br/>`$Q->andHaving($condition,$params=[])`<br/> `$Q->orHaving($condition,$params=[])`<br/>`$Q->filterHaving(array $condition)`<br/>`$Q->andFilterHaving(array $condition)`<br/>`$Q->orFilterHaving(array $condition)`<br/> |                                  |
+| join       | `$Q->join($type, $table, $on = '', $params = [])`<br>`$Q->innerJoin($table, $on = '', $params = [])`<br>`$Q->leftJoin($table, $on = '', $params = [])`<br>`$Q->rightJoin($table, $on = '', $params = [])` |                                  |
+| union      | `$Q->union($sql, $all=false)`                                |                                  |
+| order      | `$Q->orderBy($columns)`<br/>`$Q->addOrderBy($columns)`       |                                  |
+| limit      | `$Q->limit($limit)`                                          |                                  |
+| offset     | `$Q->offset($offset)`                                        |                                  |
+| with       | `$Q->withQuery($query, $alias, $recursive = false)`          |                                  |
+|            |                                                              |                                  |
+| 求one      | `$Q->one($db=null)`                                          |                                  |
+| 求all      | `$Q->all($db=null)`                                          |                                  |
+|            |                                                              |                                  |
+| 批         | `$Q->batch($size=100,$db=null)`                              |                                  |
+|            | `$Q->each($size=100,$db=null)`                               |                                  |
+|            |                                                              |                                  |
+| 求标量     | `$Q->scalar($db=null)`                                       | 结果集第一行第一个字段得值       |
+| 求列       | `$Q->column($db=null)`                                       | 结果集得第一个字段(一维数组)     |
+|            |                                                              |                                  |
+| count(*)   | `$Q->count($q='*',$db=null)`                                 |                                  |
+| sum(field) | `$Q->sum($q,$db=null)`                                       |                                  |
+| avg(field) | `$Q->averge($q,$db=null)`                                    |                                  |
+| min(field) | `$Q->min($q,$db=null)`                                       |                                  |
+| max(field) | `$Q->max($q,$db=null)`                                       |                                  |
+
+
 
 #### (5)、事务
 
@@ -1108,7 +1154,7 @@ simple_expr:
 
 ### 1、model
 
-(1)、yii\base\Model
+#### (1)、yii\base\Model
 
 >```php
 >class \yii\base\Model extends \yii\base\Component implements StaticInstanceInterface, IteratorAggregate, ArrayAccess, Arrayable
@@ -1253,112 +1299,113 @@ simple_expr:
 
 
 
-(2)、yii\db\BaseActiveRecord
+#### (2)、yii\db\BaseActiveRecord
 
 
 
 > ```php
 > abstract class \yii\db\BaseActiveRecord extends \yii\base\Model implements ActiveRecordInterface
 > {
->     const EVENT_INIT = 'init';
->     const EVENT_AFTER_REFRESH = 'afterRefresh';
->     const EVENT_AFTER_FIND = 'afterFind';      //select事件
->     const EVENT_BEFORE_INSERT = 'beforeInsert';//insert事件
->     const EVENT_AFTER_INSERT = 'afterInsert';
->     const EVENT_BEFORE_UPDATE = 'beforeUpdate';//update事件
->     const EVENT_AFTER_UPDATE = 'afterUpdate';
->     const EVENT_BEFORE_DELETE = 'beforeDelete';//delete事件
->     const EVENT_AFTER_DELETE = 'afterDelete';
+>  const EVENT_INIT = 'init';
+>  const EVENT_AFTER_REFRESH = 'afterRefresh';
+>  const EVENT_AFTER_FIND = 'afterFind';      //select事件
+>  const EVENT_BEFORE_INSERT = 'beforeInsert';//insert事件
+>  const EVENT_AFTER_INSERT = 'afterInsert';
+>  const EVENT_BEFORE_UPDATE = 'beforeUpdate';//update事件
+>  const EVENT_AFTER_UPDATE = 'afterUpdate';
+>  const EVENT_BEFORE_DELETE = 'beforeDelete';//delete事件
+>  const EVENT_AFTER_DELETE = 'afterDelete';
+>  
+>  private $_attributes = [];
+>  private $_oldAttributes;
+>  private $_related = [];
+>  private $_relationsDependencies = [];
+>  
+>  public static function findOne($condition){}//object|null.findByCondition()->one()
+>  public static function findAll($condition){}//[object]}null.findByCondition()->all()
+>  protected static function findByCondition($condition){}//static::find()->andWhere();
+> 
+>  public function optimisticLock(){return null;}
+>  
+>  //多了个属性判断  $this->hasAttribute($name)
+>  public function canGetProperty($name, $checkVars = true, $checkBehaviors = true){}
+>  public function canSetProperty($name, $checkVars = true, $checkBehaviors = true){}
+>  public function __get($name){}
+>  public function __set($name, $value){}
+>  public function __isset($name){}
+>  public function __unset($name){}
+>  
+>  public function hasOne($class, $link){}//createRelationQuery()
+>  public function hasMany($class, $link){}//createRelationQuery()
+>  protected function createRelationQuery($class, $link, $multiple){}
+>  
+>  public function populateRelation($name, $records){}
+>  public function isRelationPopulated($name){}
+>  public function getRelatedRecords(){}
+>  
+>  public function hasAttribute($name){}
+>  public function getAttribute($name){}
+>  public function setAttribute($name, $value){}
+>  public function getOldAttributes(){}
+>  public function setOldAttributes($values){}
+>  public function getOldAttribute($name){}
+>  public function setOldAttribute($name, $value){}
+>  public function markAttributeDirty($name){}
+>  public function isAttributeChanged($name, $identical = true){}
+>  public function getDirtyAttributes($names = null){}
+>  
+>  public function save($runValidation = true, $attributeNames = null){}//insert()和update()
+>  public function update($runValidation = true, $attributeNames = null){}//updateInternal()
+>  public function updateAttributes($attributes){}//getDirtyAttributes()和updateAll()
+>  protected function updateInternal($attributes = null){}//updateAll()
+>  public function updateCounters($counters){}//updateAllCounters()
+>  public function delete(){}//deleteAll()
+>  public function getIsNewRecord(){}
+>  public function setIsNewRecord($value){}
+>  //绑定事件
+>  public function init(){}
+>  public function afterFind(){}
+>  public function beforeSave($insert){}
+>  public function afterSave($insert, $changedAttributes){}
+>  public function beforeDelete(){}
+>  public function afterDelete(){}
+>  
+>  public function refresh(){}//刷新查询到得数据(重查)
+>  protected function refreshInternal($record){}//刷新(重新赋值)
+>  public function afterRefresh(){}
 >     
->     private $_attributes = [];
->     private $_oldAttributes;
->     private $_related = [];
->     private $_relationsDependencies = [];
->     
->     public static function findOne($condition){}//object|null.findByCondition()->one()
->     public static function findAll($condition){}//[object]}null.findByCondition()->all()
->     protected static function findByCondition($condition){}//static::find()->andWhere();
->    
->     public function optimisticLock(){return null;}
->     
->     //多了个属性判断  $this->hasAttribute($name)
->     public function canGetProperty($name, $checkVars = true, $checkBehaviors = true){}
->     public function canSetProperty($name, $checkVars = true, $checkBehaviors = true){}
->     public function __get($name){}
->     public function __set($name, $value){}
->     public function __isset($name){}
->     public function __unset($name){}
->     
->     public function hasOne($class, $link){}//createRelationQuery()
->     public function hasMany($class, $link){}//createRelationQuery()
->     protected function createRelationQuery($class, $link, $multiple){}
->     
->     public function populateRelation($name, $records){}
->     public function isRelationPopulated($name){}
->     public function getRelatedRecords(){}
->     
->     public function hasAttribute($name){}
->     public function getAttribute($name){}
->     public function setAttribute($name, $value){}
->     public function getOldAttributes(){}
->     public function setOldAttributes($values){}
->     public function getOldAttribute($name){}
->     public function setOldAttribute($name, $value){}
->     public function markAttributeDirty($name){}
->     public function isAttributeChanged($name, $identical = true){}
->     public function getDirtyAttributes($names = null){}
->     
->     public function save($runValidation = true, $attributeNames = null){}//insert()和update()
->     public function update($runValidation = true, $attributeNames = null){}//updateInternal()
->     public function updateAttributes($attributes){}//getDirtyAttributes()和updateAll()
->     protected function updateInternal($attributes = null){}//updateAll()
->     public function updateCounters($counters){}//updateAllCounters()
->     public function delete(){}//deleteAll()
->     public function getIsNewRecord(){}
->     public function setIsNewRecord($value){}
->     //绑定事件
->     public function init(){}
->     public function afterFind(){}
->     public function beforeSave($insert){}
->     public function afterSave($insert, $changedAttributes){}
->     public function beforeDelete(){}
->     public function afterDelete(){}
->     
->     public function refresh(){}
->     protected function refreshInternal($record){}
->     public function afterRefresh(){}
->     public function equals($record){}
->     public function getPrimaryKey($asArray = false){}
->     public function getOldPrimaryKey($asArray = false){}
->     public static function populateRecord($record, $row){}
->     public static function instantiate($row){}
->     public function offsetExists($offset){}
->     public function getRelation($name, $throwException = true){}
->     public function link($name, $model, $extraColumns = []){}
->     public function unlink($name, $model, $delete = false){}
->     public function unlinkAll($name, $delete = false){}
->     private function bindModels($link, $foreignModel, $primaryModel){}
->     public static function isPrimaryKey($keys){}
->     public function getAttributeLabel($attribute){}
->     public function getAttributeHint($attribute){}
->     public function fields(){}
->     public function extraFields(){}
->     public function offsetUnset($offset){}
->     private function resetDependentRelations($attribute){}
->     private function setRelationDependencies($name, $relation, $viaRelationName = null){}
->     
->     
->     
->     
->      public static function updateAll($attributes, $condition = ''){}//未实现
->     public static function updateAllCounters($counters, $condition = ''){}//未实现
->     public static function deleteAll($condition = null){}//未实现
+>  public function equals($record){}//判断两个record-object是否相等(primarykey)
+>  public function getPrimaryKey($asArray = false){}//获取primarykey对应得值
+>  public function getOldPrimaryKey($asArray = false){}
+>  public static function populateRecord($record, $row){}
+>  public static function instantiate($row){}
+>  public function offsetExists($offset){}
+>  public function getRelation($name, $throwException = true){}
+>  public function link($name, $model, $extraColumns = []){}
+>  public function unlink($name, $model, $delete = false){}
+>  public function unlinkAll($name, $delete = false){}
+>  private function bindModels($link, $foreignModel, $primaryModel){}
+>  public static function isPrimaryKey($keys){}
+>  public function getAttributeLabel($attribute){}
+>  public function getAttributeHint($attribute){}
+>  public function fields(){}
+>  public function extraFields(){}
+>  public function offsetUnset($offset){}
+>  private function resetDependentRelations($attribute){}
+>  private function setRelationDependencies($name, $relation, $viaRelationName = null){}
+>  
+>  
+>  
+>  
+>  public static function updateAll($attributes, $condition = ''){}//未实现
+>  public static function updateAllCounters($counters, $condition = ''){}//未实现
+>  public static function deleteAll($condition = null){}//未实现
 > }
 > ```
 >
 > 
 
-(3)、yii\db\ActiveRecord
+#### (3)、yii\db\ActiveRecord
 
 >
 >
@@ -1402,11 +1449,277 @@ simple_expr:
 
 ### 2、query
 
-(1)、yii\db\Query
+#### (1)、yii\db\Query
 
-(2)、yii\db\ActiveQuery
+>
+>
+>```php
+>class yii\db\Query extends yii\db\Component implements QueryInterface, ExpressionInterface
+>{
+>    use yii\db\QueryTrait;
+>
+>    public $selectOption;
+>    public $distinct;
+>    public $select;//字段
+>    public $from; //table
+>    public $groupBy;//group
+>    public $having;//having
+>    public $join;  //join  
+>    public $union; //union
+>    public $withQueries;
+>    public $params = [];//参数实体
+>    public $queryCacheDuration;
+>    public $queryCacheDependency;
+>    public function createCommand($db = null){}//yii\db\Connection
+>    public function prepare($builder){}
+>    public function populate($rows){}//处理查询结果集与indexBy相关
+>    
+>    //字段修饰
+>    public function distinct($value = true){}
+>    //字段
+>    public function select($columns, $option = null){}
+>    public function addSelect($columns){}
+>    //table
+>    public function from($tables){}
+>    //where
+>    public function where($condition, $params = []){}
+>    public function andWhere($condition, $params = []){}
+>    public function orWhere($condition, $params = []){}
+>    //group
+>    public function groupBy($columns){}
+>    public function addGroupBy($columns){}
+>    //having
+>    public function having($condition, $params = []){}
+>    public function andHaving($condition, $params = []){}
+>    public function orHaving($condition, $params = []){}
+>    public function filterHaving(array $condition){}
+>    public function andFilterHaving(array $condition){}
+>    public function orFilterHaving(array $condition){}
+>    //join
+>    public function join($type, $table, $on = '', $params = []){}
+>    public function innerJoin($table, $on = '', $params = []){}
+>    public function leftJoin($table, $on = '', $params = []){}
+>    public function rightJoin($table, $on = '', $params = []){}
+>    //union
+>    public function union($sql, $all = false){}
+>    //with
+>    public function withQuery($query, $alias, $recursive = false){}
+>    //params
+>    public function params($params){}
+>    public function addParams($params){}
+>    //cache
+>    public function cache($duration = true, $dependency = null){}
+>    public function noCache(){}
+>
+>	//执行查询。
+>    public function all($db = null){}//yii\db\Connection->queryAll()
+>    public function one($db = null){}//yii\db\Connection->queryOne()
+>    //用batch或each查询
+>    public function batch($batchSize = 100, $db = null){}//[]
+>    public function each($batchSize = 100, $db = null){}//
+>    
+>    //取某个字段得某个值
+>    public function scalar($db = null){}//获取标量，结果集第一个字段第一行得值
+>    //取某列得数组(一维数组)
+>    public function column($db = null){}//结果集得第一个字段结果集。一维数组
+>    //sql函数
+>    public function count($q = '*', $db = null){}//count(*)
+>    public function sum($q, $db = null){}//sum(field)
+>    public function average($q, $db = null){}//avg(field)
+>    public function min($q, $db = null){}//min(field)
+>    public function max($q, $db = null){}//max(field)
+>
+>    public function exists($db = null){}//??
+>    public function getTablesUsedInFrom(){}
+>    public function andFilterCompare($name, $value, $defaultOperator = '='){}
+>    public static function create($from){}
+>    public function __toString(){}
+>
+>    protected function queryScalar($selectExpression, $db){}
+>    protected function cleanUpTableNames($tableNames){}
+>    private function ensureNameQuoted($name){}
+>    protected function normalizeSelect($columns){}
+>    protected function getUniqueColumns($columns){}
+>    protected function getUnaliasedColumnsFromSelect(){}
+>    protected function setCommandCache($command){}
+>}
+>```
+
+##### a、yii\db\QueryTrait
+
+>```php
+>trait yii\db\QueryTrait
+>{
+>    public $where;
+>    public $limit;
+>    public $offset;
+>    public $orderBy;
+>    public $indexBy;
+>    public $emulateExecution = false;
+>    //indexBy    按这些字段组装关联数组  并不是强制使用索引
+>    public function indexBy($column){}
+>    //where
+>    public function where($condition){}
+>    public function andWhere($condition){}
+>    public function orWhere($condition){}
+>    public function filterWhere(array $condition){}
+>    public function andFilterWhere(array $condition){}
+>    public function orFilterWhere(array $condition){}
+>    //orderBy
+>    public function orderBy($columns){}
+>    public function addOrderBy($columns){}
+>    //limit
+>    public function limit($limit){}
+>    //offset
+>    public function offset($offset){}
+>    
+>    public function emulateExecution($value = true){}
+>    
+>    protected function filterCondition($condition){}
+>    protected function isEmpty($value){}
+>    protected function normalizeOrderBy($columns){}
+>}
+>```
+>
+>
+
+#### (2)、yii\db\ActiveQuery
+
+>```php
+>class yii\db\ActiveQuery extends yii\db\Query implements ActiveQueryInterface
+>{
+>    use yii\db\ActiveQueryTrait;
+>    use yii\db\ActiveRelationTrait;
+>    const EVENT_INIT = 'init';
+>    public $sql;
+>    public $on;
+>    public $joinWith;
+>
+>
+>    public function prepare($builder){}
+>    public function populate($rows){}
+>    
+>    public function all($db = null){}
+>    public function one($db = null){}
+>    
+>    public function createCommand($db = null){}
+>    public function joinWith($with, $eagerLoading = true, $joinType = 'LEFT JOIN'){}
+>    public function innerJoinWith($with, $eagerLoading = true){}
+>    public function onCondition($condition, $params = []){}
+>    public function andOnCondition($condition, $params = []){}
+>    public function orOnCondition($condition, $params = []){}
+>    public function viaTable($tableName, $link, callable $callable = null){}
+>    public function alias($alias){}
+>    public function getTablesUsedInFrom(){}
+>    
+>    protected function getPrimaryTableName(){}
+>    protected function queryScalar($selectExpression, $db){}
+>    private function buildJoinWith(){}
+>    private function joinWithRelations($model, $with, $joinType){}
+>    private function getJoinType($joinType, $name){}
+>    protected function getTableNameAndAlias(){}
+>    private function joinWithRelation($parent, $child, $joinType){}
+>    private function removeDuplicatedModels($models){}
+>}
+>```
+
+##### a、yii\db\ActiveQueryTrait
+
+>```php
+>trait yii\db\ActiveQueryTrait
+>{
+>public $modelClass;
+>public $with;
+>public $asArray;
+>
+>public function asArray($value = true){}
+>public function with(){}
+>public function findWith($with, &$models){}
+>    
+>protected function createModels($rows){}
+>private function normalizeRelations($model, $with){}    
+>}
+>```
+>
+
+##### b、yii\db\ActiveRelationTrait
+
+>```php
+>trait yii\db\ActiveRelationTrait
+>{
+>public $multiple;
+>public $primaryModel;
+>public $link;
+>public $via;
+>public $inverseOf;
+>private $viaMap;
+>
+>public function __clone()
+>public function via($relationName, callable $callable = null){}
+>public function inverseOf($relationName){}
+>public function findFor($name, $model){}
+>public function populateRelation($name, &$primaryModels){}
+>    
+>private function addInverseRelations(&$result){}
+>private function populateInverseRelation(&$primaryModels, $models, $primaryName, $name){}
+>private function buildBuckets($models, $link, $viaModels = null, $viaQuery = null, $checkMultiple = true){}
+>private function mapVia($map, $viaMap){}
+>private function indexBuckets($buckets, $indexBy){}
+>private function prefixKeyColumns($attributes){}
+>private function filterByModels($models){}
+>private function getModelKey($model, $attributes){}
+>private function normalizeModelKey($value){}
+>private function findJunctionRows($primaryModels){}
+>}
+>```
+>
+
+#### (3)、核心代码
+
+##### a、Query::createCommand
+
+> ```php
+> 
+>     public function Query::createCommand($db = null)
+>     {
+>         if ($db === null) {
+>             $db = Yii::$app->getDb(); //yii2\db\connection
+>         }
+>         list($sql, $params) = $db->getQueryBuilder()->build($this);
+> 
+>         $command = $db->createCommand($sql, $params);
+>         $this->setCommandCache($command);
+> 
+>         return $command;
+>     }
+> ```
+>
 
 
+
+##### b、Query::create
+
+> ```php
+>     public static function create($from)
+>     {
+>         return new self([
+>             'where' => $from->where,
+>             'limit' => $from->limit,
+>             'offset' => $from->offset,
+>             'orderBy' => $from->orderBy,
+>             'indexBy' => $from->indexBy,
+>             'select' => $from->select,
+>             'selectOption' => $from->selectOption,
+>             'distinct' => $from->distinct,
+>             'from' => $from->from,
+>             'groupBy' => $from->groupBy,
+>             'join' => $from->join,
+>             'having' => $from->having,
+>             'union' => $from->union,
+>             'params' => $from->params,
+>         ]);
+>     }
+> ```
 
 ### 3、command
 
