@@ -234,9 +234,11 @@
 >config/main.php
 >
 >* ```php
->  'defaultRoute' => 'hello-world',///或者hello-world/say-hello
->  ```
->```
+> 'defaultRoute' => 'hello-world',///或者hello-world/say-hello
+> ```
+> ```
+>
+> ```
 >
 >```
 >
@@ -249,10 +251,14 @@
 >在controller中设置默认action
 >
 >* ```php
-> class HelloWorldController extends \yii\web\Controller{
->  	public $defaultAction = 'say-hello';//设置默认方法
->  }
+>  class HelloWorldController extends \yii\web\Controller{
+>   	public $defaultAction = 'say-hello';//设置默认方法
+>   }
+>  ```
 >```
+>
+>```
+>
 >```
 >
 >```
@@ -509,13 +515,165 @@
 
 ##### a、增一
 
-###### b、批量
+| 序号 | 方法     | 获取错误          | 获取sql | 获取最新id                |
+| ---- | -------- | ----------------- | ------- | ------------------------- |
+| 1    | 逐一赋值 | `$o->getErrors()` | 不可    | `$id=$o->save()?$o->id:0` |
+| 2    | 块赋值   | `$o->getErrors()` | 不可    | `$id=$o->save()?$o->id:0` |
+| 3    | command  | 不可              | 不可    | 不可                      |
+
+> * ```php
+>   字段  a11  char(1)
+>   ```
+>
+> * ```php
+>   字段  a14 tinyint(3)
+>   ```
+>
+> ```php
+> /**---------逐一赋值---------*/
+> $obj1 = new Xyz();//字符型严格对应字符型。数字型则随意
+> //$obj1->a11 = 1;//a11是char型。会报错。：a1 must be a string
+> $obj1->a11 = '1';
+> $obj1->a14 = '1';
+> if($obj1->save()){
+>     $id = $obj1->id;
+> }else{
+> 	$obj1->getErrors()    
+> }
+> 
+> /**----------块赋值------------*/
+> $obj2 = new Xyz();
+> $obj2->attributes = ['a11' => '2', 'a14' =>2];//或$obj2->setAttributes();
+> if($obj2->save()){
+>     $id = $obj2->id;
+> }else{
+> 	$obj2->getErrors()    
+> }
+> 
+> /**----------command------------*/
+> $res = Yii::$app->db->createCommand()->insert(Xyz::tableName(), ['a11' => 3, 'a14' => 3])->execute();
+> var_dump($res);//插入的记录条数
+> ```
+>
+> 
+
+##### b、批量
+
+| 序号 | 方法                | 备注           |
+| ---- | ------------------- | -------------- |
+| 1    | command             |                |
+| 2    | 数据遍历+clone      | 批量变逐条新增 |
+| 3    | 数据遍历+isNewReord | 批量变逐条新增 |
+
+>
+>
+>```php
+>/**---------command----------------*/
+>Yii::$app->db->createCommand()->batchInsert(Xyz::tableName(), ['a11', 'a14'], [[4,41],[4,42]])->execute();
+>
+>/**---------数据遍历+clone-----------*/
+>$data = [['a11' => '5', 'a14' =>51],['a11' => '5','a14' =>52],];
+>$obj3 = new Xyz();
+>foreach($data as $d)
+>{
+>    $_model = clone $obj3;
+>    $_model->setAttributes($d);
+>    $_model->save();
+>}
+>
+>/**---------数据遍历+isNewReord-----------*/    
+>$data = [['a11' => '6', 'a14' =>61],['a11' => '6','a14' =>62],];
+>$obj4 = new Xyz();
+>foreach($data as $i =>$attributes)
+>{
+>    $obj4->id=null;//这个是必须的。不然id会报错
+>    $obj4->isNewRecord = true;
+>    $obj4->setAttributes($attributes);
+>    $obj4->save() ;
+>}
+>```
+>
+>
 
 #### (2)、删
 
+| 序号 | 方法             | 备注                              |
+| ---- | ---------------- | --------------------------------- |
+| 1    | `$M->delete()`   | 适用于`M::find()`和`M::findOne()` |
+| 2    | `M::deleteAll()` |                                   |
+| 3    | command          |                                   |
+
+
+
+
+
+> ```php
+> //删除指定某个
+> if($record = Xyz::find()->where(['a11'=>4])->one()) $record->delete();
+> if($record = Xyz::findOne(['a11' => 4])) $record->delete();
+> //        if($record = Xyz::findAll(['a11' => 5])) $record->delete();不存在这个写法
+> 
+> //删除全部
+> Xyz::deleteAll(['a11' => 5]);
+> Yii::$app->db->createCommand()->delete(Xyz::tableName(), ['a11' => 4])->execute();
+> ```
+>
+> 
+
 #### (3)、改
 
+| 序号 | 方法                                               | 备注                              |
+| ---- | -------------------------------------------------- | --------------------------------- |
+| 1    | `$M->save()`                                       | 适用于`M::find()`和`M::findOne()` |
+| 2    | `M::updateAll()`                                   |                                   |
+| 3    | `$M->updateCounters(['filed'=>+-1])`               | 字段自增自减                      |
+| 4    | `M::updateAllCounters($counters, $condition = '')` |                                   |
+| 5    | command                                            |                                   |
+
+> ```php
+> //修改指定某个
+> if($record = Xyz::find()->where(['a11'=>4])->one()) {
+>     $record->a11 = 5;
+>     $record->save();
+> }
+> if($record = Xyz::findOne(['a11' => 4])) {
+>     $record->a11 = 5;
+>     $record->save();
+> }
+> 
+> $post = Post::findOne($id);
+> $post && $post->updateCounters(['view_count' => 1]);
+> 
+> //批量修改
+> Xyz::updateAll(['a11' => 5], ['a11' => 4]);
+> Yii::$app->db->createCommand()->update(Xyz::tableName(), ['a11' => 5], ['a11' => 4])->execute();
+> ```
+>
+> 
+
 #### (4)、查
+
+>```php
+>$o = (new Query())
+>    ->from(Xyz::tableName()." x")
+>    ->innerJoin(User::tableName(). ' u','u.id=x.id')
+>    ->select(['x.a11', 'u.username', 'x.id', 'u.id'])
+>    ->andWhere(['in', 'x.a11', [1,2,3]])
+>    ->andWhere(['in', 'u.username', ['a', 'b', 'c']]);
+>$o2 = (clone $o)->andWhere(['u.id'=>99]);
+>$result = $o->union($o2)->all();
+>var_dump($result);
+>var_dump($o->createCommand()->getRawSql());
+>
+>
+>/*
+>(SELECT `x`.`a11`, `u`.`username`, `x`.`id`, `u`.`id` FROM `pre_xyz` `x` INNER JOIN `pre_user` `u` ON u.id=x.id WHERE (`x`.`a11` IN (1, 2, 3)) AND (`u`.`username` IN ('a', 'b', 'c'))) 
+>UNION
+>( SELECT `x`.`a11`, `u`.`username`, `x`.`id`, `u`.`id` FROM `pre_xyz` `x` INNER JOIN `pre_user` `u` ON u.id=x.id WHERE (`x`.`a11` IN (1, 2, 3)) AND (`u`.`username` IN ('a', 'b', 'c')) AND (`u`.`id`=99) )
+>*/
+>```
+>
+>
 
 `$Q = new Query()`
 
@@ -556,6 +714,27 @@
 
 
 #### (5)、事务
+
+> ```php
+> $odb = Yii::$app->db;
+> $trans = $odb->beginTransaction();
+> try{
+>     $o = new Xyz();
+>     $o->a11 = '1';
+>     if(!$o->save()) throw new \Exception('错误1');
+> 
+>     $o = new Xyz();
+>     $o->a11 = 2;//a11是char(1)， 验证失败
+>     if(!$o->save()) throw new \Exception('错误2');
+> 
+>     $trans->commit();
+> }catch (\Exception $e){
+>     $trans->rollBack();//
+>     var_dump($e->getMessage());
+> }
+> ```
+>
+> 
 
 ### 2、where
 
@@ -652,13 +831,323 @@ simple_expr:
 
 
 
-
-
-
-
 ### 3、自动验证
 
+#### (1)、场景
+
+>```php
+> /**
+>     * {@inheritdoc}
+>     */
+>public function rules()
+>{
+>    return [
+>        [['a14', 'a15', 'a16', 'a17', 'a27', 'test'], 'integer','on' => 'scenario3'],
+>        [['a19', 'a20', 'a21'], 'number','on' => 'scenario3'],
+>        [['a22', 'a23', 'a24', 'a25'], 'safe','on' => 'scenario3'],
+>        [['a13', 'a26'], 'string','on' => ['scenario3', 'scenario4']],//场景3和场景4
+>        
+>        [['a11'], 'string', 'max' => 1, 'on' => 'scenario1'],//仅场景1
+>        [['a18'], 'number','on' => 'scenario2'],//仅场景2
+>        [['a12'], 'string', 'max' => 255], //没有设定场景，所有场景共有
+>    ];
+>}
+>
+>
+>
+>
+>//场景1两个字段（a11和a12）   a11 char(1)和a12 string()
+>$data1 = [
+>    "a11" => '1',
+>    'a12' =>'2',
+>    'a18' =>'aaaaaaa'
+>];
+>$o = new Xyz();
+>$o->setScenario('scenario1');
+>$o->setAttributes($data1);
+>$o->validate() && $o->save();
+>var_dump($o->getErrors());
+>var_dump($o->activeAttributes());
+>
+>//场景2两个字段（a12和a18） a12 string() 和 a18 number()
+>$data2 = [
+>    "a11" => 1,  //多的字段被场景自动过滤，不会验证也不会写入库
+>    'a12' => '2',
+>    'a18' =>2,
+>];
+>$o = new Xyz();
+>$o->setScenario('scenario2');
+>$o->setAttributes($data2);
+>$o->validate() && $o->save();
+>var_dump($o->getErrors());
+>var_dump($o->activeAttributes());
+>```
+
+#### (2)、规则
+
+> yii2\validators\Validator
+>
+> ```php
+> a1  'boolean' => 'yii\validators\BooleanValidator',
+> a2  'captcha' => 'yii\captcha\CaptchaValidator',
+> a3  'compare' => 'yii\validators\CompareValidator',
+> a4  'date' => 'yii\validators\DateValidator',
+> a5  'datetime' => [
+>         'class' => 'yii\validators\DateValidator',
+>         'type' => DateValidator::TYPE_DATETIME,
+>     ],
+> a6   'time' => [
+>         'class' => 'yii\validators\DateValidator',
+>         'type' => DateValidator::TYPE_TIME,
+>     ],
+> a7  'default' => 'yii\validators\DefaultValueValidator',
+> a8  'double' => 'yii\validators\NumberValidator',
+> a9  'each' => 'yii\validators\EachValidator',
+> a10 'email' => 'yii\validators\EmailValidator',
+> a11 'exist' => 'yii\validators\ExistValidator',
+> a12 'file' => 'yii\validators\FileValidator',
+> a13 'filter' => 'yii\validators\FilterValidator',
+> a14 'image' => 'yii\validators\ImageValidator',
+> a15 'in' => 'yii\validators\RangeValidator',
+> a16 'integer' => [
+>         'class' => 'yii\validators\NumberValidator',
+>         'integerOnly' => true,
+>     ],
+> a17 'match' => 'yii\validators\RegularExpressionValidator',
+> a18 'number' => 'yii\validators\NumberValidator',
+> a19 'required' => 'yii\validators\RequiredValidator',
+> a20 'safe' => 'yii\validators\SafeValidator',
+> a21 'string' => 'yii\validators\StringValidator',
+> a22 'trim' => [
+>         'class' => 'yii\validators\FilterValidator',
+>         'filter' => 'trim',
+>         'skipOnArray' => true,
+>     ],
+> a23 'unique' => 'yii\validators\UniqueValidator',
+> a24 'url' => 'yii\validators\UrlValidator',
+> a25 'ip' => 'yii\validators\IpValidator',
+> ```
+>
+> 
+
+##### a1、boolean : 是否为一个布尔值
+
+>```php
+>['字段名', 'boolean', 'trueValue' => true, 'falseValue' => false, 'strict' => true]; #说明:CBooleanValidator 的别名 
+>```
+
+##### a2、captcha : 验证码
+
+>```php
+>['verificationCode', 'captcha']; #说明:CCaptchaValidator 的别名,确保了特性的值等于 CAPTCHA 显示出来的验证码. 
+>```
+
+##### a3、compare : 比较
+
+>```php
+>['age', 'compare', 'compareValue' => 30, 'operator' => '>=']; #说明:compareValue(比较常量值) - operator(比较操作符)  #说明:CCompareValidator 的别名,确保了特性的值等于另一个特性或常量. 
+>```
+
+##### a4、date : 日期
+
+>```php
+>[['from', 'to'], 'date'];
+>```
+
+##### a5、datetime
+
+> ```php
+> 
+> ```
+
+##### a6、time
+
+> ```php
+>  
+> ```
+
+##### a7、default: 默认值
+
+> ```php
+> ['age', 'default', 'value' => null]; #说明:CDefaultValueValidator 的别名, 为特性指派了一个默认值.
+> ```
+
+##### a8、double : 双精度浮点型
+
+> ```php
+> ['salary', 'double'];
+> ```
+
+##### a9、each
+
+> ```php
+> 
+> ```
+
+##### a10、email： 邮箱验证
+
+> ```php
+> [['字段名'],required,'requiredValue'=>'必填值','message'=>'提示信息']; #说明:CRequiredValidator 的别名, 确保了特性不为空.
+> ```
+
+##### a11、exist: 存在
+
+> ```php
+> ['username', 'exist']; #说明:CExistValidator 的别名,确保属性值存在于指定的数据表字段中. 
+> ```
+
+##### a12、file: 文件
+
+> ```php
+> ['primaryImage', 'file', 'extensions' => ['png', 'jpg', 'gif'], 'maxSize' => 1024*1024*1024]; #说明:CFileValidator 的别名, 确保了特性包含了一个上传文件的名称. 
+> ```
+
+##### a13、filter: 滤镜
+
+> ```php
+> [['username', 'email'], 'filter', 'filter' => 'trim', 'skipOnArray' => true]; #说明:CFilterValidator 的别名, 使用一个filter转换属性.
+> ```
+
+##### a14、image
+
+> ```php
+> 
+> ```
+
+##### a15、in : 范围
+
+> ```php
+> ['level', 'in', 'range' => [1, 2, 3]]; #说明:CRangeValidator 的别名,确保了特性出现在一个预订的值列表里. 
+> ```
+
+##### a16、integer : 整数
+
+> ```php
+> ['age', 'integer'];
+> ```
+
+##### a17、match：正则验证
+
+> ```php
+> [['字段名'],match,'pattern'=>'正则表达式','message'=>'提示信息'];      
+> [['字段名'],match,'not'=>ture,'pattern'=>'正则表达式','message'=>'提示信息']; /*正则取反*/ #说明:CRegularExpressionValidator 的别名, 确保了特性匹配一个正则表达式. 
+> ```
+
+##### a18、number : 数字
+
+> ```php
+> ['salary', 'number'];
+> ```
+
+##### a19、required：必须值验证属性
+
+> ```php
+> [['字段名'],required,'requiredValue'=>'必填值','message'=>'提示信息']; #说明:CRequiredValidator 的别名, 确保了特性不为空.
+> ```
+
+##### a20、safe : 安全
+
+> ```php
+> ['description', 'safe'];
+> ```
+
+##### a21、string : 字符串
+
+> ```php
+> ['username', 'string', 'length' => [4, 24]];
+> ```
+
+##### a22、trim
+
+> ```php
+> 
+> ```
+
+##### a23、unique : 唯一性
+
+> ```php
+> ['username', 'unique'] #说明:CUniqueValidator 的别名,确保了特性在数据表字段中是唯一的. 
+> ```
+
+##### a24、url：网址
+
+> ```php
+> ['website', 'url', 'defaultScheme' => 'http']; #说明:CUrlValidator 的别名, 确保了特性是一个有效的路径.
+> ```
+
+##### a25、ip
+
+> ```php
+> 
+> ```
+
+
+
+
+
 ### 4、自动完成
+
+| 序号 | 方法           | 备注 |
+| ---- | -------------- | ---- |
+| 1    | behavior       |      |
+| 2    | beforeSave     |      |
+| 3    | beforeValidate |      |
+
+
+
+==自动完成在场景之外==
+
+* 如果场景中没有created_at、updated_at字段，但是在behaviors中设置了自动完成。created_at和updated_at也会被真实填充
+
+#### (1)、behaviors
+
+>```php
+>public function behaviors()
+>{
+>    return [
+>        [
+>            'class' => TimestampBehavior::className(),
+>            'attributes' => [
+>                ActiveRecord::EVENT_BEFORE_INSERT => ['a23'],
+>                ActiveRecord::EVENT_BEFORE_UPDATE => ['a23'],
+>            ],
+>            'value' => new Expression('NOW()'),
+>        ]
+>    ];
+>}
+>```
+
+
+
+#### (2)、beforeSave
+
+> ```php
+> 
+> public function beforeSave($insert)
+> {
+>     if($result = parent::beforeSave($insert)){ // TODO: Change the autogenerated stub
+>         $this->a23 = date("Y-m-d H:i:s");
+>     }
+>     return $result;
+> }
+> ```
+
+
+
+#### (3)、beforeValidate
+
+>```php
+>
+>public function beforeValidate()
+>{
+>    if($result = parent::beforeValidate()){// TODO: Change the autogenerated stub
+>        $this->a23 = date("Y-m-d H:i:s");
+>    }
+>    return $result;
+>}
+>```
+>
+>
 
 ### 5、属性标签
 
