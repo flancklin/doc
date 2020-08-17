@@ -67,6 +67,16 @@ git reflog
 
 ## 安装
 
+## 配置
+
+### 设仓库源
+
+阿里云 https://mirrors.aliyun.com/composer/
+
+国内    https://packagist.phpcomposer.com
+
+原本    https://asset-packagist.org
+
 ## 执行composer.json
 
 只有一个composer.json。没有其他，甚至没有composer.lock
