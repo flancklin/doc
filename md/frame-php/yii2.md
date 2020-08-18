@@ -192,9 +192,165 @@
 
 ## (一)、路由router
 
-### 1、设置默认路由
+**组件：urlManager**
+
+### 1、默认路由格式
+
+`/index.php?r=site/login&p1=a&p2=b`
+
+### 2、缺省路由(默认controller和action)
+
+* `/index.php?p1=a&p2=b`是`/index.php?r=site/login&p1=a&p2=b`的简写
 
 详细见 【控制器controller】 -> 【设置默认controller和默认action】
+
+>
+>
+>```php
+>$config['defaultRoute']='site/index';
+>//或
+>$config['defaultRoute']='site';//仅默认控制器
+>```
+>
+>
+
+### 3、重写路由
+
+/index.php?r=site/login&p1=a&p2=b（默认）
+
+/index.php?site/login&p1=a&p2=b（干掉r）
+
+/site/login&p1=a&p2=b（干掉index.php）
+
+/sl&p1=a&p2=b（重写/美化）
+
+>
+>
+>```php
+>$config['components']['urlManager']=[
+>            'enablePrettyUrl' => true,//是否开启路由重写(美化)
+>            'showScriptName' => false,//是否显示index.php,false-不显示；true-显示
+>            'enableStrictParsing' => false,//是否开启严格解析
+>    'suffix' => '.html',
+>            'rules' => [
+>                
+>    'posts' => 'post/index', 
+>    'post/<id:\d+>' => 'post/view',
+>                [
+>        'pattern' => 'posts',
+>        'route' => 'post/index',
+>        'suffix' => '.json',
+>    ],
+>               //给参数命名 'posts/<year:\d{4}>/<category>' => 'post/index',
+>    'posts' => 'post/index',
+>    'post/<id:\d+>' => 'post/view',
+>                
+>                
+>                
+>                '<controller:(post|comment)>/create' => '<controller>/create',
+>    '<controller:(post|comment)>/<id:\d+>/<action:(update|delete)>' => '<controller>/<action>',
+>    '<controller:(post|comment)>/<id:\d+>' => '<controller>/view',
+>    '<controller:(post|comment)>s' => '<controller>/index',
+>                
+>                
+>                
+>                
+>                [
+>        'pattern' => 'posts/<page:\d+>/<tag>',
+>        'route' => 'post/index',
+>        'defaults' => ['page' => 1, 'tag' => ''],
+>    ],
+>                
+>                
+>           'http://admin.example.com/login' => 'admin/user/login',
+>    'http://www.example.com/login' => 'site/login',
+>                
+>                
+>                'http://<language:\w+>.example.com/posts' => 'post/index',
+>                
+>          
+>            
+>                
+>                
+>                'PUT,POST post/<id:\d+>' => 'post/update',
+>    'DELETE post/<id:\d+>' => 'post/delete',
+>    'post/<id:\d+>' => 'post/view',
+>            ],
+>        ];
+>```
+>
+>* 如果你在URL规则中不配置 `class` 选项，默认将使用类 [yii\web\UrlRule](https://www.yiichina.com/doc/api/2.0/yii-web-urlrule)。
+>
+>什么是严格解析：
+>
+>* 如果设置为启用，请求的URL必须至少匹配 [规则](https://www.yiichina.com/doc/api/2.0/yii-web-urlmanager#$rules-detail) 中设定的一条规则作为正确请求， 否则系统将抛出 [yii\web\NotFoundHttpException](https://www.yiichina.com/doc/api/2.0/yii-web-notfoundhttpexception) 异常。
+>*  如果严格解析被关闭，当 [规则](https://www.yiichina.com/doc/api/2.0/yii-web-urlmanager#$rules-detail) 中没有任何一条匹配时， 请求URL中的路径信息将被作为请求路由使用
+
+### 4、生成url
+
+>
+>
+>```php
+>use yii\helpers\Url;
+>
+>// 创建一个普通的路由URL：/index.php?r=post%2Findex
+>echo Url::to(['post/index']);
+>
+>// 创建一个带路由参数的URL：/index.php?r=post%2Fview&id=100
+>echo Url::to(['post/view', 'id' => 100]);
+>
+>// 创建一个带锚定的URL：/index.php?r=post%2Fview&id=100#content
+>echo Url::to(['post/view', 'id' => 100, '#' => 'content']);
+>
+>// 创建一个绝对路径URL：http://www.example.com/index.php?r=post%2Findex
+>echo Url::to(['post/index'], true);
+>
+>// 创建一个带https协议的绝对路径URL：https://www.example.com/index.php?r=post%2Findex
+>echo Url::to(['post/index'], 'https');
+>
+>//方法 yii\helpers\Url::to() 同时支持创建和任何路由不相关的 URL。 这种情况下，第一个参数不再传入一个数组，而是传入一个字符串。例如：
+>
+>
+>// 当前请求URL：/index.php?r=admin%2Fpost%2Findex
+>echo Url::to();
+>
+>// 设定了别名的URL：http://example.com
+>Yii::setAlias('@example', 'http://example.com/');
+>echo Url::to('@example');
+>
+>// 绝对URL：http://example.com/images/logo.gif
+>echo Url::to('/images/logo.gif', true);
+>
+>
+>
+>
+>// 主页URL：/index.php?r=site%2Findex
+>echo Url::home();
+>
+>// 根URL，如果程序部署到一个Web目录下的子目录时非常有用
+>echo Url::base();
+>
+>// 当前请求的权威规范URL
+>// 参考 https://en.wikipedia.org/wiki/Canonical_link_element
+>echo Url::canonical();
+>
+>// 记住当前请求的URL并在以后获取
+>Url::remember();
+>echo Url::previous();
+>```
+>
+>
+
+#### 4、全拦截catchAll
+
+>```php
+>$config['catchAll']=['site/offline'];
+>//全部请求会调到SiteController::actionOffline
+>```
+>
+>
+
+
 
 ## (二)、请求request
 
@@ -234,11 +390,13 @@
 >config/main.php
 >
 >* ```php
-> 'defaultRoute' => 'hello-world',///或者hello-world/say-hello
-> ```
-> ```
+>  'defaultRoute' => 'hello-world',///或者hello-world/say-hello
+>  ```
+>```
 >
-> ```
+>```
+>
+>```
 >
 >```
 >
@@ -251,10 +409,10 @@
 >在controller中设置默认action
 >
 >* ```php
->  class HelloWorldController extends \yii\web\Controller{
->   	public $defaultAction = 'say-hello';//设置默认方法
->   }
->  ```
+> class HelloWorldController extends \yii\web\Controller{
+>  	public $defaultAction = 'say-hello';//设置默认方法
+>  }
+>```
 >```
 >
 >```
