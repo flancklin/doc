@@ -2,6 +2,8 @@
 
 ## (一)、环境需求
 
+![0-检查yii2需要支持的扩展](static/yii2/0-%E6%A3%80%E6%9F%A5yii2%E9%9C%80%E8%A6%81%E6%94%AF%E6%8C%81%E7%9A%84%E6%89%A9%E5%B1%95.png)
+
 ## (二)、安装
 
 ### 1、composer(create-project)
@@ -194,7 +196,7 @@
 
 **组件：urlManager**
 
-### 1、默认路由格式
+### 1、自带路由格式
 
 `/index.php?r=site/login&p1=a&p2=b`
 
@@ -224,135 +226,231 @@
 
 /sl&p1=a&p2=b（重写/美化）
 
->
->
+#### (1)、配置
+
 >```php
 >$config['components']['urlManager']=[
->            'enablePrettyUrl' => true,//是否开启路由重写(美化)
->            'showScriptName' => false,//是否显示index.php,false-不显示；true-显示
+>       'enablePrettyUrl' => true,//是否开启路由重写(美化)
+>       'showScriptName' => false,//是否显示index.php,false-不显示；true-显示
 >            'enableStrictParsing' => false,//是否开启严格解析
->    'suffix' => '.html',
->            'rules' => [
->                
+>     	   'suffix' => '.html',
+>            'routeParam' => 'r'
+>           'rules' => [
+>     			//....
+>            ],
+>        
+>           'normalizer' => [//url规范器
+>                'class' => 'yii\web\UrlNormalizer',
+>                // 调试时使用临时跳转代替永久跳转
+>                'action' => UrlNormalizer::ACTION_REDIRECT_TEMPORARY,
+>            ],
+>           'cache' =>'cache',//在路由中使用到的缓存库（组件名称）
+>            'ruleConfig' => ['class' => 'yii\web\UrlRule'] ,
+>       ];
+>    ```
+>     
+>     * 如果你在URL规则中不配置 `class` 选项，默认将使用类 [yii\web\UrlRule](https://www.yiichina.com/doc/api/2.0/yii-web-urlrule)。
+
+##### a、什么是==严格解析==：
+
+>* 如果设置为启用，请求的URL必须至少匹配 [规则](https://www.yiichina.com/doc/api/2.0/yii-web-urlmanager#$rules-detail) 中设定的一条规则作为正确请求， 否则系统将抛出 [yii\web\NotFoundHttpException](https://www.yiichina.com/doc/api/2.0/yii-web-notfoundhttpexception) 异常。
+>
+>* 如果严格解析被关闭，当 [规则](https://www.yiichina.com/doc/api/2.0/yii-web-urlmanager#$rules-detail) 中没有任何一条匹配时， 请求URL中的路径信息将被作为请求路由使用
+>
+>     * 比如
+>     
+>       >```php
+>      >$config['components']['urlManager']['rules']=[
+>       >    'posts/<year:\d{4}>/<category>' => 'post/index',
+>       >];
+>      >//url:/index.php/posts/php
+>      >//严格解析时   因为rules中没有适合url的规则。故而抛出NotFoundHttpException
+>       >//不严格时    posts会被当作controller。php当作action。
+>       >```
+>       >
+>       >==严格解析有点强制局限于rules的意思==
+
+##### b、路由规则是怎么解析的
+
+* 如果你在URL规则中不配置 `class` 选项，默认将使用类 [yii\web\UrlRule](https://www.yiichina.com/doc/api/2.0/yii-web-urlrule)。
+
+* yii\web\UrlRule支持参数
+
+* > ```php
+  > [
+  >     'pattern' => '路由规则',
+  >     'route' => '路由规则解析出的yii2路由',
+  >     
+  >     'defaults' => [],//默认参数  k-v
+  >     'name' => '这条规则的名称',
+  >     'host'=>'指定域名',
+  >     'suffix' => '',
+  >     'verb' => '',
+  >     'mode' => '',
+  >     'encodeParams' => true,
+  >     'normalizer' => '',
+  > ];
+  > ```
+
+##### c、规范器
+
+> url规范器？什么东东？
+>
+> 1、http://www.baidu.com和http://www.baidu.com/zhe两个，到底要不要最后的那个斜杆？
+>
+> 2、http://www.baidu.com//search这中间双斜杠？？
+
+#### (2)、路由规则
+
+>```php
+>$config['components']['urlManager']['rules']=[
 >    'posts' => 'post/index', 
->    'post/<id:\d+>' => 'post/view',
->                [
+>    [
 >        'pattern' => 'posts',
 >        'route' => 'post/index',
 >        'suffix' => '.json',
 >    ],
->               //给参数命名 'posts/<year:\d{4}>/<category>' => 'post/index',
->    'posts' => 'post/index',
+>/**----------命名参数-----*/    
 >    'post/<id:\d+>' => 'post/view',
->                
->                
->                
->                '<controller:(post|comment)>/create' => '<controller>/create',
->    '<controller:(post|comment)>/<id:\d+>/<action:(update|delete)>' => '<controller>/<action>',
->    '<controller:(post|comment)>/<id:\d+>' => '<controller>/view',
->    '<controller:(post|comment)>s' => '<controller>/index',
->                
->                
->                
->                
->                [
->        'pattern' => 'posts/<page:\d+>/<tag>',
->        'route' => 'post/index',
->        'defaults' => ['page' => 1, 'tag' => ''],
->    ],
->                
->                
->           'http://admin.example.com/login' => 'admin/user/login',
+>/**----------参数化路由----*/
+>    //index.php/comment/99/update适合
+>    '<controller:(post|comment)>/<id:\d+>/<action:(update|delete)>' =>'<controller>/<action>',
+>    '<controller:(post|comment)>s' => '<controller>/index',//index.php/comments适用
+>    
+>/**----------带域名的路由规则----*/
 >    'http://www.example.com/login' => 'site/login',
->                
->                
->                'http://<language:\w+>.example.com/posts' => 'post/index',
->                
->          
->            
->                
->                
->                'PUT,POST post/<id:\d+>' => 'post/update',
+>    
+>/**----------http method----*/
+>    'PUT,POST post/<id:\d+>' => 'post/update',
 >    'DELETE post/<id:\d+>' => 'post/delete',
 >    'post/<id:\d+>' => 'post/view',
->            ],
->        ];
+>];
 >```
 >
->* 如果你在URL规则中不配置 `class` 选项，默认将使用类 [yii\web\UrlRule](https://www.yiichina.com/doc/api/2.0/yii-web-urlrule)。
->
->什么是严格解析：
->
->* 如果设置为启用，请求的URL必须至少匹配 [规则](https://www.yiichina.com/doc/api/2.0/yii-web-urlmanager#$rules-detail) 中设定的一条规则作为正确请求， 否则系统将抛出 [yii\web\NotFoundHttpException](https://www.yiichina.com/doc/api/2.0/yii-web-notfoundhttpexception) 异常。
->*  如果严格解析被关闭，当 [规则](https://www.yiichina.com/doc/api/2.0/yii-web-urlmanager#$rules-detail) 中没有任何一条匹配时， 请求URL中的路径信息将被作为请求路由使用
 
-### 4、生成url
+##### a、命名参数
 
->
->
->```php
->use yii\helpers\Url;
->
->// 创建一个普通的路由URL：/index.php?r=post%2Findex
->echo Url::to(['post/index']);
->
->// 创建一个带路由参数的URL：/index.php?r=post%2Fview&id=100
->echo Url::to(['post/view', 'id' => 100]);
->
->// 创建一个带锚定的URL：/index.php?r=post%2Fview&id=100#content
->echo Url::to(['post/view', 'id' => 100, '#' => 'content']);
->
->// 创建一个绝对路径URL：http://www.example.com/index.php?r=post%2Findex
->echo Url::to(['post/index'], true);
->
->// 创建一个带https协议的绝对路径URL：https://www.example.com/index.php?r=post%2Findex
->echo Url::to(['post/index'], 'https');
->
->//方法 yii\helpers\Url::to() 同时支持创建和任何路由不相关的 URL。 这种情况下，第一个参数不再传入一个数组，而是传入一个字符串。例如：
->
->
->// 当前请求URL：/index.php?r=admin%2Fpost%2Findex
->echo Url::to();
->
->// 设定了别名的URL：http://example.com
->Yii::setAlias('@example', 'http://example.com/');
->echo Url::to('@example');
->
->// 绝对URL：http://example.com/images/logo.gif
->echo Url::to('/images/logo.gif', true);
->
->
->
->
->// 主页URL：/index.php?r=site%2Findex
->echo Url::home();
->
->// 根URL，如果程序部署到一个Web目录下的子目录时非常有用
->echo Url::base();
->
->// 当前请求的权威规范URL
->// 参考 https://en.wikipedia.org/wiki/Canonical_link_element
->echo Url::canonical();
->
->// 记住当前请求的URL并在以后获取
->Url::remember();
->echo Url::previous();
->```
->
->
+​				规则后的参数没有key，所以需要命名。比如：/detail/99，这个99是指id=99？如何让程序清除知道呢？那就在路由规则的时候给参数命名。
 
-#### 4、全拦截catchAll
+* `'posts/<year:\d{4}>/<category>' => 'post/index',`
+* * url为`/index.php/posts/2014/php`
+  * 解析为/index.php/post/index?year=2014&category=php
+
+##### b、参数化路由
+
+> ```php
+> //index.php/comment/99/update适合
+> '<controller:(post|comment)>/<id:\d+>/<action:(update|delete)>' =>'<controller>/<action>',
+> //index.php/comments适用
+> '<controller:(post|comment)>s' => '<controller>/index',
+> ```
+
+##### c、带域名的路由规则
+
+> ```php
+> [
+>     'http://admin.example.com/login' => 'admin/user/login',
+>     'http://www.example.com/login' => 'site/login',
+>     'http://<language:\w+>.example.com/posts' => 'post/index',//不分二级域名
+>     '//www.example.com/login' => 'site/login',//不分http还是https
+> ]
+> ```
+>
+> 
+
+##### d、http的method
+
+> ```php
+> 'PUT,POST post/<id:\d+>' => 'post/update',
+> 'DELETE post/<id:\d+>' => 'post/delete',
+> 'post/<id:\d+>' => 'post/view',
+> ```
+>
+> /post/99   用post请求  对应  post/update
+>
+> /post/99   用get请求    对应   post/view
+
+### 4、创建url
+
+这里创建的url。是什么格式呢？是原生的带index.php带?带r=的呢？
+
+##### (1)、依据mvc创建
+
+> ```php
+> use yii\helpers\Url;
+> 
+> // 创建一个普通的路由URL：/index.php?r=post%2Findex
+> echo Url::to(['post/index']);
+> 
+> // 创建一个带路由参数的URL：/index.php?r=post%2Fview&id=100
+> echo Url::to(['post/view', 'id' => 100]);
+> 
+> // 创建一个带锚定的URL：/index.php?r=post%2Fview&id=100#content
+> echo Url::to(['post/view', 'id' => 100, '#' => 'content']);
+> 
+> // 创建一个绝对路径URL：http://www.example.com/index.php?r=post%2Findex
+> echo Url::to(['post/index'], true);
+> 
+> // 创建一个带https协议的绝对路径URL：https://www.example.com/index.php?r=post%2Findex
+> echo Url::to(['post/index'], 'https');
+> ```
+>
+> 绝对路径是指：带有域名，完整得url
+>
+> ==这个域名怎么配？==
+
+
+
+##### (2)、与mvc无关得
+
+> ```php
+> 
+> //方法 yii\helpers\Url::to() 同时支持创建和任何路由不相关的 URL。 这种情况下，第一个参数不再传入一个数组，而是传入一个字符串。例如：
+> 
+> 
+> // 当前请求URL：/index.php?r=admin%2Fpost%2Findex
+> echo Url::to();
+> 
+> // 设定了别名的URL：http://example.com
+> Yii::setAlias('@example', 'http://example.com/');
+> echo Url::to('@example');
+> 
+> // 绝对URL：http://example.com/images/logo.gif
+> echo Url::to('/images/logo.gif', true);
+> 
+> ```
+
+##### (3)、其他
+
+> ```php
+> 
+> // 主页URL：/index.php?r=site%2Findex
+> echo Url::home();
+> 
+> // 根URL，如果程序部署到一个Web目录下的子目录时非常有用
+> echo Url::base();
+> 
+> // 当前请求的权威规范URL
+> // 参考 https://en.wikipedia.org/wiki/Canonical_link_element
+> echo Url::canonical();
+> 
+> // 记住当前请求的URL并在以后获取
+> Url::remember();
+> echo Url::previous();
+> ```
+>
+> 
+
+### 5、全拦截catchAll
 
 >```php
 >$config['catchAll']=['site/offline'];
 >//全部请求会调到SiteController::actionOffline
 >```
->
->
-
-
 
 ## (二)、请求request
+
+![request](static/yii2/request.png)
 
 ## (三)、控制器controller
 
@@ -390,9 +488,11 @@
 >config/main.php
 >
 >* ```php
->  'defaultRoute' => 'hello-world',///或者hello-world/say-hello
->  ```
->```
+> 'defaultRoute' => 'hello-world',///或者hello-world/say-hello
+> ```
+> ```
+>
+> ```
 >
 >```
 >
@@ -409,10 +509,14 @@
 >在controller中设置默认action
 >
 >* ```php
-> class HelloWorldController extends \yii\web\Controller{
->  	public $defaultAction = 'say-hello';//设置默认方法
->  }
+>  class HelloWorldController extends \yii\web\Controller{
+>   	public $defaultAction = 'say-hello';//设置默认方法
+>   }
+>  ```
 >```
+>
+>```
+>
 >```
 >
 >```
@@ -899,10 +1003,9 @@
 **书写方式：**
 
 * 1-字符串where(string)
-
 * 2-数组where([k=>v])
-
 * 3-参数where(K，v)
+* new Condition?new Where?
 
 | 运算符分类 | 运算符                                            | 表达式          | 举例 |
 | ---------- | ------------------------------------------------- | --------------- | ---- |
@@ -1313,15 +1416,166 @@ simple_expr:
 
 ## (五)、响应response
 
+> ```php
+> $response = Yii::$app->getResponse();
+> 
+> //定义event：beforeSend  afterSend  afterPrepare
+> //定义常量，支持的响应数据格式  FORMAT_RAW FORMAT_HTML FORMAT_JSON FORMAT_JSONP FORMAT_XML
+> $response->format = Response::FORMAT_HTML;//默认
+> $response->acceptMimeType;//人为填充或者【ContentNegotiator 内容协商】得结果填充
+> $response->acceptParams = [];//ContentNegotiator
+> $response->formatters = [];//响应格式 =》 解析响应格式的类
+> $response->data;//需要被响应的原始数据
+> $response->content;//$response->data根据响应格式转化后的内容
+> $response->stream;//文件流
+> $response->charset;//未设置则调用Application::charset(UTF-8)
+> $response->statusText = "OK";
+> $response->version;//http协议版本,若未设置则调用$_SERVER['SERVER_PROTOCOL']
+> $response->isSent = false;//是否以发送响应。isSent=true表示以发送，则不再会触发send().send后会修改isSent=true
+> die;
+> $response->init();//1、未设置version则解析$_SERVER['SERVER_PROTOCOL']赋值；2、未设置charset则用Application::charset赋值。3、把默认的formatter与用户自定义的进行合并
+> $response->getStatusCode();//获取设置的http的status code
+> $response->setStatusCode($value, $text = null);//设置http的status code以及其对应的描述比如 Status code: 200 OK。就是这个200和OK
+> $response->setStatusCodeByException($e);//用httpException的statusCode设置http的status code
+> $response->getHeaders();//获取设置的http的header
+> $response->getCookies();//获取已设置的响应中的cookie
+> $response->send();//isSent=true则不发送.【prepare->sendHeaders->sendContent】
+> $response->clear();//清空headers/cookies/data/content/stream,响应status code: 200 OK
+> 
+> $response->sendFile($filePath, $attachmentName = null, $options = []);//下载文件filePath。 调用sendStreamAsFile()
+> $response->sendStreamAsFile($handle, $attachmentName, $options = []);//文件流下载
+> $response->sendContentAsFile($content, $attachmentName, $options = []);//把content以文件格式下载
+> $response->xSendFile($filePath, $attachmentName = null, $options = []);//
+> $response->setDownloadHeaders($attachmentName, $mimeType = null, $inline = false, $contentLength = null);//
+> 
+> $response->redirect($url, $statusCode = 302, $checkAjax = true);//响应跳转
+> $response->refresh($anchor = '');//刷新
+> 
+> $response->getIsInvalid();//判断设置的http status code是否符合区间 [100, 600)
+> $response->getIsInformational();//判断设置的http status code是否符合区间 [100, 200)
+> $response->getIsSuccessful();;//判断设置的http status code是否符合区间 [200, 300)
+> $response->getIsRedirection();//判断设置的http status code是否符合区间 [300, 400)
+> $response->getIsClientError();//判断设置的http status code是否符合区间 [400, 500)
+> $response->getIsServerError();//判断设置的http status code是否符合区间 [500, 600)
+> $response->getIsOk();//判断http status code 是否为 200
+> $response->getIsForbidden();//判断http status code 是否为 403
+> $response->getIsNotFound();//判断http status code 是否为 404
+> $response->getIsEmpty();//判断http status code 是否为 [201, 204, 304]]
+> //protected方法
+> $response->getDispositionHeaderValue($disposition, $attachmentName);//
+> $response->getHttpRange($fileSize);//
+> $response->defaultFormatters();//默认的返回格式 => 格式解析类  $response->formatters
+> //send() ---【prepare->sendHeaders[sendCookies]->sendContent】
+> $response->prepare();
+> $response->sendHeaders();//把header发送给client，然后发送cookie:$response->sendCookies().把headers数组循环执行header()函数;
+> $response->sendContent();//把内容(content或stream[文件流])发送给client。
+> $response->sendCookies();//把cookie发送给client.把cookie数组遍历执行setcookie()函数
+> //        public function send()
+> //        {
+> //            if ($this->isSent) {
+> //                return;
+> //            }
+> //            $this->trigger(self::EVENT_BEFORE_SEND);
+> //            $this->prepare();
+> //            $this->trigger(self::EVENT_AFTER_PREPARE);
+> //            $this->sendHeaders();
+> //            $this->sendContent();
+> //            $this->trigger(self::EVENT_AFTER_SEND);
+> //            $this->isSent = true;
+> //        }
+> ```
+>
+> 
+
 ## (六)、缓存cache
 
+> ```php
+> interface yii\caching\CacheInterface extends \ArrayAccess
+> {
+>     //覆盖式新增
+> 	public function set(mixed $key, mixed $value, $duration = null, $dependency = null);
+>     public function multiSet($items, $duration = 0, $dependency = null);
+>     //不存在key，才去新增
+>     public function add(mixed $key, mixed $value, $duration = 0, $dependency = null);
+>     public function multiAdd($items, $duration = 0, $dependency = null);
+>     //判断key是否存在
+>     public function exists(mixed $key);
+>     //获取
+>     public function get(mixed $key);
+>     public function multiGet(string[] $keys);//$keys array
+>     //删除
+>     public function delete(mixed $key);
+>     //清空全部cache
+>     public function flush();
+>     public function getOrSet($key, $callable, $duration = null, $dependency = null);
+>     
+>     
+>     public function buildKey(mixed $key);//一般缓存组件底层自己调用。比如FileCache
+> }
+> ```
+>
+> * items   k-v
+> * duration   过期时间  秒；0表示永不过期。
+> * dependency   yii\caching\dependency
+>
+> * getOrSet
+>
+> * * >```php
+>     > public function getTopProducts($count = 10) {
+>     >     $cache = $this->cache; // Could be Yii::$app->cache
+>     >     return $cache->getOrSet(['top-n-products', 'n' => $count], function ($cache) use ($count) {
+>     >         return Products::find()->mostPopular()->limit($count)->all();
+>     >     }, 1000);
+>     > }
+>     >```
+
 ## (七)、日志log
+
+##### a、config
+
+> ```php
+> $config['components']['log'] => [
+>         'class' => 'yii\log\Dispatcher',
+>         'targets' => [//存储目标
+>                 [
+>                     'class' => 'yii\log\DbTarget',
+>                     'levels' => ['error', 'warning'],
+>                 ],
+>                 [
+>                     'class' => 'yii\log\EmailTarget',
+>                     'levels' => ['error'],
+>                     'categories' => ['yii\db\*'],
+>                     'message' => [
+>                        'from' => ['log@example.com'],
+>                        'to' => ['admin@example.com', 'developer@example.com'],
+>                        'subject' => 'Database errors at example.com',
+>                     ],
+>                 ],
+>             ],
+>     ]
+> ```
+>
+> - [yii\log\DbTarget](https://www.yiichina.com/doc/api/2.0/yii-log-dbtarget)：在数据库表里存储日志消息。
+> - [yii\log\EmailTarget](https://www.yiichina.com/doc/api/2.0/yii-log-emailtarget)：发送日志消息到预先指定的邮箱地址。
+> - [yii\log\FileTarget](https://www.yiichina.com/doc/api/2.0/yii-log-filetarget)：保存日志消息到文件中.
+> - [yii\log\SyslogTarget](https://www.yiichina.com/doc/api/2.0/yii-log-syslogtarget)：通过调用PHP函数 `syslog()` 将日志消息保存到系统日志里。
+
+
+
+##### b、使用
+
+- [Yii::trace()](https://www.yiichina.com/doc/api/2.0/yii-baseyii#trace()-detail)：记录一条消息去跟踪一段代码是怎样运行的。这主要在开发的时候使用。
+- [Yii::info()](https://www.yiichina.com/doc/api/2.0/yii-baseyii#info()-detail)：记录一条消息来传达一些有用的信息。
+- [Yii::warning()](https://www.yiichina.com/doc/api/2.0/yii-baseyii#warning()-detail)：记录一个警告消息用来指示一些已经发生的意外。
+- [Yii::error()](https://www.yiichina.com/doc/api/2.0/yii-baseyii#error()-detail)：记录一个致命的错误，这个错误应该尽快被检查。
 
 
 
 # 三、特色
 
-## (一)、gii
+## (一)、组件
+
+
 
 # 四、功能
 
@@ -2377,6 +2631,145 @@ simple_expr:
 (1)、yii\db\Connection
 
 ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
+
+## 组件
+
+### yii\base\Application.php
+
+> ```php
+>     public function preInit(&$config)
+>     {
+>         if (!isset($config['id'])) {
+>             throw new InvalidConfigException('The "id" configuration for the Application is required.');
+>         }
+>         if (isset($config['basePath'])) {
+>             $this->setBasePath($config['basePath']);
+>             unset($config['basePath']);
+>         } else {
+>             throw new InvalidConfigException('The "basePath" configuration for the Application is required.');
+>         }
+> 
+>         if (isset($config['vendorPath'])) {
+>             $this->setVendorPath($config['vendorPath']);
+>             unset($config['vendorPath']);
+>         } else {
+>             // set "@vendor"
+>             $this->getVendorPath();
+>         }
+>         if (isset($config['runtimePath'])) {
+>             $this->setRuntimePath($config['runtimePath']);
+>             unset($config['runtimePath']);
+>         } else {
+>             // set "@runtime"
+>             $this->getRuntimePath();
+>         }
+> 
+>         if (isset($config['timeZone'])) {
+>             $this->setTimeZone($config['timeZone']);
+>             unset($config['timeZone']);
+>         } elseif (!ini_get('date.timezone')) {
+>             $this->setTimeZone('UTC');
+>         }
+> 
+>         if (isset($config['container'])) {
+>             $this->setContainer($config['container']);
+> 
+>             unset($config['container']);
+>         }
+> 
+>         // merge core components with custom components
+>         foreach ($this->coreComponents() as $id => $component) {
+>             if (!isset($config['components'][$id])) {
+>                 $config['components'][$id] = $component;
+>             } elseif (is_array($config['components'][$id]) && !isset($config['components'][$id]['class'])) {
+>                 $config['components'][$id]['class'] = $component['class'];
+>             }
+>         }
+>     }
+> ```
+
+
+
+### 核心组件 yii\base\Application.php 
+
+> ```php
+>     public function coreComponents()
+>     {
+>         return [
+>             'log' => ['class' => 'yii\log\Dispatcher'],
+>             'view' => ['class' => 'yii\web\View'],
+>             'formatter' => ['class' => 'yii\i18n\Formatter'],
+>             'i18n' => ['class' => 'yii\i18n\I18N'],
+>             'mailer' => ['class' => 'yii\swiftmailer\Mailer'],
+>             'urlManager' => ['class' => 'yii\web\UrlManager'],
+>             'assetManager' => ['class' => 'yii\web\AssetManager'],
+>             'security' => ['class' => 'yii\base\Security'],
+>         ];
+>     }
+> ```
+>
+> 
+
+### 其他组件
+
+> ```php
+> $config['components']=[
+>     'errorHandler' => [
+>         'class' => 'yii\web\ErrorHandler',
+>     ],
+>     'cache' => [
+>         'class' => 'yii\caching\FileCache',
+>     ],
+>     'db' => [
+>         'class' => 'yii\db\Connection',
+>         'dsn' => 'mysql:host=localhost;dbname=yii2advanced',
+>         'username' => '',
+>         'passworld' => '',
+>         'charset' => 'utf8',
+>         'tablePrefix'=>'tp_'
+>     ],
+>     'mailer' => [
+>         'class' => 'yii\swiftmailer\Mailer',
+>         'viewPath'=>'@common/mail'
+>     ],
+>     'request' => [
+>         'class' => 'yii\web\Request',
+>         'csrfParam' => '_csrf-frontend',
+>         'cookieValidationKey' => '随便自己写'
+>     ],
+>     'session' => [
+>         'class' => 'yii\web\Session',
+>         'name'=>'advanced-frontend'
+>     ],
+>     'user' => [
+>         'class' => 'yii\web\User',
+>         'identityClass' => 'common\models\User',
+>         'enableAutoLogin' => TRUE,
+>         'identityCookie'=>['name' => '_identity-frontend', 'httpOnly' => true]
+>     ],
+>     'log' => [
+>         'class' => 'yii\log\Dispatcher',
+>         'targets' => [//存储目标
+>                 [
+>                     'class' => 'yii\log\DbTarget',
+>                     'levels' => ['error', 'warning'],
+>                 ],
+>                 [
+>                     'class' => 'yii\log\EmailTarget',
+>                     'levels' => ['error'],
+>                     'categories' => ['yii\db\*'],
+>                     'message' => [
+>                        'from' => ['log@example.com'],
+>                        'to' => ['admin@example.com', 'developer@example.com'],
+>                        'subject' => 'Database errors at example.com',
+>                     ],
+>                 ],
+>             ],
+>     ]
+> ];
+> ```
+>
+> 
 
 ## last
 
