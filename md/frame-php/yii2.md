@@ -257,18 +257,21 @@
 >
 >* 如果严格解析被关闭，当 [规则](https://www.yiichina.com/doc/api/2.0/yii-web-urlmanager#$rules-detail) 中没有任何一条匹配时， 请求URL中的路径信息将被作为请求路由使用
 >
->     * 比如
->     
->       >```php
->      >$config['components']['urlManager']['rules']=[
->       >    'posts/<year:\d{4}>/<category>' => 'post/index',
->       >];
->      >//url:/index.php/posts/php
->      >//严格解析时   因为rules中没有适合url的规则。故而抛出NotFoundHttpException
->       >//不严格时    posts会被当作controller。php当作action。
->       >```
->       >
->       >==严格解析有点强制局限于rules的意思==
+>    * 比如
+>    
+>      >```php
+>      >
+>      >```
+>     >$config['components']['urlManager']['rules']=[
+>     >'posts/<year:\d{4}>/<category>' => 'post/index',
+>     >];
+>     >//url:/index.php/posts/php
+>     >//严格解析时   因为rules中没有适合url的规则。故而抛出NotFoundHttpException
+>     >//不严格时    posts会被当作controller。php当作action。
+>     >```
+>     >
+>     >==严格解析有点强制局限于rules的意思==
+>     >```
 
 ##### b、路由规则是怎么解析的
 
@@ -488,11 +491,13 @@
 >config/main.php
 >
 >* ```php
-> 'defaultRoute' => 'hello-world',///或者hello-world/say-hello
-> ```
-> ```
+>  'defaultRoute' => 'hello-world',///或者hello-world/say-hello
+>  ```
+>```
 >
-> ```
+>```
+>
+>```
 >
 >```
 >
@@ -509,10 +514,10 @@
 >在controller中设置默认action
 >
 >* ```php
->  class HelloWorldController extends \yii\web\Controller{
->   	public $defaultAction = 'say-hello';//设置默认方法
->   }
->  ```
+> class HelloWorldController extends \yii\web\Controller{
+>  	public $defaultAction = 'say-hello';//设置默认方法
+>  }
+>```
 >```
 >
 >```
@@ -1571,11 +1576,267 @@ simple_expr:
 
 
 
+## behavor-filter-event
+
+### 1、behavor与组件关联
+
+
+
+### 2、filter与behavior关联
+
+### 3、event
+
+==**一个事件可以有多个处理器。**==
+
+==默认新附加的事件处理器排在已存在处理器队列的最后。 因此，这个处理器将在事件被触发时最后一个调用==
+
+* 所谓的event。就是在某条件下触发某个独立的功能。比如：用户注册成功，同时发个邮件和短信。
+
+* 注册成功是一个事件，发邮件和发短信这是两个处理器
+
+  
+
+#### (1)、绑定处理器  yii\base\Component::on() 
+
+> ```php
+> public function on($name, $handler, $data = null, $append = true);
+> /*
+> name    事件名
+> handler 事件处理机制
+> data    处理事件需要的参数
+> append  一个事件多个触发器时。true:后来的后执行；false:后来的先执行
+> 
+> */
+> 
+> $Component->on(Foo::EVENT_HELLO, 'function_name');
+> 
+> // 处理器是对象方法
+> $Component->on(Foo::EVENT_HELLO, [$object, 'methodName']);
+> 
+> // 处理器是静态类方法
+> $Component->on(Foo::EVENT_HELLO, ['app\components\Bar', 'methodName']);
+> 
+> // 处理器是匿名函数
+> $Component->on(Foo::EVENT_HELLO, function ($event) {
+>     //事件处理逻辑
+> });
+> ```
+>
+> 
+
+#### (2)、触发事件
+
+> ```php
+>  $Component->trigger(self::EVENT_HELLO);
+> ```
+
+#### (3)、移除处理器
+
+> ```php
+> // 处理器是全局函数
+> $Component->off(Foo::EVENT_HELLO, 'function_name');
+> 
+> // 处理器是对象方法
+> $Component->off(Foo::EVENT_HELLO, [$object, 'methodName']);
+> 
+> // 处理器是静态类方法
+> $Component->off(Foo::EVENT_HELLO, ['app\components\Bar', 'methodName']);
+> 
+> // 处理器是匿名函数
+> $Component->off(Foo::EVENT_HELLO, $anonymousFunction);
+> 
+> //移除全部的处理器
+> $Component->off(Foo::EVENT_HELLO);
+> ```
+>
+> `// 处理器是匿名函数
+> $Component->off(Foo::EVENT_HELLO, $anonymousFunction);`
+>
+> ==一个事件有多个匿名函数。如何确定谁是谁？==
+
+#### (4)、类级别事件
+
+以上部分，我们叙述了在*实例级别*如何附加处理器到事件。 有时想要一个类的*所有*实例而不是一个指定的实例都响应一个被触发的事件， 并不是一个个附加事件处理器到每个实例， 而是通过调用静态方法 [yii\base\Event::on()](https://www.yiichina.com/doc/api/2.0/yii-base-event#on()-detail) 在*类级别*附加处理器。
+
+
+
+
+
+当对象触发事件时，它首先调用实例级别的处理器，然后才会调用类级别处理器。
+
+可调用静态方法[yii\base\Event::trigger()](https://www.yiichina.com/doc/api/2.0/yii-base-event#trigger()-detail)来触发一个*类级别*事件。 类级别事件不与特定对象相关联。因此，它只会引起类级别事件处理器的调用。 如：
+
+```php
+use yii\base\Event;
+
+Event::on(Foo::className(), Foo::EVENT_HELLO, function ($event) {
+    var_dump($event->sender);  // 显示 "null"
+});
+
+Event::trigger(Foo::className(), Foo::EVENT_HELLO);
+```
+
 # 三、特色
 
-## (一)、组件
+## (一)、组件+behaviors
+
+什么是组件？组装零件。相当于帮多个class或者叫对象，组装成一个class或对象。
+
+更简洁的说就是把多个class合并成一个。
 
 
+
+==组件依赖于从behaviors()中获取。故而组件和behaviors是一体的==
+
+
+
+### 1、Component的部分代码。
+
+> ```php
+> class \yii\base\Component extends \yii\base\BaseObject
+> {
+>     public function __get($name)
+>     {
+>         $getter = 'get' . $name;
+>         if (method_exists($this, $getter)) {
+>             // read property, e.g. getName()
+>             return $this->$getter();
+>         }
+> 
+>         // behavior property
+>         $this->ensureBehaviors();//调用$this->behaviors()
+>         foreach ($this->_behaviors as $behavior) {
+>             if ($behavior->canGetProperty($name)) {
+>                 return $behavior->$name;
+>             }
+>         }
+> 
+>         if (method_exists($this, 'set' . $name)) {
+>             throw new InvalidCallException('Getting write-only property: ' . get_class($this) . '::' . $name);
+>         }
+> 
+>         throw new UnknownPropertyException('Getting unknown property: ' . get_class($this) . '::' . $name);
+>     }
+> 
+> 
+> 
+>     public function __call($name, $params)
+>     {
+>         $this->ensureBehaviors();//调用$this->behaviors()
+>         foreach ($this->_behaviors as $object) {
+>             if ($object->hasMethod($name)) {
+>                 return call_user_func_array([$object, $name], $params);
+>             }
+>         }
+>         throw new UnknownMethodException('Calling unknown method: ' . get_class($this) . "::$name()");
+>     }
+> }
+> ```
+
+
+
+### 2、解析上面的核心代码
+
+* 第一个循环是获取属性的。当自我属性中没有这个属性时，会去behaviors()中遍历，返回遇到的第一个。
+* 第二个循环时获取方法的。原理同属性
+
+>```php
+>foreach ($this->_behaviors as $behavior) {
+>    if ($behavior->canGetProperty($name)) {
+>        return $behavior->$name;
+>    }
+>}
+>
+>foreach ($this->_behaviors as $object) {
+>    if ($object->hasMethod($name)) {
+>        return call_user_func_array([$object, $name], $params);
+>    }
+>}
+>```
+
+### 3、例子
+
+在控制器中添加behaviors()        VerbFilter ----AccessControl
+
+> ```php
+> class SiteController extends Controller
+> {
+>     /**
+>      * {@inheritdoc}
+>      */
+>     public function behaviors()
+>     {
+>         return [
+>             'verbs' => [
+>                 'class' => VerbFilter::className(),
+>                 'actions' => [
+>                     'logout' => ['post'],
+>                 ],
+>             ],
+>             'access' => [
+>                 'class' => AccessControl::className(),
+>                 'rules' => [
+>                     [
+>                         'actions' => ['login', 'error'],
+>                         'allow' => true,
+>                     ],
+>                     [
+>                         'actions' => ['logout', 'index'],
+>                         'allow' => true,
+>                         'roles' => ['@'],
+>                     ],
+>                 ],
+>             ],
+>         ];
+>     }
+>     public function actionLogin()
+>     {
+>         var_dump($this->aa());
+>         var_dump($this->bb());die;
+>     }
+> }
+> ```
+
+
+
+在 VerbFilter ----AccessControl 分别添加   aa()方法  和   bb()方法
+
+>```php
+>class AccessControl extends ActionFilter
+>{
+>    /.....
+>        
+>    public function aa(){
+>        return "I am aa.its in".__CLASS__;
+>    }
+>    
+>}
+>```
+
+
+
+
+
+> ```php
+> class VerbFilter extends Behavior
+> {
+>     /....
+>     public function bb(){
+>         return "I am bb.its in".__CLASS__;
+>     }
+> }
+> ```
+
+
+
+执行site/log，结果输出：
+
+>```html
+>C:\app\backend\controllers\SiteController.php:45:string 'I am aa.its inyii\filters\AccessControl' (length=39)
+>C:\app\backend\controllers\SiteController.php:46:string 'I am bb.its inyii\filters\VerbFilter' (length=36)
+>```
+>
+>
 
 # 四、功能
 
@@ -2632,7 +2893,7 @@ simple_expr:
 
 ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 
-## 组件
+## 组件+behaviors
 
 ### yii\base\Application.php
 

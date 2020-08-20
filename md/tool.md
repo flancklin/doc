@@ -86,3 +86,49 @@ git reflog
 ## 更新某个项目	
 
 composer update norkunas/onesignal-php-api:2.1.0
+
+
+
+
+
+
+
+# wamp
+
+## 安装扩展
+
+> 
+>
+>PHP+Apache+Mysql+MariaDB的集成软件。
+>
+> 
+>
+>官网：http://www.wampserver.com/
+>
+>扩展包：https://sourceforge.net/projects/wampserver/
+>
+> 
+>
+> 
+>
+> 
+>
+> 
+>
+># 任意添加php版本   mysql版本等
+>
+>扩展包：https://sourceforge.net/projects/wampserver/
+>
+> 
+>
+>进入扩展网站
+>
+>搜索【Project Activity】
+>
+>点击【Project Activity】板块的右下角【See All Activity 】
+>
+>下载需要安装的扩展
+>
+>把wampserver关掉
+>
+>点击运行扩展.exe文件
