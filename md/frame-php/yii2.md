@@ -192,6 +192,10 @@
 
 
 
+
+
+
+
 ## (一)、路由router
 
 **组件：urlManager**
@@ -511,6 +515,10 @@
 >
 >```
 >
+>```
+>
+>```
+>
 >在controller中设置默认action
 >
 >* ```php
@@ -518,6 +526,10 @@
 >  	public $defaultAction = 'say-hello';//设置默认方法
 >  }
 >```
+>```
+>
+>```
+>
 >```
 >
 >```
@@ -946,37 +958,37 @@
 
 `$AQ = new ActiveQuery()`
 
-| sql功能    | yii2支持                                                     | 备注                             |
-| ---------- | ------------------------------------------------------------ | -------------------------------- |
-| distinct   | `$Q->distinct($value=true)`                                  |                                  |
-| 修饰字段   | `$Q->select([字段], $option)`                                | option比如SQL_CALC_FOUND_ROWS    |
-| 字段       |                                                              |                                  |
-| table      | `$Q->from($tables)`                                          | tables可string可array            |
-| alias      | `$Q->from(['table u'])`<br>`$Q->from('table');$AQ->alias('u')` |                                  |
-| where      | `$Q->where($condition)`<br>`$Q->andWhere($condition)`<br> `$Q->orWhere($condition)`<br/>`$Q->filterWhere($condition)`<br/>`$Q->andFilterWhere($condition)`<br/>`$Q->orFilterWhere($condition)`<br/> | filter当k-v中v为空，则会被过滤掉 |
-| group      | `$Q->groupBy($columns)`<br>`$Q->addGroupBy($columns)`        |                                  |
-| having     | `$Q->having($condition,$params=[])`<br/>`$Q->andHaving($condition,$params=[])`<br/> `$Q->orHaving($condition,$params=[])`<br/>`$Q->filterHaving(array $condition)`<br/>`$Q->andFilterHaving(array $condition)`<br/>`$Q->orFilterHaving(array $condition)`<br/> |                                  |
-| join       | `$Q->join($type, $table, $on = '', $params = [])`<br>`$Q->innerJoin($table, $on = '', $params = [])`<br>`$Q->leftJoin($table, $on = '', $params = [])`<br>`$Q->rightJoin($table, $on = '', $params = [])` |                                  |
-| union      | `$Q->union($sql, $all=false)`                                |                                  |
-| order      | `$Q->orderBy($columns)`<br/>`$Q->addOrderBy($columns)`       |                                  |
-| limit      | `$Q->limit($limit)`                                          |                                  |
-| offset     | `$Q->offset($offset)`                                        |                                  |
-| with       | `$Q->withQuery($query, $alias, $recursive = false)`          |                                  |
-|            |                                                              |                                  |
-| 求one      | `$Q->one($db=null)`                                          |                                  |
-| 求all      | `$Q->all($db=null)`                                          |                                  |
-|            |                                                              |                                  |
-| 批         | `$Q->batch($size=100,$db=null)`                              |                                  |
-|            | `$Q->each($size=100,$db=null)`                               |                                  |
-|            |                                                              |                                  |
-| 求标量     | `$Q->scalar($db=null)`                                       | 结果集第一行第一个字段得值       |
-| 求列       | `$Q->column($db=null)`                                       | 结果集得第一个字段(一维数组)     |
-|            |                                                              |                                  |
-| count(*)   | `$Q->count($q='*',$db=null)`                                 |                                  |
-| sum(field) | `$Q->sum($q,$db=null)`                                       |                                  |
-| avg(field) | `$Q->averge($q,$db=null)`                                    |                                  |
-| min(field) | `$Q->min($q,$db=null)`                                       |                                  |
-| max(field) | `$Q->max($q,$db=null)`                                       |                                  |
+| sql功能    | yii2支持                                                     | 备注                                                         |
+| ---------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| distinct   | `$Q->distinct($value=true)`                                  |                                                              |
+| 修饰字段   | `$Q->select([字段], $option)`                                | option比如SQL_CALC_FOUND_ROWS                                |
+| 字段       |                                                              |                                                              |
+| table      | `$Q->from($tables)`                                          | tables可string可array                                        |
+| alias      | `$Q->from(['table u'])`<br>`$Q->from('table');$AQ->alias('u')` |                                                              |
+| where      | `$Q->where($condition)`<br>`$Q->andWhere($condition)`<br> `$Q->orWhere($condition)`<br/>`$Q->filterWhere($condition)`<br/>`$Q->andFilterWhere($condition)`<br/>`$Q->orFilterWhere($condition)`<br/> | filter当k-v中v为空，则会被过滤掉(四种)<br>`$value === ''`<br>`$value === []`<br>`$value === null`<br>`is_string($value) && trim($value) === ''` |
+| group      | `$Q->groupBy($columns)`<br>`$Q->addGroupBy($columns)`        |                                                              |
+| having     | `$Q->having($condition,$params=[])`<br/>`$Q->andHaving($condition,$params=[])`<br/> `$Q->orHaving($condition,$params=[])`<br/>`$Q->filterHaving(array $condition)`<br/>`$Q->andFilterHaving(array $condition)`<br/>`$Q->orFilterHaving(array $condition)`<br/> |                                                              |
+| join       | `$Q->join($type, $table, $on = '', $params = [])`<br>`$Q->innerJoin($table, $on = '', $params = [])`<br>`$Q->leftJoin($table, $on = '', $params = [])`<br>`$Q->rightJoin($table, $on = '', $params = [])` |                                                              |
+| union      | `$Q->union($sql, $all=false)`                                |                                                              |
+| order      | `$Q->orderBy($columns)`<br/>`$Q->addOrderBy($columns)`       |                                                              |
+| limit      | `$Q->limit($limit)`                                          |                                                              |
+| offset     | `$Q->offset($offset)`                                        |                                                              |
+| with       | `$Q->withQuery($query, $alias, $recursive = false)`          |                                                              |
+|            |                                                              |                                                              |
+| 求one      | `$Q->one($db=null)`                                          |                                                              |
+| 求all      | `$Q->all($db=null)`                                          |                                                              |
+|            |                                                              |                                                              |
+| 批         | `$Q->batch($size=100,$db=null)`                              |                                                              |
+|            | `$Q->each($size=100,$db=null)`                               |                                                              |
+|            |                                                              |                                                              |
+| 求标量     | `$Q->scalar($db=null)`                                       | 结果集第一行第一个字段得值                                   |
+| 求列       | `$Q->column($db=null)`                                       | 结果集得第一个字段(一维数组)                                 |
+|            |                                                              |                                                              |
+| count(*)   | `$Q->count($q='*',$db=null)`                                 |                                                              |
+| sum(field) | `$Q->sum($q,$db=null)`                                       |                                                              |
+| avg(field) | `$Q->averge($q,$db=null)`                                    |                                                              |
+| min(field) | `$Q->min($q,$db=null)`                                       |                                                              |
+| max(field) | `$Q->max($q,$db=null)`                                       |                                                              |
 
 
 
@@ -1007,10 +1019,134 @@
 
 **书写方式：**
 
-* 1-字符串where(string)
-* 2-数组where([k=>v])
-* 3-参数where(K，v)
-* new Condition?new Where?
+| 序号 | 书写格式           | 绑定参数 | field安全 | value安全                | 举例                                                         | 备注 |
+| ---- | ------------------ | -------- | --------- | ------------------------ | ------------------------------------------------------------ | ---- |
+| 1    | string             | 支持     | 不安全    | 绑参安全<br>不绑参不安全 | `where('a=11 and b=12')`<br>`where('a=:a and b=:b', [':a'=>13, ':b'=>14])` |      |
+| 2    | hash(数组k-v)      | 自动绑参 | 不安全    | 安全                     | `where(['a'=>21,'b'=>22])`                                   |      |
+| 3    | 操作符(数组非关联) | 自动绑参 | 不安全    | 安全                     | where(['=', 'a', 31])                                        |      |
+| 4    | 对象               |          |           |                          |                                                              |      |
+
+==在内部，上面描述的格式在构建 SQL 之前被隐式转换为对象格式==
+
+#### (1)、string
+
+> ```php
+> SELECT * FROM `shop_cart` WHERE (a=1 and b=2) AND (c=3 and d=4)
+>     
+> $query = Cart::find();
+> $query->andWhere('a=1 and b=2');
+> $query->andWhere('c=:c and d=4', [':c' => 3]);
+> var_dump($query->createCommand()->getRawSql());die;
+> ```
+>
+> 
+
+#### (2)、hash
+
+==部分==查询可自动转化，==仅限部分==
+
+> ```php
+> SELECT * FROM `shop_cart` WHERE (`a`=1) AND (`b`='bbb') AND (`c` IS NULL) AND (`d` IN (4, 5)) AND (`e` IN (SELECT * FROM `shop_user` WHERE `id`=1))
+> 
+> $query = Cart::find();
+> $query->andWhere([
+>     'a' => 1,
+>     'b' => 'bbb',
+>     'c'=>null,                            //自动转化为 c is null
+>     'd' => [4,5],                         //自动转化为 d in (4,5)
+>     'e' => User::find()->where(['id' =>1])//自动转化为 d in (select ...)
+> ]);
+> var_dump($query->createCommand()->getRawSql());die;
+> ```
+>
+> 
+
+#### (3)、操作符
+
+> ```php
+> WHERE (`a` = 1) AND (`b` LIKE '%b%') AND (`c` IS NOT NULL)
+> 
+> $query = Cart::find();
+> $query->andWhere(['=', 'a', 1])
+>     ->andWhere(['like', 'b', 'b'])
+>     ->andWhere(['is not', 'c', null]);
+> 
+> var_dump($query->createCommand()->getRawSql());die;
+> ```
+>
+> * ==like只能是%b%，没法写成%b或b%==   除非用string方式写
+> * 操作符支持and和or等逻辑运算符
+> * * `where(['and', 'id=1', 'id=2'])`
+
+| 序号 | 运算符                     | 举例                                                | sql                                                   | 备注             |
+| ---- | -------------------------- | --------------------------------------------------- | ----------------------------------------------------- | ---------------- |
+| 1    | and/or                     | where(['and', 'a=1', 'b=2'])                        | where a=1 and b=2                                     |                  |
+| 2    | not                        | where(['not', 'a=1'])                               | where not (a=1)                                       | 数组中仅有两个， |
+| 3    | [not] between              | where(['between', 'a', 1, 2])                       | where a between 1 and 2                               |                  |
+| 4    | [not] in                   | where(['in', 'a', [1,2]])                           | where a in (1,2)                                      |                  |
+| 5    | ==[or\|not\|or not] like== | where(['or not like', 'a', ['v1', 'v2']])           | where a not like '%v1%' OR a not like '%v2%'          |                  |
+| 6    | [not] exists               | where(['exists', User::find()->where(['id' =>1]) ]) | where exists (SELECT * FROM `shop_user` WHERE `id`=1) |                  |
+| 7    | [>\|>=\|<\|<=]             | where(['>', 'a', 1])                                | where a>1                                             |                  |
+
+>```php
+>SELECT * FROM `shop_cart` WHERE (a=1) OR (a2=11) OR ((`b`=2) AND (`c` LIKE '%c3%') AND (`d`<>4))
+>
+>$query = Cart::find();
+>$query->andWhere([
+>    'or',
+>    'a=1',
+>    'a2=:a2',
+>    [	
+>         'and',
+>         ['b'=>2],
+>         ['like', 'c', 'c3'],
+>         new InCondition('d', 'like', 4)//incondition仅接受in和not in 。其他操作符会被转成=或<>
+>    ]
+>])->addParams([':a2'=>11]);
+>
+>var_dump($query->createCommand()->getRawSql());
+>```
+>
+>
+
+#### (4)、对象
+
+
+
+> yii2\db\QueryBuilder
+>
+> ```php
+> 'NOT' => 'yii\db\conditions\NotCondition',
+> 'AND' => 'yii\db\conditions\AndCondition',
+> 'OR' => 'yii\db\conditions\OrCondition',
+> ['BETWEEN', 'NOT BETWEEN']                   => 'yii\db\conditions\BetweenCondition',
+> ['IN', 'NOT IN']                             => 'yii\db\conditions\InCondition',
+> ['LIKE', 'NOT LIKE','OR LIKE','OR NOT LIKE'] => 'yii\db\conditions\LikeCondition',
+> ['EXISTS','NOT EXISTS']                      => 'yii\db\conditions\ExistsCondition',
+>  
+> ```
+
+
+
+>```php
+>WHERE (a=1) OR (a2='11') OR ((`b`=2) AND (`c` LIKE '%c3%') AND (`d`<>4))
+>
+>$query = Cart::find();
+>$query->andWhere(new OrCondition([
+>    'a=1',
+>    'a2=:a2',
+>    new AndCondition([
+>        ['b'=>2],
+>        ['like', 'c', 'c3'],
+>        new InCondition('d', 'like', 4)//incondition仅接受in和not in 。其他操作符会被转成=或<>
+>    ])
+>]))->addParams([':a2'=>'11']);
+>var_dump($query->createCommand()->getRawSql());die;
+>```
+>
+>
+
+
 
 | 运算符分类 | 运算符                                            | 表达式          | 举例 |
 | ---------- | ------------------------------------------------- | --------------- | ---- |
@@ -1020,7 +1156,7 @@
 | 匹配       | `like` `not like`                                 |                 |      |
 | null       | `is null` `is not null`                           |                 |      |
 | 逻辑       | `and ||` `or &&` `not !` `xor`                    |                 |      |
-| 正则       | `regexp`                                          |                 |      |
+| 正则       | `regexp`                                          | ?????           |      |
 | 存在       | `exists`                                          |                 |      |
 
 
