@@ -832,27 +832,29 @@ breake
 >正确的初始化举例
 >
 >* ```php
-> static $a;                    //不初始化，默认是null
-> static $a = null;             //null类型   
-> static $a = false;            //boolean类型
-> static $a = 100;              //integer类型
-> static $a = 100.23;           //float类型
-> static $a = ['a' => 'a'];     //array类型
-> static $a = PHP_VERSION;      //调用已定义的常量
-> static $a = "abcd";           //string类型
->               //string的nowdoc
-> static $a = <<<'label'
-> abcd
-> label;
->               //string的heredoc
-> static $a=<<<label
-> abcd
-> label;
-> static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
-> ```
-> ```
+>  static $a;                    //不初始化，默认是null
+>  static $a = null;             //null类型   
+>  static $a = false;            //boolean类型
+>  static $a = 100;              //integer类型
+>  static $a = 100.23;           //float类型
+>  static $a = ['a' => 'a'];     //array类型
+>  static $a = PHP_VERSION;      //调用已定义的常量
+>  static $a = "abcd";           //string类型
+>              //string的nowdoc
+>  static $a = <<<'label'
+>  abcd
+>  label;
+>              //string的heredoc
+>  static $a=<<<label
+>  abcd
+>  label;
+>  static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
+>  ```
+>```
 >
-> ```
+>```
+>
+>```
 >
 >
 >
@@ -861,10 +863,14 @@ breake
 >错误的初始化举例
 >
 >* ```php
-> static $a = bcadd(1,2);                 //不可以调用函数
-> static $a = function(){echo 'hello!';}  //不可以callback
-> static $a = new stdClass();             //不可以object
+>  static $a = bcadd(1,2);                 //不可以调用函数
+>  static $a = function(){echo 'hello!';}  //不可以callback
+>  static $a = new stdClass();             //不可以object
+>  ```
 >```
+>
+>```
+>
 >```
 >
 >```
@@ -2126,9 +2132,59 @@ Warning: session_set_save_handler(): Cannot change save handler when session is 
 > **注意：所有合法的项都需要一个等号(即使后面没有值)。
 >** 推荐值为"a=href,area=href,frame=src,input=src,form=fakeentry"。
 
-## (二)、文件上传
+## (二)、文件
 
-### 1、post上传
+
+
+
+
+**Warning**
+
+在区分二进制文件和文本文件的系统上（如     Windows）打开文件时，[fopen()](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/function.fopen.html) 函数的 mode 参数要加上 'b'。 
+
+> 如果只是想将一个文件的内容读入到一个字符串中，用     [file_get_contents()](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/function.file-get-contents.html)，它的性能比上面的代码(fread/stream_get_contents)好得多。 
+
+| 序号 | 函数/常量           | 本地文件 | 远程文件        | 不存在的文件    | 备注                                      |
+| ---- | ------------------- | -------- | --------------- | --------------- | ----------------------------------------- |
+| 1    | is_file/file_exists | true     | false           | false           | 注意系统字符编码                          |
+| 2    | filesize            | int      | false+E_WARNING | false+E_WARNING | 建议文件==小于2GB==<br>可用@屏蔽E_WARNING |
+| 3    | fopen               | source   | source          | false+E_WARNING | 可用@屏蔽E_WARNING                        |
+| 4    |                     |          |                 |                 |                                           |
+| 5    |                     |          |                 |                 |                                           |
+| 6    |                     |          |                 |                 |                                           |
+| 7    |                     |          |                 |                 |                                           |
+
+| 序号 | mode | 功能 | 指针位置 | 创建文件     | 备注                                       |
+| ---- | ---- | ---- | -------- | ------------ | ------------------------------------------ |
+| 1    | `r`  | 读   | 头       | 否           |                                            |
+| 2    | `r+` | 读写 | 头       | 否           |                                            |
+| 3    | `w`  | 写   | 头       | 不存在则新建 |                                            |
+| 4    | `w+` | 读写 | 头       | 不存在则新建 |                                            |
+| 5    | `a`  | 写   | 末尾     | 不存在则新建 |                                            |
+| 6    | `a+` | 读写 | 末尾     | 不存在则新建 |                                            |
+| 7    | `x`  | 写   | 头       | 必须新建     | 如果文件已存在，<br>返回false+E_WARNING    |
+| 8    | `x+` | 读写 | 头       | 必须新建     | 如果文件已存在，<br>返回false+E_WARNING    |
+| 9    | `c`  |      |          |              |                                            |
+| 10   | `c+` |      |          |              |                                            |
+|      |      |      |          |              |                                            |
+| 1    | `t`  |      |          | Windows      | 透明地将 \n 转换为 \r\n                    |
+| 2    | `b`  |      |          | Windows      | 强制使用二进制模式，<br>这样就不会转换数据 |
+
+在操作二进制文件时如果没有指定 'b' 标记，可能会碰到一些奇怪的问题，包括坏掉的图片文件以及关于 \r\n 字符的奇怪问题。 
+
+
+
+
+
+
+
+### 1、读文件
+
+### 2、写文件
+
+### 3、从浏览器上传到我方服务器
+
+#### (1)、post上传
 
 >核心函数
 >
@@ -2139,7 +2195,7 @@ Warning: session_set_save_handler(): Cannot change save handler when session is 
 
 
 
-#### (1)、上传单个文件
+##### a、上传单个文件
 
 
 
@@ -2168,9 +2224,9 @@ Warning: session_set_save_handler(): Cannot change save handler when session is 
 
 
 
-#### (2)、上传多个文件
+##### b、上传多个文件
 
-##### a、input的name是数组(多个input)
+###### (I)、input的name是数组(多个input)
 
 >```html
 ><form action="index.php" method="post"  enctype="multipart/form-data">
@@ -2211,7 +2267,7 @@ Warning: session_set_save_handler(): Cannot change save handler when session is 
 >]
 >```
 
-##### b、input带multiple
+###### (II)、input带multiple
 
 > ```html
 > <form action="./index.php" method="post" enctype="multipart/form-data">
@@ -2254,9 +2310,9 @@ Warning: session_set_save_handler(): Cannot change save handler when session is 
 
 
 
-### 2、系统参数
+#### (2)、系统参数
 
-#### (1)、系统常量
+##### a、系统常量
 
 
 
@@ -2272,13 +2328,17 @@ Warning: session_set_save_handler(): Cannot change save handler when session is 
 >| **`UPLOAD_ERR_NO_TMP_DIR`** | 6    | 找不到临时文件夹                                             |
 >| **`UPLOAD_ERR_CANT_WRITE`** | 7    | 文件写入失败                                                 |
 
-#### (2)、php.ini配置
+##### b、php.ini配置
 
 
 
 
 
 
+
+### 4、我方服务器从第三方拉取文件
+
+### 5、我方服务器向浏览器提供下载文件
 
 ## (三)、数学精度计算
 
@@ -2543,7 +2603,49 @@ getTime()
 
 ob_flush
 
+## (十二)、文件读写
 
+### 1、读
+
+### 2、写
+
+
+
+# 五、常用系统函数/常量
+
+## (一)、操作系统相关
+
+### 1、code运行服务器
+
+#### (1)、识别当前服务器类型
+
+> ```
+> echo PHP_OS;//常量             Windows NT
+> echo php_uname('s');//函数     WINNT  
+> ```
+>
+> * 'a'：此为默认。包含序列 "s n r v m" 里的所有模式。
+>
+> * 's'：操作系统名称。例如： FreeBSD。
+>
+> * 'n'：主机名。例如： localhost.example.com。
+>
+> * 'r'：版本名称，例如： 5.1.2-RELEASE。
+>
+> * 'v'：版本信息。操作系统之间有很大的不同。
+>
+> *  'm'：机器类型。例如：i386。 
+
+#### (2)、服务器差异性
+
+| 序号 | 函数/常量           | window | linux | 备注             |
+| ---- | ------------------- | ------ | ----- | ---------------- |
+| 1    | DIRECTORY_SEPARATOR | `\`    | `/`   | 路径分隔符       |
+| 2    | PHP_SHLIB_SUFFIX    | `dll`  | `so`  | 运行文件后缀     |
+| 3    | PATH_SEPARATOR      | `;`    | `:`   | 多文件路劲分割符 |
+| 4    | PHP_EOL             | `\r\n` | `\r`  | 换行标识         |
+
+* PATH_SEPARATOR：include多个路径使用，在windows下，当你要include多个路径的话，你要用”;”隔开，但在linux下就使用”:”隔开的。
 
 # 分门别类
 
@@ -3147,7 +3249,7 @@ get_class_methods ($class_name)
 
 # 其他问题
 
-##### isset 判断是否存在且不为null
+## (一)、isset 判断是否存在且不为null
 
 >```php
 >$a;
@@ -3159,7 +3261,20 @@ get_class_methods ($class_name)
 >var_dump(isset($c));//true
 >```
 >
+
+## (二)、file_exists和is_file文件明明在，确不存在
+
+==此类问题常出现在windows==
+
+根本原因是windows的中文系统使用的是GB字符集
+
+解决方法：把文件路径转一下字符集
+
+> ```php
+> $filePath = iconv("UTF-8","GB2312//IGNORE",$filePath);
+> ```
 >
+> 
 
 ## call_user_func/call_user_func_array()
 

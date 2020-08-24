@@ -1,9 +1,28 @@
 # redis
 
+## 概述
+
+### 1、官方文档
+
+官网：https://redis.io/
+
+官方推荐文档：https://github.com/redis/redis-doc
+
+指令文档：https://github.com/redis/redis-doc/blob/master/commands.json
+
 | 场景        | 调用                       | 路径                                          | 备注                                          |
 | ----------- | -------------------------- | --------------------------------------------- | --------------------------------------------- |
 | php原生支持 | new \Redis()               | php.jar > stubs > redis > Redis.php           | 需要php_redis.dll文件，配置php.ini的extension |
 | yii2支持    | new yii\redis\Connection() | app/vendor/yiisoft/yii2-redis/src/Connect.php | 不用安装redis扩展                             |
+
+### 2、查看版本号
+
+| 序号 | 位置              | 指令            | 备注 |
+| ---- | ----------------- | --------------- | ---- |
+| 1    | 在redis内部       | info+回车       |      |
+| 2    | 在linux或者window | redis-server -v |      |
+
+
 
 ## (一)、string
 
