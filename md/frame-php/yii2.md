@@ -495,9 +495,11 @@
 >config/main.php
 >
 >* ```php
->  'defaultRoute' => 'hello-world',///或者hello-world/say-hello
->  ```
->```
+> 'defaultRoute' => 'hello-world',///或者hello-world/say-hello
+> ```
+> ```
+>
+> ```
 >
 >```
 >
@@ -522,10 +524,14 @@
 >在controller中设置默认action
 >
 >* ```php
-> class HelloWorldController extends \yii\web\Controller{
->  	public $defaultAction = 'say-hello';//设置默认方法
->  }
+>  class HelloWorldController extends \yii\web\Controller{
+>   	public $defaultAction = 'say-hello';//设置默认方法
+>   }
+>  ```
 >```
+>
+>```
+>
 >```
 >
 >```
@@ -1811,6 +1817,8 @@ Event::on(Foo::className(), Foo::EVENT_HELLO, function ($event) {
 
 Event::trigger(Foo::className(), Foo::EVENT_HELLO);
 ```
+
+## yii+migrate
 
 # 三、特色
 
