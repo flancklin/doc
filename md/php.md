@@ -336,7 +336,7 @@ index.php
 | 序号 | 类型     | 强转换                     | 备注                                                         |
 | ---- | -------- | -------------------------- | ------------------------------------------------------------ |
 | 1    | boolean  | (bool)\|(boolean)          | 当转换为 [boolean](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/language.types.boolean.html) 时，以下值被认为是 **`FALSE`**：   <br>[布尔](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/language.types.boolean.html)值 **`FALSE`** 本身<br/>[整型](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/language.types.integer.html)值 0（零）<br/>[浮点型](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/language.types.float.html)值 0.0（零）<br/>空[字符串](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/language.types.string.html)，以及[字符串](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/language.types.string.html) "0"  <br/>不包括任何元素的[数组](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/language.types.array.html)<br/>特殊类型 [NULL](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/language.types.null.html)（包括尚未赋值的变量）<br/>从空标记生成的 [SimpleXML](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/ref.simplexml.html) 对象<br>所有其它值都被认为是 **`TRUE`**（==包括任何[资源](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/language.types.resource.html) 和  **`NAN`**==）。 |
-| 2    | integer  | (int)\|(integer)\|intval() | 从boolen转换：false-0,true-1<br>从float转换：向下取整<br>NaN和Infinity转换：0     （==php7.0.0==）<br>从string转换：以数字(含科学计数)开头则数字，其他为0<br>==没有定义从其它类型转换为整型的行为。*不要*依赖任何现有的行为，因为它会未加通知地改变== |
+| 2    | integer  | (int)\|(integer)\|intval() | 从boolen转换：false-0,true-1<br>从float转换：向下取整<br>NaN和Infinity转换：0     （==php7.0.0==）<br>从string转换：以数字(含科学计数)开头则数字，其他为0<br>将 [resource](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/language.types.resource.html) 转换成 [integer](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/language.types.integer.html) 时，   结果会是 PHP 运行时为 [resource](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/language.types.resource.html) 分配的唯一资源号。<br>==没有定义从其它类型转换为整型的行为。*不要*依赖任何现有的行为，因为它会未加通知地改变== |
 | 3    | float    |                            |                                                              |
 | 4    | string   | (string)\|strval()         | 从boolean值转换：false-0,true-1<br>从integer和float转换：对应字符串<br>从array转换：‘Array’字样<br>从object转换：‘Object’字样<br>从resource转换：‘Resource id #1'字样<br>从null转换：空字符串 |
 | 5    | null     |                            |                                                              |
@@ -840,16 +840,24 @@ breake
 >  static $a = ['a' => 'a'];     //array类型
 >  static $a = PHP_VERSION;      //调用已定义的常量
 >  static $a = "abcd";           //string类型
->              //string的nowdoc
+>          //string的nowdoc
 >  static $a = <<<'label'
 >  abcd
 >  label;
->              //string的heredoc
+>          //string的heredoc
 >  static $a=<<<label
 >  abcd
 >  label;
 >  static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
 >  ```
+>```
+>
+>```
+>
+>```
+>
+>```
+>
 >```
 >
 >```
@@ -867,6 +875,14 @@ breake
 >  static $a = function(){echo 'hello!';}  //不可以callback
 >  static $a = new stdClass();             //不可以object
 >  ```
+>```
+>
+>```
+>
+>```
+>
+>```
+>
 >```
 >
 >```
@@ -1210,6 +1226,8 @@ __construct()
 
 ##### a、self、parent、static
 
+* ==parent==既可以调用父类的==静态方法==，也可以调用==非静态方法==。调用格式`parent::方法名/类常量/类变量`
+
 >
 >
 >```php
@@ -1437,9 +1455,19 @@ __construct()
 
 ##### b、final类
 
-### 2、abstract class
+### 2、abstract class和interface
 
-#### (1)、定义
+| 序号 | 对比项 | abstract class | interface | 备注 |
+| ---- | ------ | -------------- | --------- | ---- |
+| 1    | 类变量 | 支持           | 不支持    |      |
+| 2    | 类常量 | 支持           | 支持      |      |
+| 3    |        |                |           |      |
+| 4    |        |                |           |      |
+| 5    | 继承   | 单继承         | 多继承    |      |
+
+#### (1)、abstract class
+
+##### (a)、定义
 
 >**定义规则**
 >
@@ -1455,7 +1483,7 @@ abstract class MyClass{
 }
 ```
 
-#### (2)、继承与实现
+##### (b)、继承与实现
 
 >**继承规则**
 >
@@ -1476,9 +1504,9 @@ abstract class MyClass{
 >
 >
 
-### 3、interface
+#### (2)、interface
 
-#### (1)、定义
+##### (a)、定义
 
 >**定义规则**
 >
@@ -1490,7 +1518,7 @@ abstract class MyClass{
 >
 >
 
-#### (2)、继承与实现
+##### (b)、继承与实现
 
 单继承
 
@@ -1500,9 +1528,11 @@ abstract class MyClass{
 
 多继承，排重问题
 
-### 4、trait
+### 3、trait
 
 只是一种==代码复用机制==。与对象概念无关。
+
+
 
 
 
