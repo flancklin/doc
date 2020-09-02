@@ -832,25 +832,27 @@ breake
 >正确的初始化举例
 >
 >* ```php
->  static $a;                    //不初始化，默认是null
->  static $a = null;             //null类型   
->  static $a = false;            //boolean类型
->  static $a = 100;              //integer类型
->  static $a = 100.23;           //float类型
->  static $a = ['a' => 'a'];     //array类型
->  static $a = PHP_VERSION;      //调用已定义的常量
->  static $a = "abcd";           //string类型
->          //string的nowdoc
->  static $a = <<<'label'
->  abcd
->  label;
->          //string的heredoc
->  static $a=<<<label
->  abcd
->  label;
->  static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
->  ```
->```
+> static $a;                    //不初始化，默认是null
+> static $a = null;             //null类型   
+> static $a = false;            //boolean类型
+> static $a = 100;              //integer类型
+> static $a = 100.23;           //float类型
+> static $a = ['a' => 'a'];     //array类型
+> static $a = PHP_VERSION;      //调用已定义的常量
+> static $a = "abcd";           //string类型
+>         //string的nowdoc
+> static $a = <<<'label'
+> abcd
+> label;
+>         //string的heredoc
+> static $a=<<<label
+> abcd
+> label;
+> static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
+> ```
+> ```
+>
+> ```
 >
 >```
 >
@@ -871,10 +873,10 @@ breake
 >错误的初始化举例
 >
 >* ```php
->  static $a = bcadd(1,2);                 //不可以调用函数
->  static $a = function(){echo 'hello!';}  //不可以callback
->  static $a = new stdClass();             //不可以object
->  ```
+> static $a = bcadd(1,2);                 //不可以调用函数
+> static $a = function(){echo 'hello!';}  //不可以callback
+> static $a = new stdClass();             //不可以object
+>```
 >```
 >
 >```
@@ -2638,6 +2640,39 @@ ob_flush
 ### 1、读
 
 ### 2、写
+
+## (十三)、socket
+
+![微信图片_20200901182937](static/php/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20200901182937.jpg)
+
+
+
+>
+>
+>　**a、client建立WebSocket时向服务器端请求的信息**
+>
+>　　GET /chat HTTP/1.1 
+>　　Host: server.example.com 
+>　　Upgrade: websocket //告诉服务器现在发送的是WebSocket协议
+>　　Connection: Upgrade 
+>　　Sec-WebSocket-Key: x3JJHMbDL1EzLkh9GBhXDw== //是一个Base64 encode的值，这个是浏览器随机生成的，用于验证服务器端返回数据是否是WebSocket助理
+>　　Sec-WebSocket-Protocol: chat, superchat 
+>　　Sec-WebSocket-Version: 13 
+>　　Origin: http://example.com
+>
+>　　**b、服务器获取到client请求的信息后，根据WebSocket协议对数据进行处理并返回，其中要对Sec-WebSocket-Key进行加密等操作**
+>
+>　　HTTP/1.1 101 Switching Protocols 
+>　　Upgrade: websocket //依然是固定的，告诉客户端即将升级的是Websocket协议，而不是mozillasocket，lurnarsocket或者shitsocket
+>　　Connection: Upgrade 
+>　　Sec-WebSocket-Accept: HSmrc0sMlYUkAGmm5OPpG2HaGWk= //这个则是经过服务器确认，并且加密过后的 Sec-WebSocket-Key,也就是client要求建立WebSocket验证的凭证
+>　　Sec-WebSocket-Protocol: chat
+
+
+
+
+
+
 
 
 

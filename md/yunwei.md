@@ -247,3 +247,12 @@ goto
 
 
 
+
+
+
+
+# FTP TFTP  SFTP
+
+# nginx
+
+中文文档： https://www.nginx.cn/doc/

@@ -1,6 +1,20 @@
 # mysql
 
+![14f761f10fad2e2eae08bd2d3457b175](static/db/14f761f10fad2e2eae08bd2d3457b175.jpg)
+
+
+
 # redis
+
+> ```php
+> //centos下看是否安装redis及其版本号
+> # redis-server -v
+> 
+> Redis server v=6.0.6 sha=00000000:0 malloc=jemalloc-5.1.0 bits=64 build=3f4720fbc51b9c9
+> //版本为5.1.0
+> ```
+>
+> 
 
 ## 概述
 
@@ -11,6 +25,8 @@
 官方推荐文档：https://github.com/redis/redis-doc
 
 指令文档：https://github.com/redis/redis-doc/blob/master/commands.json
+
+指令文档：https://redis.io/commands/+指令
 
 | 场景        | 调用                       | 路径                                          | 备注                                          |
 | ----------- | -------------------------- | --------------------------------------------- | --------------------------------------------- |
@@ -24,33 +40,132 @@
 | 1    | 在redis内部       | info+回车       |      |
 | 2    | 在linux或者window | redis-server -v |      |
 
+### 3、进入redis
 
+> ```shell
+> #redis-cli -h 127.0.0.1 -p 6379 -a myPassword
+> ```
+
+### 4、null与nil
+
+redis种null的写法是nil
+
+### 5、解析command
+
+> ```php
+> <?php
+> $redisArr = include_once './redis-command.php';
+> $data = [];
+> $maxVersion = 0;
+> foreach ($redisArr as $command => $remark){
+>     $group = $remark['group'];
+>     $version = explode('.', $remark['since']);
+>     $remark['version'] = $version[0];
+>     $maxVersion < $version[0] && $maxVersion = $version[0];
+>     if(!isset($data[$group])) $data[$group] = [];
+>     $data[$group][$command] = $remark;
+> }
+> echo "version:".$maxVersion.'<br>';
+> $i = 1;
+> foreach ($data as $group => $commands){
+>     echo $i++ . '-'.$group  . '<br>';
+>     showCommand($commands);
+> }
+> 
+> function showCommand($commands, $version = 0){
+>     $j = 1;
+>     foreach ($commands as $command => $remark){
+> //        if($command == 'SET') var_dump($remark);
+>         if($remark['version'] == $version){
+>             $o = [];
+>             if(isset($remark['complexity'])){
+>                 $oA = explode(' ', $remark['complexity']);
+>                 foreach ($oA as $oi){
+>                     if(stripos($oi, 'O(') !== 0){
+>                         continue;
+>                     }else{
+>                         $oi && $o[] = $oi;
+>                     }
+>                 }
+>                 if($o){
+>                     foreach ($o as &$oj){
+>                         $oj = trim($oj,'., ');
+>                         if(stripos($oj, 'O(') !== 0){
+>                             $oj = '?-?';
+>                         }elseif(substr_count($oj, '(') != substr_count($oj, ')')){
+>                             $oj .= '?';
+>                         }
+>                     }
+>                     $o = array_unique($o);
+>                     $o = implode('/', $o);
+>                 }
+>             }
+>             $o || $o = "无";
+>             $c = strtolower($command);
+>             $s = str_pad($j++,2,0,STR_PAD_LEFT).'='.$version.'='.$o.'='. $c.'=<a href="https://redis.io/commands/'.strtr($command,' ', '-').'">';
+>             !isset($remark['arguments']) && $remark['arguments'] = [];
+>             foreach ($remark['arguments'] as $param){
+>                 if(isset($param['enum'])){
+>                     $p =implode('|', $param['enum']);
+>                 }elseif(is_array($param['name'])){
+>                     $p = implode(' ', $param['name']);
+>                 }else{
+>                     $p = $param['name'];
+>                 }
+> 
+>                 if(isset($param['multiple']) && $param['multiple']) $p .=" [{$p} ...]";
+>                 if(isset($param['optional']) && $param['optional']){
+>                     $c .= "  [" . $p .']';
+>                 }else{
+>                     $c .= "  " . $p;
+>                 }
+>             }
+>             echo $s.="{$c}</a><br>";
+>         }
+>     }
+>     $version < 10 && showCommand($commands, $version + 1);
+> }
+> ```
+>
+> 
 
 ## (一)、string
 
-### 1、增/改
+| 序号                                        | 复杂度                   | 版   | 功能  | 指令        | 指令参数                                                     |
+| ------------------------------------------- | ------------------------ | ---- | ----- | ----------- | ------------------------------------------------------------ |
+| [1](https://redis.io/commands/set)          | O(1)                     | 1    | 入    | set         | set key value [EX seconds\|PX milliseconds\|KEEPTTL] [NX\|XX] |
+| [2](https://redis.io/commands/setnx)        | O(1)                     | 1    | 入    | setnx       | setnx key value                                              |
+| [3](https://redis.io/commands/msetnx)       | O(N)                     | 1    | 入    | msetnx      | msetnx key value [key value ...]                             |
+| [4](https://redis.io/commands/append)       | O(1)                     | 2    | 入    | append      | append key value                                             |
+| [5](https://redis.io/commands/psetex)       | O(1)                     | 2    | 入    | psetex      | psetex key milliseconds value                                |
+| [6](https://redis.io/commands/setbit)       | O(1)                     | 2    | 入    | setbit      | setbit key offset value                                      |
+| [7](https://redis.io/commands/setex)        | O(1)                     | 2    | 入    | setex       | setex key seconds value                                      |
+| [8](https://redis.io/commands/setrange)     | O(1)/O(M)                | 2    | 入    | setrange    | setrange key offset value                                    |
+| [9](https://redis.io/commands/get)          | O(1)                     | 1    | 取    | get         | get key                                                      |
+| [10](https://redis.io/commands/mget)        | O(N)                     | 1    | 取    | mget        | mget key [key ...]                                           |
+| [11](https://redis.io/commands/mset)        | O(N)                     | 1    | 取    | mset        | mset key value [key value ...]                               |
+| [12](https://redis.io/commands/getbit)      | O(1)                     | 2    | 取    | getbit      | getbit key offset                                            |
+| [13](https://redis.io/commands/getrange)    | O(N)/O(1)                | 2    | 取    | getrange    | getrange key start end                                       |
+| [14](https://redis.io/commands/getset)      | O(1)                     | 1    | 入+取 | getset      | getset key value                                             |
+| [15](https://redis.io/commands/decr)        | O(1)                     | 1    | 减    | decr        | decr key                                                     |
+| [16](https://redis.io/commands/decrby)      | O(1)                     | 1    | 减    | decrby      | decrby key decrement                                         |
+| [17](https://redis.io/commands/incr)        | O(1)                     | 1    | 增    | incr        | incr key                                                     |
+| [18](https://redis.io/commands/incrby)      | O(1)                     | 1    | 增    | incrby      | incrby key increment                                         |
+| [19](https://redis.io/commands/incrbyfloat) | O(1)                     | 2    | 增    | incrbyfloat | incrbyfloat key increment                                    |
+| [20](https://redis.io/commands/bitcount)    | O(N)                     | 2    |       | bitcount    | bitcount key [start end]                                     |
+| [21](https://redis.io/commands/bitop)       | O(N)                     | 2    |       | bitop       | bitop operation destkey key [key ...]                        |
+| [22](https://redis.io/commands/bitpos)      | O(N)                     | 2    |       | bitpos      | bitpos key bit [start] [end]                                 |
+| [23](https://redis.io/commands/strlen)      | O(1)                     | 2    | 长    | strlen      | strlen key                                                   |
+| [24](https://redis.io/commands/bitfield)    | O(1)                     | 3    |       | bitfield    | bitfield key [type offset] [type offset value] [type offset increment] [WRAP\|SAT\|FAIL] |
+| [25](https://redis.io/commands/stralgo)     | O(strlen(s1)*strlen(s2)) | 6    |       | stralgo     | stralgo LCS algo-specific-argument [algo-specific-argument ...] |
 
-(1)、set
+> * getset既存也取。因为第一次getset的时候，库种没有值，故而返回null，但是存入是成功了的
 
-(2)、
-
-(3)、
-
-(4)、
-
-(5)、
-
-(6)、
-
-(7)、
-
-(8)、
-
-### 2、删
-
-### 3、查
-
-### 4、属性
+| 参数                         | 功能                    | 备注       |
+| ---------------------------- | ----------------------- | ---------- |
+| EX senconds\|PX milliseconds | 过期时间(秒和毫秒)      | \>= 2.6.12 |
+| NX\|XX                       | 不存在则存入/存在才存入 | \>= 2.6.12 |
+| KEEPTTL                      |                         |            |
 
 ## (二)、hash
 
@@ -157,3 +272,37 @@ E:\wamp64\bin\apache\apache2.4.23\bin\php.ini添加代码:
 1、linux安装
 
 2、windows安装
+
+
+
+# 数据结构
+
+二叉排序树 → 二叉平衡树 → B-Tree（B树） → B+Tree（B+树）
+
+## 二叉排序树  
+
+## 二叉平衡树 
+
+## B-Tree（B树）
+
+## B+Tree（B+树）
+
+# 问题
+
+## (一)、缓存穿透
+
+缓存穿透是指查询一个一定不存在的数据，因为这个数据不存在，所以永远不会被缓存，所以每次请求都会去请求数据库。
+
+## (二)、缓存穿刺
+
+当热点KEY在失效的瞬间，海量的请求会不会产生大量的数据库请求，从而导致数据库崩溃？
+
+
+
+### 1、互斥锁
+
+互斥锁指的是在缓存KEY过期去更新的时候，先让程序去获取锁，只有获取到锁的线程才有资格去更新缓存KEY
+
+## (三)、缓存雪崩
+
+缓存雪崩是指在我们设置缓存时采用了相同的过期时间，导致缓存在某一时刻同时失效，请求全部转发到数据库，最终导致数据库瞬时压力过大而崩溃。

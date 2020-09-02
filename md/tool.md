@@ -1,8 +1,6 @@
 # git
 
-
-
-![bg2015120901](static/tool/bg2015120901.png)
+![git](static/tool/git.jpeg)
 
 
 
