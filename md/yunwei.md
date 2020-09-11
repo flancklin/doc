@@ -759,3 +759,187 @@ goto
 # nginx
 
 中文文档： https://www.nginx.cn/doc/
+
+
+
+
+
+| 配置文件     | 作用                              |
+| ------------ | --------------------------------- |
+| nginx.conf   | nginx的基本配置文件               |
+| fastcgi.conf | 与fastcgi相关的配置文件           |
+| mime.types   | MIME类型关联的扩展文件            |
+| proxy.conf   | 与proxy相关的配置                 |
+| sites.conf   | 配置nginx提供的网站，包括虚拟主机 |
+
+## nginx.conf
+
+![930199-20190709185221414-800436399](static/yunwei/930199-20190709185221414-800436399.png)
+
+- 支持==使用变量==：
+  - 内置变量：模块会提供内置变量
+  - 自定义变量：如下
+
+> **set var_name value**
+
+| 位置       | 注释                      |
+| ---------- | ------------------------- |
+| 全局块配置 | nginx运行和进程相关       |
+| events     | nginx工作模式和单进程设置 |
+| http块     | http服务器                |
+
+
+
+| 位置       | 注释 |
+| ---------- | ---- |
+| http全局块 |      |
+| server块   |      |
+
+
+
+| 位置         | 注释 |
+| ------------ | ---- |
+| server全局块 |      |
+| location块   |      |
+
+
+
+### 1、全局块配置
+
+设置nginx的进程相关
+
+
+
+建议值中：p-pro正式环境；d-dev测试环境
+
+==每行指令用分号结束==
+
+| key-value                                 | 注释                                         | 建议值     |
+| ----------------------------------------- | -------------------------------------------- | ---------- |
+| `user USER [GROUP];`                      | 指定运行worker的用户组                       |            |
+| `worker_processse N;`                     | 启动N个worker进程。建议为cpu的总核数         |            |
+| `worker_cpu_affinity CPUMASK [CPUMASK…];` | 将进程绑定到某个CPU中，避免频繁刷新缓存      |            |
+| `daemon [on|off];`                        | 以守护进程==运行==nginx                      | p-on/d-off |
+| `master_process [on|off];`                | 以master/worker模型来==运行==nginx           | p-on/d-off |
+| `error_log 存储位置 级别;`                | 配置错误日志                                 |            |
+| `pid /path/to/pid_file;`                  | 指定nginx守护进程的pid文件                   |            |
+| `worker_rlimit_nofile NUMBER;`            | 所有worker进程最大可以打开的文件数，默认1024 |            |
+
+
+
+1. **日志存储位置**
+   file
+   stderr
+   syslog:server=address[,parameter=value]
+   memory:size 
+
+2. **日志级别**（级别的从大到小排列）
+
+   debug：若要使用debug级别，需要在编译nginx时使用- -with-debug选项
+   info
+   notice
+   warn
+   error
+   crit
+   alert
+   emerg
+
+3、CPUMASK：使用8位二进制表示CPU核心
+
+​		第一颗CPU核心：00000001
+​		第二颗CPU核心：00000010
+​		第三颗CPU核心：00000100
+​		第四颗CPU核心：00001000
+​		第五颗CPU核心：00010000
+​		第六颗CPU核心：00100000
+​		第七颗CPU核心：01000000
+​		第八颗CPU核心：10000000 
+
+### 2、events
+
+工作模式与连接数上限
+
+| key-value                        | 注释                         | 建议值 |
+| -------------------------------- | ---------------------------- | ------ |
+| `use [epoll|rtsig|select|poll];` | 指明使用的事件模型           |        |
+| `worker_connections NUMBER;`     | 每个进程能够接受的最大连接数 |        |
+| `accept_mutex [on|off];`         |                              |        |
+| `lock_file FILEPATH;`            |                              |        |
+| `multi_accept on;`               |                              |        |
+
+
+
+### 3、http全局块
+
+| key-value                                                    | 注释                                                         |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| `include mime.types;`                                        | 文件扩展名与文件类型映射表                                   |
+| `default_type application/octet-stream;`                     | 默认文件类型                                                 |
+| `keepalive_timeout 120;`                                     | 连接超长时间                                                 |
+|                                                              |                                                              |
+|                                                              |                                                              |
+| client_header_buffer_size 32k；                              | 上传文件大小限制                                             |
+| sendfile on;                                                 | sendfile传输文件                                             |
+| autoindex [on\|off];                                         | 启目录列表访问，合适下载服务器，默认关闭                     |
+| tcp_nopush on;                                               | 防止网络阻塞                                                 |
+| tcp_nodelay on;                                              | 防止网络阻塞                                                 |
+|                                                              |                                                              |
+|                                                              |                                                              |
+| `fastcgi_connect_timeout 300;`                               |                                                              |
+| `fastcgi_send_timeout 300;`                                  |                                                              |
+| `fastcgi_read_timeout 300;`                                  |                                                              |
+| `fastcgi_buffer_size 64k;`                                   |                                                              |
+| `fastcgi_buffers 4 64k;`                                     |                                                              |
+| `fastcgi_busy_buffers_size 128k;`                            |                                                              |
+| `fastcgi_temp_file_write_size 128k;`                         |                                                              |
+|                                                              |                                                              |
+| gzip on;                                                     | 开启gzip压缩输出                                             |
+| gzip_min_length 1k;                                          | 最小压缩文件大小                                             |
+| gzip_buffers 4 16k;                                          | 压缩缓冲区                                                   |
+| gzip_http_version 1.0;                                       | 压缩版本（默认1.1，前端如果是squid2.5请使用1.0）             |
+| gzip_comp_level 2;                                           | 压缩等级                                                     |
+| gzip_types text/plain application/x-javascript text/css application/xml; | 压缩类型，默认就已经包含text/html，所以下面就不用再写了，写上去也不会有问题，但是会有一个warn。 |
+| gzip_vary on;                                                |                                                              |
+|                                                              |                                                              |
+| upstream DOMAIN{}                                            | 负载均衡                                                     |
+|                                                              |                                                              |
+
+
+
+### 4、server全局块
+
+| key-value                             | 注释                       |
+| ------------------------------------- | -------------------------- |
+| listen 80;                            | 监听端口                   |
+| `server_name www.a.com www.b.com;`    | 域名可以有多个，用空格隔开 |
+| index index.html index.htm index.php; |                            |
+|                                       |                            |
+|                                       |                            |
+|                                       |                            |
+|                                       |                            |
+|                                       |                            |
+|                                       |                            |
+|                                       |                            |
+|                                       |                            |
+
+
+
+### 5、location块
+
+
+
+## 反向代理
+
+>
+>
+>```shell
+>location / {
+>	proxy_pass http://www.baidu.com
+>}
+>```
+>
+>
+
+## 动静分离
+
+## 负载均衡

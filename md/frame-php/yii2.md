@@ -495,11 +495,13 @@
 >config/main.php
 >
 >* ```php
-> 'defaultRoute' => 'hello-world',///或者hello-world/say-hello
-> ```
-> ```
+>  'defaultRoute' => 'hello-world',///或者hello-world/say-hello
+>  ```
+>```
 >
-> ```
+>```
+>
+>```
 >
 >```
 >
@@ -524,10 +526,10 @@
 >在controller中设置默认action
 >
 >* ```php
->  class HelloWorldController extends \yii\web\Controller{
->   	public $defaultAction = 'say-hello';//设置默认方法
->   }
->  ```
+> class HelloWorldController extends \yii\web\Controller{
+>  	public $defaultAction = 'say-hello';//设置默认方法
+>  }
+>```
 >```
 >
 >```
@@ -1016,6 +1018,23 @@
 > }catch (\Exception $e){
 >     $trans->rollBack();//
 >     var_dump($e->getMessage());
+> }
+> ```
+>
+> 
+
+#### (6)、batch/each
+
+取完100条，进行处理，处理完；再取100条，再处理，。。。直到query查不出数据了
+
+> ```php
+> foreach ($query->batch() as $users) {
+>     // $users 是一个包含100条或小于100条用户表数据的数组
+> }
+> 
+> // or to iterate the row one by one
+> foreach ($query->each() as $user) {
+>     // 数据从服务端中以 100 个为一组批量获取，数据对象 yii\db\BatchQueryResult
 > }
 > ```
 >
