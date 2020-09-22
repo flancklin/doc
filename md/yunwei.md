@@ -1418,7 +1418,7 @@ configure安装成功后的输出
 
 
 
-###### (a)、server全局块
+##### (4)、server全局块
 
 | key-value                             | 注释                       |
 | ------------------------------------- | -------------------------- |
@@ -1436,7 +1436,7 @@ configure安装成功后的输出
 
 
 
-###### (b)、location块
+##### (5)、location块
 
 官方文档：http://nginx.org/en/docs/http/ngx_http_core_module.html#location
 
@@ -1461,13 +1461,93 @@ configure安装成功后的输出
 
 
 
-| a        | a                 |
-| -------- | ----------------- |
-| 精准匹配 | location = uri {} |
-| 一般匹配 | location uri {}   |
-| 正则匹配 | location ~ uri {} |
+| 分类     | 示例              | 备注           |
+| -------- | ----------------- | -------------- |
+| 精准匹配 | location = uri {} |                |
+| 一般匹配 | location uri {}   | 最长字符串匹配 |
+| 正则匹配 | location ~ uri {} |                |
+
+###### (a)、精准匹配
+
+###### (b)、一般匹配
+
+==最长字符串匹配==
+
+> 当访问链接是：http://www.13sui.cn/image/images/a.jpg
+>
+> 真实图片存放路径：/root/image/images/a.jpg
+
+测试1：
+
+> ```shell
+>  location /image/ {
+>      root /root/image;
+>      autoindex on;
+>  }
+>  location /image/images/ {
+>      root /root/image/images;
+>      autoindex on;
+>  }
+> ```
+>
+> 最终匹配上的是：==第二个location==.(可以在error.log中看得出)
+>
+> > ```shell
+> > 41 open() "/root/image/images/image/images/a.jpg" failed (2: No such file or directory)
+> > ```
+
+测试2：
+
+> ```shell
+> location image {
+>     root /root/image;
+>     autoindex on;
+> }
+> location images {
+>     root /root/image/images;
+>     autoindex on;
+> }
+> ```
+>
+> 最终匹配上的是：==第一个location==
+>
+> > ```shell
+> > 45 open() "/root/image/image/images/a.jpg" failed (2: No such file or directory
+> > ```
+
+测试3：
+
+> ```shell
+> location image {
+>     root /root/image;
+>     autoindex on;
+> }
+> ```
+>
+> 最终没有匹配上任何location(只有一个)
+>
+> > ```shell
+> > 47 open() "/usr/local/nginx/html/image/images/a.jpg" failed (2: No such file or directory)
+> > ```
+
+测试4：
+
+>```shell
+>location /image/ {
+>    root /root/image;
+>    autoindex on;
+>}
+>```
+>
+>成功匹配上唯一的location
+>
+>> ```shell
+>> 49 open() "/root/image/image/images/a.jpg" failed (2: No such file or directory)
+>> ```
 
 
+
+###### (c)、正则匹配
 
 ### 3、配置log
 
