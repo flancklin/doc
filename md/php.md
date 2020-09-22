@@ -832,27 +832,29 @@ breake
 >正确的初始化举例
 >
 >* ```php
-> static $a;                    //不初始化，默认是null
-> static $a = null;             //null类型   
-> static $a = false;            //boolean类型
-> static $a = 100;              //integer类型
-> static $a = 100.23;           //float类型
-> static $a = ['a' => 'a'];     //array类型
-> static $a = PHP_VERSION;      //调用已定义的常量
-> static $a = "abcd";           //string类型
->         //string的nowdoc
-> static $a = <<<'label'
-> abcd
-> label;
->         //string的heredoc
-> static $a=<<<label
-> abcd
-> label;
-> static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
-> ```
-> ```
+>  static $a;                    //不初始化，默认是null
+>  static $a = null;             //null类型   
+>  static $a = false;            //boolean类型
+>  static $a = 100;              //integer类型
+>  static $a = 100.23;           //float类型
+>  static $a = ['a' => 'a'];     //array类型
+>  static $a = PHP_VERSION;      //调用已定义的常量
+>  static $a = "abcd";           //string类型
+>        //string的nowdoc
+>  static $a = <<<'label'
+>  abcd
+>  label;
+>        //string的heredoc
+>  static $a=<<<label
+>  abcd
+>  label;
+>  static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
+>  ```
+>```
 >
-> ```
+>```
+>
+>```
 >
 >```
 >
@@ -873,10 +875,14 @@ breake
 >错误的初始化举例
 >
 >* ```php
-> static $a = bcadd(1,2);                 //不可以调用函数
-> static $a = function(){echo 'hello!';}  //不可以callback
-> static $a = new stdClass();             //不可以object
+>  static $a = bcadd(1,2);                 //不可以调用函数
+>  static $a = function(){echo 'hello!';}  //不可以callback
+>  static $a = new stdClass();             //不可以object
+>  ```
 >```
+>
+>```
+>
 >```
 >
 >```
@@ -1176,8 +1182,9 @@ breake
 >设置值仅支持：
 >
 >* [boolean|integer|float|string|null|array]+已定义的常量。
->
 >* 不支持调用，回调等方式。
+>
+>==符类的static 属性会被子类共享==
 
 
 
