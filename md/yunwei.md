@@ -551,7 +551,7 @@ python-2.4.3-21.e15
 
 如果使用Debian系统，可以使用`dpkg  -s`或者`dpkg-query`命令.
 
-# shell程序
+# shell
 
 ## (一)、入门须知
 
@@ -759,6 +759,8 @@ goto
 
 
 # FTP TFTP  SFTP
+
+# lua
 
 # nginx
 

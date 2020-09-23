@@ -36,6 +36,185 @@
 
 索引过多会影响insert和update的速度
 
+## 锁
+
+学习文章：https://blog.csdn.net/Saintyyu/article/details/91269087
+
+​					https://www.cnblogs.com/chenqionghe/p/4845693.html
+
+| 序号 | 锁                                                           | a    | a    |
+| ---- | ------------------------------------------------------------ | ---- | ---- |
+|      | 行锁（Record Locks）                                         |      |      |
+|      | 间隙锁（Gap Locks）                                          |      |      |
+|      | 临键锁（Next-key Locks）                                     |      |      |
+|      | 共享锁/排他锁（Shared and Exclusive Locks）                  |      |      |
+|      | 意向共享锁/意向排他锁（Intention Shared and Exclusive Locks） |      |      |
+|      | 插入意向锁（Insert Intention Locks）                         |      |      |
+|      | 自增锁（Auto-inc Locks）                                     |      |      |
+
+
+
+| 引擎   | 分类   | 锁             | 功能 | 注释                       |
+| ------ | ------ | -------------- | ---- | -------------------------- |
+| InnoDB | 行级锁 | 共享锁(S)      | 读锁 | 允许事务读一行数据         |
+|        |        | 排他锁(X)      | 写锁 | 允许事务删除或更新一行数据 |
+|        | 表级锁 | 意向共享锁(IS) |      |                            |
+|        |        | 意向排他锁(IX) |      |                            |
+
+==意向锁是InnoDB自动加的，不需用户干预==
+
+当前锁模式/是否兼容/请求锁模式
+
+|      | X    | IX   | S    | IS   |
+| ---- | ---- | ---- | ---- | ---- |
+| X    | 冲突 | -    | -    | -    |
+| IX   | -    | 兼容 | -    | 兼容 |
+| S    | 冲突 | -    | 兼容 | 兼容 |
+| IS   | -    | 兼容 | 兼容 | 兼容 |
+
+### **获取InonoD行锁争用情况**
+
+可以通过检查InnoDB_row_lock状态变量来分析系统上的行锁的争夺情况：
+
+> ```sql
+> mysql> show status like 'innodb_row_lock%';
+> +-------------------------------+-------+
+> | Variable_name | Value |
+> +-------------------------------+-------+
+> | Innodb_row_lock_current_waits | 0 |
+> | Innodb_row_lock_time | 0 |
+> | Innodb_row_lock_time_avg | 0 |
+> | Innodb_row_lock_time_max | 0 |
+> | Innodb_row_lock_waits | 0 |
+> +-------------------------------+-------+
+> 5 rows in set (0.00 sec)
+> ```
+
+如果发现争用比较严重，如Innodb_row_lock_waits和Innodb_row_lock_time_avg的值比较高，还可以通过设置InnoDB Monitors来进一步观察发生锁冲突的表、数据行等，并分析锁争用的原因。
+
+### 杂碎
+
+
+
+>查看lock设置的过期时间
+>
+>SHOW VARIABLES LIKE 'innodb_lock_wait_timeout'
+>
+>SET innodb_lock_wait_timeout=5
+>
+>
+>
+>查看是否有锁表
+>
+>mysql> show open tables where in_use>0;
+>
+>
+>
+>**-- 查询是否锁表**
+>
+>show OPEN TABLES ;
+>
+>**-- 查询进程**
+>
+>show processlist ;
+>
+>**-- 查询到相对应的进程，然后杀死进程**
+>
+>kill id; -- 一般到这一步就解锁了
+>
+>**-- 查看正在锁的事务**
+>
+>SELECT * FROM INFORMATION_SCHEMA.INNODB_LOCKS;
+>
+>**-- 查看等待锁的事务**
+>
+>SELECT * FROM INFORMATION_SCHEMA.INNODB_LOCK_WAITS;
+>
+>**-- 解锁表**
+>
+>UNLOCK TABLES;
+
+> 
+>
+> **方案一：**
+>
+>1、查看是否有锁表
+>
+>```
+>show OPEN TABLES where In_use > 0;
+>```
+>
+>2、查询进程（如果你有SUPER权限，你可以看到所有线程。否则，只能看到你自己的线程）
+>
+>```
+>show processlist;
+>```
+>
+>3、杀死进程id（就是上面命令的id列）
+>
+>```
+>kill id
+>```
+>
+> 
+>
+>**方案二：**
+>
+>1、查看在锁的事务
+>
+>```
+>SELECT * FROM INFORMATION_SCHEMA.INNODB_TRX;
+>```
+>
+>2、杀死进程id（就是上面命令的trx_mysql_thread_id列）
+>
+>```
+>kill id
+>```
+>
+>  
+>
+> 
+>
+>
+
+>```
+># 查看当前的事务
+>SELECT * FROM INFORMATION_SCHEMA.INNODB_TRX;
+>
+># 查看当前锁定的事务
+>SELECT * FROM INFORMATION_SCHEMA.INNODB_LOCKS;
+>
+># 查看当前等锁的事务
+>SELECT * FROM INFORMATION_SCHEMA.INNODB_LOCK_WAITS; 
+>```
+
+## 事务
+
+### 事务隔离级别
+
+如果没有采取必要的隔离机制，就会导致各种并发问题:
+
+>
+>
+>➢**脏读:**对于两个事务T1,T2,T1读取了已经被T2更新但还没有被提交的字段.之后，若T2回滚，T1读取的内容就是临时且无效的.
+>
+>
+>➢**不可重复读:**对于两个事务T1, T2, T1读取了一个字段,然后T2更新了该字段之后，T1再次读取同一个字段,值就不同了，
+>
+>
+>
+>➢**幻读:**对于两个事务T1,T2,T1从一个表中读取了一个字段,然后T2在该表中插入了一些新的行.之后，如果T1再次读取同一个表,就会多出几行
+
+| 序号 | 级别                  | 功能         | 脏读 | 不可重复读 | 幻读 |
+| ---- | --------------------- | ------------ | ---- | ---------- | ---- |
+| 1    | READ UNCOMMITTED      | 读未提交数据 |      |            |      |
+| 2    | READ COMMITED         | 读已提交数据 | 解决 |            |      |
+| 3    | REPEATABLE READ(默认) | 可重复读     | 解决 | 解决       |      |
+| 4    | SERIALIZABLE          | 可串行化     | 解决 | 解决       | 解决 |
+
+
+
 ## 存储过程/函数
 
 示例：
@@ -295,6 +474,29 @@ redis种null的写法是nil
 3、查
 
 4、属性
+
+## (六)、script
+
+### lua
+
+> ```php
+> public function actionTt1(){
+>     $redis = \Yii::$app->redis;
+>     $script = <<<LUA
+> local flagKey=KEYS[1]
+> local key1=KEYS[2]
+> local value1=ARGV[1]
+> if(redis.call("get",flagKey)) then
+>     return redis.call("set",key1,value1)
+> end
+> LUA;
+>     //$redis->set("aa",'aa');
+>     $r = $redis->eval($script, 2,'aa','k', 'v');
+>     var_dump($r);
+> }
+> ```
+>
+> 
 
 ## 其他
 
