@@ -832,25 +832,27 @@ breake
 >正确的初始化举例
 >
 >* ```php
->  static $a;                    //不初始化，默认是null
->  static $a = null;             //null类型   
->  static $a = false;            //boolean类型
->  static $a = 100;              //integer类型
->  static $a = 100.23;           //float类型
->  static $a = ['a' => 'a'];     //array类型
->  static $a = PHP_VERSION;      //调用已定义的常量
->  static $a = "abcd";           //string类型
->        //string的nowdoc
->  static $a = <<<'label'
->  abcd
->  label;
->        //string的heredoc
->  static $a=<<<label
->  abcd
->  label;
->  static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
->  ```
->```
+> static $a;                    //不初始化，默认是null
+> static $a = null;             //null类型   
+> static $a = false;            //boolean类型
+> static $a = 100;              //integer类型
+> static $a = 100.23;           //float类型
+> static $a = ['a' => 'a'];     //array类型
+> static $a = PHP_VERSION;      //调用已定义的常量
+> static $a = "abcd";           //string类型
+>       //string的nowdoc
+> static $a = <<<'label'
+> abcd
+> label;
+>       //string的heredoc
+> static $a=<<<label
+> abcd
+> label;
+> static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
+> ```
+> ```
+>
+> ```
 >
 >```
 >
@@ -875,10 +877,10 @@ breake
 >错误的初始化举例
 >
 >* ```php
->  static $a = bcadd(1,2);                 //不可以调用函数
->  static $a = function(){echo 'hello!';}  //不可以callback
->  static $a = new stdClass();             //不可以object
->  ```
+> static $a = bcadd(1,2);                 //不可以调用函数
+> static $a = function(){echo 'hello!';}  //不可以callback
+> static $a = new stdClass();             //不可以object
+>```
 >```
 >
 >```
@@ -1037,7 +1039,41 @@ breake
 >
 >
 
-### 3、强制函数返回数据类型
+### 3、函数参数
+
+#### (1)、默认值
+
+> ```php
+> function myFun($a, $b=2)
+> {
+>     var_dump($a, $b);
+> }
+> ```
+
+#### (2)、强制类型(?/int)
+
+> ```php
+> function myFun($a, int $b)
+> {
+>     var_dump($a, $b); 
+> }
+> 
+> function myFun($a, ?int $b)//$b要么是int要么为null,其他会报error php7.1+
+> {
+>     var_dump($a, $b); 
+> }
+> ```
+
+#### (3)、引用参数
+
+> ```php
+> function myFun($a, &$b)
+> {
+>     var_dump($a, $b)
+> }
+> ```
+
+### 4、强制函数返回数据类型
 
 >* ==php5.6不支持==
 >
@@ -1048,7 +1084,7 @@ breake
 > }
 >```
 
-### 4、重载和递归
+### 5、重载和递归
 
 #### (1)、函数重载
 
@@ -1075,7 +1111,7 @@ breake
 >
 >
 
-### 5、相关函数
+### 6、相关函数
 
 | 函数                       | 功能 | 参数 | 返回值版本 | 备注 |
 | -------------------------- | ---- | ---- | ---------- | ---- |
@@ -1400,13 +1436,14 @@ __construct()
 >2. 类常量名称==不能使用\$==
 >3. 不能加访问控制
 >4. 类常量的值必须是一个==定值==;不能是类属性，不能是变量，不能是数学运算或函数调用结果
+>5. php7.1+支持设置访问控制(公开、保护、私有)
 >
 >```php
 >const myConstant='abcd';
 >const myConstant=['a','b','c'];
 >const myConstant=<<<'label'//php>=5.3.0
->    abcd
->    label;
+>   abcd
+>   label;
 >```
 >
 >

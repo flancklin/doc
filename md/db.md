@@ -1,5 +1,51 @@
 # mysql
 
+## cli
+
+| 序号 | cli                     | 功能     | 注释         |
+| ---- | ----------------------- | -------- | ------------ |
+|      | `mysql -u root -p` 回车 | 登录     | 没有分号结尾 |
+|      | `quit;`回车             | 退出cli  |              |
+|      | `select version();`回车 | 版本信息 |              |
+|      |                         |          |              |
+
+>
+>
+>查看状态：show status like '%下面变量%';
+>
+>Aborted_clients 由于客户没有正确关闭连接已经死掉，已经放弃的连接数量。
+>Aborted_connects 尝试已经失败的MySQL服务器的连接的次数。
+>Connections 试图连接MySQL服务器的次数。
+>Created_tmp_tables 当执行语句时，已经被创造了的隐含临时表的数量。
+>Delayed_insert_threads 正在使用的延迟插入处理器线程的数量。
+>Delayed_writes 用INSERT DELAYED写入的行数。
+>Delayed_errors 用INSERT DELAYED写入的发生某些错误(可能重复键值)的行数。
+>Flush_commands 执行FLUSH命令的次数。
+>Handler_delete 请求从一张表中删除行的次数。
+>Handler_read_first 请求读入表中第一行的次数。
+>Handler_read_key 请求数字基于键读行。
+>Handler_read_next 请求读入基于一个键的一行的次数。
+>Handler_read_rnd 请求读入基于一个固定位置的一行的次数。
+>Handler_update 请求更新表中一行的次数。
+>Handler_write 请求向表中插入一行的次数。
+>Key_blocks_used 用于关键字缓存的块的数量。
+>Key_read_requests 请求从缓存读入一个键值的次数。
+>Key_reads 从磁盘物理读入一个键值的次数。
+>Key_write_requests 请求将一个关键字块写入缓存次数。
+>Key_writes 将一个键值块物理写入磁盘的次数。
+>Max_used_connections 同时使用的连接的最大数目。
+>Not_flushed_key_blocks 在键缓存中已经改变但是还没被清空到磁盘上的键块。
+>Not_flushed_delayed_rows 在INSERT DELAY队列中等待写入的行的数量。
+>Open_tables 打开表的数量。
+>Open_files 打开文件的数量。
+>Open_streams 打开流的数量(主要用于日志记载）
+>Opened_tables 已经打开的表的数量。
+>Questions 发往服务器的查询的数量。
+>Slow_queries 要花超过long_query_time时间的查询数量。
+>Threads_connected 当前打开的连接的数量。
+>Threads_running 不在睡眠的线程数量。
+>Uptime 服务器工作了多少秒。
+
 ## 数据引擎(表)
 
 >| 特点     | MyISAM       | InnoDB             | MEMORY   | MERGE | NDB  |
@@ -272,6 +318,103 @@ while
 do...while
 
 repeat...until..end repeat
+
+## 主从分离
+
+![mysql主从分离逻辑](static/db/mysql%E4%B8%BB%E4%BB%8E%E5%88%86%E7%A6%BB%E9%80%BB%E8%BE%91.png)
+
+> 配置文件：windows找mysql.ini；linux找my.cnf；
+
+### 主机配置与测试
+
+#### (1)、改配置
+
+>在配置文件中，找到`[mysqld]`
+>
+>在其下面插入一下代码
+>
+>```shell
+>[mysqld]
+>#红色的为新配置的打开binary log的配置
+>#配置binary log
+>#配置server-id
+>server-id=1
+>#打开二进制日志文件
+>log-bin=master-bin
+>#打开二进制日志文件索引
+>log-bin-index=master-bin.index
+>```
+
+#### (2)、重启mysqld
+
+#### (3)、验证
+
+>进入mysql指令界面
+>
+>```shell
+>mysql> show master status;
+>+-------------------+----------+--------------+------------------+-------------------+
+>| File              | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |
+>+-------------------+----------+--------------+------------------+-------------------+
+>| master-bin.000002 |      154 |              |                  |                   |
+>+-------------------+----------+--------------+------------------+-------------------+
+>
+>```
+>
+>
+
+### 从机配置与测试
+
+#### (1)、改配置
+
+> 在配置文件中，找到`[mysqld]`
+>
+> 在其下面插入一下代码
+>
+> ```shell
+>   #配置relay log
+>   #配置server id
+>   server-id=2
+>   #打开从服务器中介日志文件
+>   relay-log=slave-relay-bin
+>   #打开从服务器中介日志文件索引
+>   relay-log-index=slave-relay-bin.index
+> ```
+>
+> 
+
+#### (2)、重启mysqld
+
+#### (3)、连接主机
+
+> ```shell
+> mysql> change master to master_host='主服务器IP',master_port=主服务器MYSQL端口,master_user='用户名',master_password='密码',master_log_file='master-bin.000001',master_log_pos=0;
+> 
+> ```
+
+#### (4)、开始主从同步
+
+>```shell
+>mysql> start slave;
+>```
+>
+>停止是：stop slave;
+
+#### (5)、验证
+
+> ```shell
+> mysql> show slave status;
+> ```
+>
+> ![mysql主从分离-slave](static/db/mysql%E4%B8%BB%E4%BB%8E%E5%88%86%E7%A6%BB-slave.jpg)
+
+### 测试
+
+>在主服务器创建一个数据库：create database ttt;
+>
+>在从服务器中查看：show databases;
+
+## 备份？
 
 # redis-server/cli
 
