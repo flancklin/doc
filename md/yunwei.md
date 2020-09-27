@@ -772,23 +772,18 @@ goto
 
 
 
+## (一)、简介描述：
 
+* Nginx (engine x) 是一个高性能的==HTTP==和==反向代理==web服务器，同时也提供了==IMAP/POP3/SMTP==服务。
+* 代理服务器是介于客户端和Web服务器之间的另一台服务器
 
-| 配置文件     | 作用                              |
-| ------------ | --------------------------------- |
-| nginx.conf   | nginx的基本配置文件               |
-| fastcgi.conf | 与fastcgi相关的配置文件           |
-| mime.types   | MIME类型关联的扩展文件            |
-| proxy.conf   | 与proxy相关的配置                 |
-| sites.conf   | 配置nginx提供的网站，包括虚拟主机 |
+## (二)、安装与指令
 
+### 1、nginx安装
 
+#### (1)、二进制安装
 
-## nginx安装
-
-### 1、二进制安装
-
-#### (1)、下载安装包
+##### (a)、下载安装包
 
 >
 >
@@ -796,13 +791,13 @@ goto
 >
 >下载        wget  http://nginx.org/download/nginx-1.18.0.tar.gz
 
-#### (2)、解压到当前目录
+##### (b)、解压到当前目录
 
 >tar  zxvf  nginx-1.18.0.tar.gz
 
-#### (3)、开始安装
+##### (c)、开始安装
 
-##### (a)、configure
+###### (i)、configure
 
 >进入到解压后的nginx-1.18.0目录（==目的是找到configure文件==）
 >
@@ -840,7 +835,7 @@ configure安装成功后的输出
 > 
 > ```
 
-##### (b)、make && make install（编译）
+(II)、make && make install（编译）
 
 > 依旧在configure文件的目录，运行  
 >
@@ -852,7 +847,7 @@ configure安装成功后的输出
 >make[1]: Leaving directory `/fff/nginx-1.18.0'
 >```
 
-#### (4)、安装成功
+##### (d)、安装成功
 
 >根据configue确定安装目录是  /usr/local/nginx
 >
@@ -868,19 +863,19 @@ configure安装成功后的输出
 >
 >
 
-#### 其他杂货
+##### 其他杂货
 
-##### (a)、查看正在监听的全部端口
+###### (I)、查看正在监听的全部端口
 
 >netstat -antp
 
-##### (b)、查看80端口是否占用
+###### (II)、查看80端口是否占用
 
 >ps aux|grep 80
 >
 >ps aux|grep nginx
 
-##### (a)、pcre
+###### (III)、pcre
 
 >./configure: error: the HTTP rewrite module requires the PCRE library.
 >You can either disable the module by using --without-http_rewrite_module
@@ -893,7 +888,7 @@ configure安装成功后的输出
 
 >yum install -y pcre pcre-devel
 
-##### (b)、zlib
+###### (IV)、zlib
 
 >./configure: error: the HTTP gzip module requires the zlib library.
 >You can either disable the module by using --without-http_gzip_module
@@ -908,13 +903,13 @@ configure安装成功后的输出
 
 
 
-()、
 
-## nginx指令
+
+### 2、nginx指令
 
 官方文档： https://www.nginx.com/resources/wiki/start/topics/tutorials/commandline/
 
-### 1、启动
+#### (1)、启动
 
 > ```shell
 > /usr/local/nginx/sbin/nginx
@@ -934,7 +929,7 @@ configure安装成功后的输出
 | `-c` | 指定NGINX应该使用哪个配置文件代替默认配置文件。 |
 | `-g` | 设置conf中的全局指令                            |
 
-### 2、signal（关闭/重启/日志等）
+#### (2)、signal（关闭/重启/日志等）
 
 | nginx           | kill                 | 注释                            |
 | --------------- | -------------------- | ------------------------------- |
@@ -962,7 +957,7 @@ configure安装成功后的输出
 比如： 
 
 > ```shell
->  kill -TERM $(cat /usr/local/nginx/logs/nginx.pid)
+> kill -TERM $(cat /usr/local/nginx/logs/nginx.pid)
 > ```
 >
 > 或
@@ -973,13 +968,11 @@ configure安装成功后的输出
 
 
 
-## nginx.conf
-
-### 1、预定义变量
+#### (3)、nginx预定义变量
 
 官方文档： http://nginx.org/en/docs/varindex.html
 
-#### (1)、通用
+##### (a)、通用
 
 >| [$ancient_browser](http://nginx.org/en/docs/http/ngx_http_browser_module.html#var_ancient_browser) |      |
 >| ------------------------------------------------------------ | ---- |
@@ -1069,7 +1062,7 @@ configure安装成功后的输出
 >| [$upstream_trailer_](http://nginx.org/en/docs/http/ngx_http_upstream_module.html#var_upstream_trailer_) |      |
 >| [$uri](http://nginx.org/en/docs/http/ngx_http_core_module.html#var_uri) |      |
 
-#### (2)、ngx_http_core_module
+##### (b)、ngx_http_core_module
 
 >
 >
@@ -1097,7 +1090,7 @@ configure安装成功后的输出
 >| [$time_iso8601 ](http://nginx.org/en/docs/http/ngx_http_core_module.html#var_time_iso8601) | ngx_http_core_module |
 >| [$time_local ](http://nginx.org/en/docs/http/ngx_http_core_module.html#var_time_local) | ngx_http_core_module |
 
-#### (3)、ngx_http_geoip_module
+##### (c)、ngx_http_geoip_module
 
 >| [$geoip_area_code ](http://nginx.org/en/docs/http/ngx_http_geoip_module.html#var_geoip_area_code) | ngx_http_geoip_module |
 >| ------------------------------------------------------------ | --------------------- |
@@ -1117,13 +1110,13 @@ configure安装成功后的输出
 >| [$geoip_region ](http://nginx.org/en/docs/http/ngx_http_geoip_module.html#var_geoip_region) | ngx_http_geoip_module |
 >| [$geoip_region_name ](http://nginx.org/en/docs/http/ngx_http_geoip_module.html#var_geoip_region_name) | ngx_http_geoip_module |
 
-#### (4)、ngx_http_limit_conn_module
+##### (d)、ngx_http_limit_conn_module
 
 >| [$limit_conn_status ](http://nginx.org/en/docs/http/ngx_http_limit_conn_module.html#var_limit_conn_status) | ngx_http_limit_conn_module |
 >| ------------------------------------------------------------ | -------------------------- |
 >|                                                              |                            |
 
-#### (5)、ngx_http_log_module
+##### (e)、ngx_http_log_module
 
 >| [$bytes_sent ](http://nginx.org/en/docs/http/ngx_http_log_module.html#var_bytes_sent) | ngx_http_log_module |
 >| ------------------------------------------------------------ | ------------------- |
@@ -1137,13 +1130,13 @@ configure安装成功后的输出
 >| [$time_iso8601 ](http://nginx.org/en/docs/http/ngx_http_log_module.html#var_time_iso8601) | ngx_http_log_module |
 >| [$time_local ](http://nginx.org/en/docs/http/ngx_http_log_module.html#var_time_local) | ngx_http_log_module |
 
-#### (6)、ngx_http_realip_module
+##### (f)、ngx_http_realip_module
 
 >| [$realip_remote_addr ](http://nginx.org/en/docs/http/ngx_http_realip_module.html#var_realip_remote_addr) | ngx_http_realip_module |
 >| ------------------------------------------------------------ | ---------------------- |
 >| [$realip_remote_port ](http://nginx.org/en/docs/http/ngx_http_realip_module.html#var_realip_remote_port) | ngx_http_realip_module |
 
-#### (7)、ngx_http_ssl_module
+##### (g)、ngx_http_ssl_module
 
 >| [$ssl_cipher ](http://nginx.org/en/docs/http/ngx_http_ssl_module.html#var_ssl_cipher) | ngx_http_ssl_module |
 >| ------------------------------------------------------------ | ------------------- |
@@ -1164,7 +1157,7 @@ configure安装成功后的输出
 >| [$ssl_session_id ](http://nginx.org/en/docs/http/ngx_http_ssl_module.html#var_ssl_session_id) | ngx_http_ssl_module |
 >| [$ssl_session_reused ](http://nginx.org/en/docs/http/ngx_http_ssl_module.html#var_ssl_session_reused) | ngx_http_ssl_module |
 
-#### (8)、ngx_http_upstream_module
+##### (h)、ngx_http_upstream_module
 
 >| [$upstream_addr ](http://nginx.org/en/docs/http/ngx_http_upstream_module.html#var_upstream_addr) | ngx_http_upstream_module |
 >| ------------------------------------------------------------ | ------------------------ |
@@ -1172,7 +1165,7 @@ configure安装成功后的输出
 >| [$upstream_bytes_sent ](http://nginx.org/en/docs/http/ngx_http_upstream_module.html#var_upstream_bytes_sent) | ngx_http_upstream_module |
 >| [$upstream_connect_time ](http://nginx.org/en/docs/http/ngx_http_upstream_module.html#var_upstream_connect_time) | ngx_http_upstream_module |
 
-#### (9)、ngx_stream_core_module
+##### (i)、ngx_stream_core_module
 
 >| [$binary_remote_addr ](http://nginx.org/en/docs/stream/ngx_stream_core_module.html#var_binary_remote_addr) | ngx_stream_core_module |
 >| ------------------------------------------------------------ | ---------------------- |
@@ -1194,7 +1187,7 @@ configure安装成功后的输出
 >| [$time_iso8601 ](http://nginx.org/en/docs/stream/ngx_stream_core_module.html#var_time_iso8601) | ngx_stream_core_module |
 >| [$time_local ](http://nginx.org/en/docs/stream/ngx_stream_core_module.html#var_time_local) | ngx_stream_core_module |
 
-#### (10)、ngx_stream_geoip_module
+##### (j)、ngx_stream_geoip_module
 
 >| [$geoip_area_code ](http://nginx.org/en/docs/stream/ngx_stream_geoip_module.html#var_geoip_area_code) | ngx_stream_geoip_module |
 >| ------------------------------------------------------------ | ----------------------- |
@@ -1214,19 +1207,19 @@ configure安装成功后的输出
 >| [$geoip_region ](http://nginx.org/en/docs/stream/ngx_stream_geoip_module.html#var_geoip_region) | ngx_stream_geoip_module |
 >| [$geoip_region_name ](http://nginx.org/en/docs/stream/ngx_stream_geoip_module.html#var_geoip_region_name) | ngx_stream_geoip_module |
 
-#### (11)、ngx_stream_limit_conn_module
+##### (k)、ngx_stream_limit_conn_module
 
 >| [$limit_conn_status ](http://nginx.org/en/docs/stream/ngx_stream_limit_conn_module.html#var_limit_conn_status) | ngx_stream_limit_conn_module |
 >| ------------------------------------------------------------ | ---------------------------- |
 >|                                                              |                              |
 
-#### (12)、ngx_stream_realip_module
+##### (l)、ngx_stream_realip_module
 
 >| [$realip_remote_addr ](http://nginx.org/en/docs/stream/ngx_stream_realip_module.html#var_realip_remote_addr) | ngx_stream_realip_module |
 >| ------------------------------------------------------------ | ------------------------ |
 >| [$realip_remote_port ](http://nginx.org/en/docs/stream/ngx_stream_realip_module.html#var_realip_remote_port) | ngx_stream_realip_module |
 
-#### (13)、ngx_stream_ssl_module
+##### (m)、ngx_stream_ssl_module
 
 >| [$ssl_cipher ](http://nginx.org/en/docs/stream/ngx_stream_ssl_module.html#var_ssl_cipher) | ngx_stream_ssl_module |
 >| ------------------------------------------------------------ | --------------------- |
@@ -1247,7 +1240,7 @@ configure安装成功后的输出
 >| [$ssl_session_id ](http://nginx.org/en/docs/stream/ngx_stream_ssl_module.html#var_ssl_session_id) | ngx_stream_ssl_module |
 >| [$ssl_session_reused ](http://nginx.org/en/docs/stream/ngx_stream_ssl_module.html#var_ssl_session_reused) | ngx_stream_ssl_module |
 
-#### (14)、ngx_stream_upstream_module
+##### (n)、ngx_stream_upstream_module
 
 >| [$upstream_addr ](http://nginx.org/en/docs/stream/ngx_stream_upstream_module.html#var_upstream_addr) | ngx_stream_upstream_module |
 >| ------------------------------------------------------------ | -------------------------- |
@@ -1257,7 +1250,7 @@ configure安装成功后的输出
 
 
 
-### 2、conf结构
+#### (4)、nginx.conf
 
 ![930199-20190709185221414-800436399](static/yunwei/930199-20190709185221414-800436399.png)
 
@@ -1267,7 +1260,7 @@ configure安装成功后的输出
 
 > **set var_name value**
 >
->  
+> 
 >
 > ```
 > ++ 一些可用的全局变量
@@ -1318,7 +1311,7 @@ configure安装成功后的输出
 
 
 
-##### (1)、全局块
+##### (a)、全局块
 
 设置nginx的进程相关
 
@@ -1369,7 +1362,7 @@ configure安装成功后的输出
 ​		第七颗CPU核心：01000000
 ​		第八颗CPU核心：10000000 
 
-##### (2)、events
+##### (b)、events
 
 工作模式与连接数上限
 
@@ -1383,7 +1376,7 @@ configure安装成功后的输出
 
 
 
-##### (3)、http
+##### (c)、http
 
 | key-value                                                    | 注释                                                         |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -1420,7 +1413,7 @@ configure安装成功后的输出
 
 
 
-##### (4)、server全局块
+##### (d)、server全局块
 
 | key-value                             | 注释                       |
 | ------------------------------------- | -------------------------- |
@@ -1438,7 +1431,7 @@ configure安装成功后的输出
 
 
 
-##### (5)、location块
+##### (e)、location块
 
 官方文档：http://nginx.org/en/docs/http/ngx_http_core_module.html#location
 
@@ -1469,9 +1462,9 @@ configure安装成功后的输出
 | 一般匹配 | location uri {}   | 最长字符串匹配 |
 | 正则匹配 | location ~ uri {} |                |
 
-###### (a)、精准匹配
+###### (I)、精准匹配
 
-###### (b)、一般匹配
+###### (II)、一般匹配
 
 ==最长字符串匹配==
 
@@ -1482,14 +1475,14 @@ configure安装成功后的输出
 测试1：
 
 > ```shell
->  location /image/ {
->      root /root/image;
->      autoindex on;
->  }
->  location /image/images/ {
->      root /root/image/images;
->      autoindex on;
->  }
+> location /image/ {
+>   root /root/image;
+>   autoindex on;
+> }
+> location /image/images/ {
+>   root /root/image/images;
+>   autoindex on;
+> }
 > ```
 >
 > 最终匹配上的是：==第二个location==.(可以在error.log中看得出)
@@ -1502,12 +1495,12 @@ configure安装成功后的输出
 
 > ```shell
 > location image {
->     root /root/image;
->     autoindex on;
+>  root /root/image;
+>  autoindex on;
 > }
 > location images {
->     root /root/image/images;
->     autoindex on;
+>  root /root/image/images;
+>  autoindex on;
 > }
 > ```
 >
@@ -1521,8 +1514,8 @@ configure安装成功后的输出
 
 > ```shell
 > location image {
->     root /root/image;
->     autoindex on;
+>  root /root/image;
+>  autoindex on;
 > }
 > ```
 >
@@ -1536,8 +1529,8 @@ configure安装成功后的输出
 
 >```shell
 >location /image/ {
->    root /root/image;
->    autoindex on;
+>root /root/image;
+>autoindex on;
 >}
 >```
 >
@@ -1549,15 +1542,15 @@ configure安装成功后的输出
 
 
 
-###### (c)、正则匹配
+###### (III)、正则匹配
 
-### 3、配置log
+#### (5)、配置log
 
-#### (1)、可配置的位置
+##### (a)、可配置的位置
 
 > ​	全局配置 和 server全局
 
-#### (2)、log格式
+##### (b)、log格式
 
 官方的
 
@@ -1570,7 +1563,7 @@ configure安装成功后的输出
 > 
 > ```
 
-#### (3)、日志分割
+##### (c)、日志分割
 
 split_nginx_log.sh         加入定时器，每小时跑
 
@@ -1589,31 +1582,693 @@ split_nginx_log.sh         加入定时器，每小时跑
 >
 > 
 
-### 6、场景配置
+## (三)、功能
 
-(1)、php
+### 1、http服务器
 
-(2)、动静分离
+#### (1)、简介秒速
 
-(3)、路由重写rewrite
+>## nginx下关于缓存控制cache-control的配置说明
+>
+> 
+>
+>HTTP协议的Cache -Control指定请求和响应遵循的缓存机制。在请求消息或响应消息中设置 Cache-Control并不会影响另一个消息处理过程中的缓存处理过程。
+>**请求时的缓存指令**包括: no-cache、no-store、max-age、 max-stale、min-fresh、only-if-cached等。
+>**响应消息中的指令**包括: public、private、no-cache、no- store、no-transform、must-revalidate、proxy-revalidate、max-age。
+>
+>下面做一详细总结, 方便在以后的运维工作中理解和运用.
+>
+>### **一.  浏览器中关于Cache的3属性:**
+>
+>#### **1. Cache-Control:**
+>
+>设置相对过期时间, max-age指明以秒为单位的缓存时间. 若对静态资源只缓存一次, 可以设置max-age的值为315360000000 (一万年). 比如对于提交的订单，为了防止浏览器回退重新提交，可以使用Cache-Control之no-store绝对禁止缓存，即便浏览器回退依然请求的是服务器，进而判断订单的状态给出相应的提示信息！
+>
+>**Http协议的cache-control的常见取值及其组合释义:**
+>no-cache: 数据内容不能被缓存, 每次请求都重新访问服务器, 若有max-age, 则缓存期间不访问服务器.
+>no-store: 不仅不能缓存, 连暂存也不可以(即: 临时文件夹中不能暂存该资源).
+>private(默认): 只能在浏览器中缓存, 只有在第一次请求的时候才访问服务器, 若有max-age, 则缓存期间不访问服务器.
+>public: 可以被任何缓存区缓存, 如: 浏览器、服务器、代理服务器等.
+>max-age: 相对过期时间, 即以秒为单位的缓存时间.
+>no-cache, private: 打开新窗口时候重新访问服务器, 若设置max-age, 则缓存期间不访问服务器.
+>\- private, 正数的max-age: 后退时候不会访问服务器.
+>\- no-cache, 正数的max-age: 后退时会访问服务器.
+>
+>#### **2. Expires:**
+>
+>设置以分钟为单位的绝对过期时间, 优先级比Cache-Control低, 同时设置Expires和Cache-Control则后者生效. **也就是说要注意一点: Cache-Control的优先级高于Expires**
+>
+>expires起到控制页面缓存的作用，合理配置expires可以减少很多服务器的请求, expires的配置可以在http段中或者server段中或者location段中. 比如控制图片等过期时间为30天, 可以配置如下:
+>
+>```
+>location ~ \.(gif|jpg|jpeg|png|bmp|ico)$ {``      ``root ``/var/www/img/``;``      ``expires 30d;``    ``}
+>```
+>
+>再比如:
+>
+>```
+>location ~ \.(wma|wmv|asf|mp3|mmf|zip|rar|swf|flv)$ {``       ``root ``/var/www/upload/``;``       ``expires max;``   ``}
+>```
+>
+>#### **3. Last-Modified:**
+>
+>该资源的最后修改时间, 在浏览器下一次请求资源时, 浏览器将先发送一个请求到服务器上, 并附上If-Unmodified-Since头来说明浏览器所缓存资源的最后修改时间, 如果服务器发现没有修改, 则直接返回304(Not Modified)回应信息给浏览器(内容很少), 如果服务器对比时间发现修改了, 则照常返回所请求的资源. 
+>
+>**需要注意:**
+>1) Last-Modified属性通常和Expires或Cache-Control属性配合使用, 因为即使浏览器设置缓存, 当用户点击”刷新”按钮时, 浏览器会忽略缓存继续向服务器发送请求, 这时Last-Modified将能够很好的减小回应开销.
+>
+>2) ETag将返回给浏览器一个资源ID, 如果有了新版本则正常发送并附上新ID, 否则返回304， 但是在服务器集群情况下, 每个服务器将返回不同的ID, 因此不建议使用ETag.
+>
+>以上描述的客户端浏览器缓存是指存储位置在客户端浏览器, 但是对客户端浏览器缓存的实际设置工作是在服务器上的资源中完成的. 虽然上面介绍了有关于客户端浏览器缓存的属性, 但是实际上对这些属性的设置工作都需要在服务器的资源中做设置. 通常有两种操作手段对浏览器缓存进行设置, 一个是通过页面指令声明来设置, 另外一个是通过编程方式来设置.
+>
+>下面是相关页面设置Cache-Control头信息的几个简单配置:
+>例一:
+>
+>```
+>if` `($request_uri ~* ``"^/$|^/search/.+/|^/company/.+/"``) {``  ``add_header  Cache-Control max-age=3600;`` ``}
+>```
+>
+>个人理解的max-age意思是：客户端本地的缓存，在配置的生存时间内的，客户端可以直接使用，超出生存时间的，到服务器上取新数据。当然这些还要看客户端浏览器的设置。
+>
+>例二:
+>
+>```
+>location ~ .*\.(css|js|swf|php|htm|html )$ {``   ``add_header Cache-Control no-store;``}
+>```
+>
+>例三:
+>
+>```
+>location ~ .*\.(js|css)$ {``   ``expires 10d;``}
+>```
+>
+>例四: 将html结尾的请求加上no-cache
+>
+>```
+>location / {``  ``access_log ``/data/nginx/log/xxx``.log api;``  ``root ``/home/www/html``;``  ``if` `($request_filename ~ .*\.(htm|html)$)``   ``{``      ``add_header Cache-Control no-cache;``   ``}``}
+>```
+>
+>### **二.  http Headers模块 (设置HTTP报文的头标)**
+>
+>Nginx的ngx_http_headers_module模块可以对Cache-Control头相关的东西进行配置, 比如:
+>
+>```
+>expires   24h;``expires   0;``expires   -1;``expires   epoch;``add_header Cache-Control private;
+>```
+>
+>**指令**
+>
+>#### add_header add_header
+>
+>#### expires expires
+>
+>**增加头标**
+>语法： add_header name value
+>默认值： none
+>作用域： http, server, location
+>当HTTP应答状态码为 200、204、301、302 或 304 的时候，增加指定的HTTP头标。其中头标的值可以使用变量。
+>
+>**expires**
+>语法： expires [time|epoch|max|off
+>默认值： expires off
+>作用域： http, server, location
+>使用本指令可以控制HTTP应答中的“Expires”和“Cache-Control”的头标,（起到控制页面缓存的作用）。
+>
+>可以在time值中使用正数或负数。“Expires”头标的值将通过当前系统时间加上您设定的 time 值来获得。
+>
+>```
+>epoch
+>```
+>
+>指定“Expires”的值为 1 January, 1970, 00:00:01 GMT。
+>
+>```
+>max
+>```
+>
+>指定“Expires”的值为 31 December 2037 23:59:59 GMT，“Cache-Control”的值为10年。
+>
+> 
+>
+>指定“Expires”的值为 服务器当前时间 -1s,即永远过期.
+>
+>"Cache-Control"头标的值由您指定的时间来决定：
+>  \- 负数
+>
+>```
+>Cache-Control: no-cache
+>```
+>
+>  \- 正数或零
+>
+>```
+>Cache-Control: max-age = ``#
+>```
+>
+>\# 为您指定时间的秒数。
+>
+>"off" 表示不修改“Expires”和“Cache-Control”的值;
+>
+>### **三.  Cache-Control**
+>
+>Cache-Control 通用消息头字段被用于在http 请求和响应中通过指定指令来实现缓存机制。缓存指令是单向的, 这意味着在请求设置的指令，在响应中不一定包含相同的指令。
+>
+>响应头：Cache-Control：no-cache，强制每次请求直接发送给源服务器，而不经过本地缓存版本的校验。这对于需要确认认证应用很有用（可以和public结合使用），或者严格要求使用最新数据 的应用（不惜牺牲使用缓存的所有好处）. 通俗解释：浏览器通知服务器，本地没有缓存数据.
+>
+>cache-control :
+>    max-age>0时 直接从游览器缓存中提取;
+>    max-age<=0 时向server发送http请求确认 ,该资源是否有修改, 有的话 返回200 , 无的话 返回304。
+>
+>通俗解释：响应头中的 Cache-Control:max-age=315360000 是通知浏览器: 315360000 秒之内不要烦我, 就自己从缓冲区中刷新。
+>
+>**语法**
+>指令不区分大小写，并且具有可选参数，可以用令牌或者带引号的字符串语法。多个指令以逗号分隔。
+>
+>**指令**
+>**-  可缓存性**
+>public
+>   表明响应可以被任何对象（包括：发送请求的客户端，代理服务器，等等）缓存。表示相应会被缓存，并且在多用户间共享。默认是public。
+>private
+>   表明响应只能被单个用户缓存，不能作为共享缓存（即代理服务器不能缓存它）,可以缓存响应内容。响应只作为私有的缓存，不能在用户间共享。如果要求HTTP认证，响应会自动设置为private。
+>no-cache
+>   在释放缓存副本之前，强制高速缓存将请求提交给原始服务器进行验证。指定不缓存响应，表明资源不进行缓存。但是设置了no-cache之后并不代表浏览器不缓存，而是在缓存前要向服务器确认资源是否被更改。因此有的时候只设置no-cache防止缓存还是不够保险，还可以加上private指令，将过期时间设为过去的时间。
+>only-if-cached
+>   表明客户端只接受已缓存的响应，并且不要向原始服务器检查是否有更新的拷贝.
+>
+>**-  到期**
+>max-age=<seconds>
+>   设置缓存存储的最大周期，超过这个时间缓存被认为过期(单位秒)。与Expires相反，时间是相对于请求的时间。max-age会覆盖掉Expires。
+>s-maxage=<seconds>
+>   覆盖max-age 或者 Expires 头，但是仅适用于共享缓存(比如各个代理)，并且私有缓存中它被忽略。也就是说s-maxage只用于共享缓存，比如CDN缓存（s -> share）。与max-age 的区别是：     max-age用于普通缓存，而s-maxage用于代理缓存。如果存在s-maxage,则会覆盖max-age 和 Expires.
+>max-stale[=<seconds>]
+>   表明客户端愿意接收一个已经过期的资源。 可选的设置一个时间(单位秒)，表示响应不能超过的过时时间。
+>min-fresh=<seconds>
+>   表示客户端希望在指定的时间内获取最新的响应。
+>stale-while-revalidate=<seconds>
+>   表明客户端愿意接受陈旧的响应，同时在后台异步检查新的响应。秒值指示客户愿意接受陈旧响应的时间长度。
+>stale-if-error=<seconds>
+>   表示如果新的检查失败，则客户愿意接受陈旧的响应。秒数值表示客户在初始到期后愿意接受陈旧响应的时间。
+>
+>**-  重新验证和重新加载**
+>must-revalidate
+>   缓存必须在使用之前验证旧资源的状态，并且不可使用过期资源。表示如果页面过期，则去服务器进行获取。
+>proxy-revalidate
+>   与must-revalidate作用相同，但它仅适用于共享缓存（例如代理），并被私有缓存忽略。
+>immutable
+>   表示响应正文不会随时间而改变。资源（如果未过期）在服务器上不发生改变，因此客户端不应发送重新验证请求头（例如If-None-Match或If-Modified-Since）来检查更新，即使用户显式地刷新页面。在Firefox中，immutable只能被用在 https:// transactions.
+>
+>**-  其他**
+>no-store
+>   缓存不应存储有关客户端请求或服务器响应的任何内容。表示绝对禁止缓存!
+>no-transform
+>   不得对资源进行转换或转变。Content-Encoding, Content-Range, Content-Type等HTTP头不能由代理修改。例如，非透明代理可以对图像格式进行转换，以便节省缓存空间或者减少缓慢链路上的流量。 no-transform指令不允许这样做。
+>
+>**两个小示例**
+>\- 禁止缓存
+>发送如下指令可以关闭缓存。此外，可以参考Expires 和 Pragma 标题。
+>
+>```
+>Cache-Control: no-cache, no-store, must-revalidate
+>```
+>
+>\- 缓存静态资源节
+>对于应用程序中不会改变的文件，通常可以在发送响应头前添加积极缓存。这包括例如由应用程序提供的静态文件，例如图像，CSS文件和JavaScript文件。另请参阅Expires标题。
+>
+>```
+>Cache-Control:public, max-age=31536000
+>```
+>
+>**这里扩展一下:**
+>**HTTP1.0**
+>HTTP1.0中通过Pragma 控制页面缓存，通常设置的值为no- cache，不过这个值不这么保险，通常还加上Expires置为0来达到目的。但是如我们刻意需要浏览器或缓存服务器缓存住我们的页面这个值则要设置为 Pragma。
+>
+>**HTTP1.1**
+>HTTP1.1中启用Cache-Control 来控制页面的缓存与否，Cache-Control是http1.1 中的标准，可以看成是 expires 的补充, 使用的是相对时间的概念。注意几个常用的参数：
+>no-cache: 浏览器和缓存服务器都不应该缓存页面信息；
+>public: 浏览器和缓存服务器都可以缓存页面信息；
+>no-store: 请求和响应的信息都不应该被存储在对方的磁盘系统中；
+>must-revalidate: 对于客户机的每次请求，代理服务器必须想服务器验证缓存是否过时
+>
+>目前Cache-Control请求字段被各个浏览器支持的较好，其优先级也比较高，当和别的字段（如Expires）一起用时，会覆盖其他字段。
+>
+>### **四. nginx配置管理浏览器静态缓存策略**
+>
+>浏览器缓存: **expires**, **cache-control**, **last-modified**, **etag**.  先来看一张图:
+>
+>![img](https://img2018.cnblogs.com/blog/907596/201903/907596-20190302011346217-1805589363.png)
+>
+>每个状态的详细说明如下：
+>**1、Last-Modified**
+>在浏览器第一次请求某一个URL时，服务器端的返回状态会是200，内容是你请求的资源，同时有一个Last-Modified的属性标记(HttpReponse Header)此文件在服务期端最后被修改的时间，格式类似这样:
+>
+>```
+>Last-Modified:Tue, 24 Feb 2019 08:01:04 GMT
+>```
+>
+>客户端第二次请求此URL时，根据HTTP协议的规定，浏览器会向服务器传送If-Modified-Since报头(HttpRequest Header)，询问该时间之后文件是否有被修改过:
+>
+>```
+>If-Modified-Since:Tue, 24 Feb 2019 08:01:04 GMT
+>```
+>
+>如果服务器端的资源没有变化，则自动返回HTTP304（NotChanged.）状态码，内容为空，这样就节省了传输数据量。当服务器端代码发生改变或者重启服务器时，则重新发出资源，返回和第一次请求时类似。从而保证不向客户端重复发出资源，也保证当服务器有变化时，客户端能够得到最新的资源。
+>
+>**注意:** 如果If-Modified-Since的时间比服务器当前时间(当前的请求时间request_time)还晚，会认为是个非法请求
+>
+>**2、Etag工作原理**
+>HTTP协议规格说明定义ETag为“被请求变量的实体标记”（参见14.19）。简单点即服务器响应时给请求URL标记，并在HTTP响应头中将其传送到客户端，类似服务器端返回的格式:
+>
+>```
+>Etag:“5d8c72a5edda8d6a:3239″
+>```
+>
+>客户端的查询更新格式是这样的:
+>
+>```
+>If-None-Match:“5d8c72a5edda8d6a:3239″
+>```
+>
+>如果ETag没改变，则返回状态304。即: 在客户端发出请求后，HttpReponse Header中包含Etag:“5d8c72a5edda8d6a:3239″
+>标识，等于告诉Client端，你拿到的这个的资源有表示ID：5d8c72a5edda8d6a:3239。当下次需要发Request索要同一个URI的时候，浏览器同时发出一个If-None-Match报头(Http RequestHeader)此时包头中信息包含上次访问得到的Etag:“5d8c72a5edda8d6a:3239″标识。
+>
+>```
+>If-None-Match:“5d8c72a5edda8d6a:3239“
+>```
+>
+>这样，Client端等于Cache了两份，服务器端就会比对2者的etag。如果If-None-Match为False，不返回200，返回304(Not Modified) Response。
+>
+>**3、Expires**
+>给出的日期/时间后，被响应认为是过时。如 Expires:Thu, 02 Apr 2009 05:14:08 GMT需和Last-Modified结合使用。用于控制请求文件的有效时间，当请求数据在有效期内时客户端浏览器从缓存请求数据而不是服务器端.当缓存中数据失效或过期，才决定从服务器更新数据。
+>
+>**4、Last-Modified和Expires**
+>Last-Modified标识能够节省一点带宽，但是还是逃不掉发一个HTTP请求出去，而且要和Expires一起用。而Expires标识却使得浏览器干脆连HTTP请求都不用发，比如当用户F5或者点击Refresh按钮的时候就算对于有Expires的URI，一样也会发一个HTTP请求出去，所以，Last-Modified还是要用的，而且要和Expires一起用。
+>
+>**5、Etag和Expires**
+>如果服务器端同时设置了Etag和Expires时，Etag原理同样，即与 Last-Modified/Etag 对应的 HttpRequestHeader:If-Modified-Since 和 If-None-Match。我们可以看到这两个Header的值和WebServer发出的Last-Modified,Etag值完全一样；在完全匹配If-Modified-Since和If-None-Match即检查完修改时间和Etag之后，服务器才能返回304.
+>
+>**6、Last-Modified和Etag**
+>分布式系统里多台机器间文件的last-modified必须保持一致，以免负载均衡到不同机器导致比对失败. 分布式系统尽量关闭掉Etag(每台机器生成的etag都会不一样)
+>
+>Last-Modified和ETags请求的http报头一起使用，服务器首先产生Last-Modified/Etag标记，服务器可在稍后使用它来判断页面是否已经被修改，来决定文件是否继续缓存
+>
+>过程如下:
+>1) 客户端请求一个页面（A）。
+>2) 服务器返回页面A，并在给A加上一个Last-Modified/ETag。
+>3) 客户端展现该页面，并将页面连同Last-Modified/ETag一起缓存。
+>4) 客户再次请求页面A，并将上次请求时服务器返回的Last-Modified/ETag一起传递给服务器。
+>5) 服务器检查该Last-Modified或ETag，并判断出该页面自上次客户端请求之后还未被修改，直接返回响应304和一个空的响应体。
+>
+>需要注意:
+>1) Last-Modified和Etag头都是由WebServer发出的HttpReponse Header，WebServer应该同时支持这两种头。
+>2) WebServer发送完Last-Modified/Etag头给客户端后，客户端会缓存这些头；
+>3) 客户端再次发起相同页面的请求时，将分别发送与Last-Modified/Etag对应的HttpRequestHeader:If-Modified-Since和If-None-Match。我们可以看到这两个Header的值和WebServer发出的Last-Modified,Etag值完全一样；
+>4) 通过上述值到服务器端检查，判断文件是否继续缓存；
+>
+>**7、关于 Cache-Control: max-age=秒 和 Expires**
+>Expires = 时间，HTTP 1.0 版本，缓存的载止时间，允许客户端在这个时间之前不去检查（发请求）
+>max-age = 秒，HTTP 1.1版本，资源在本地缓存多少秒。
+>如果max-age和Expires同时存在，则被Cache-Control的max-age覆盖。
+>
+>**Expires 的一个缺点**: 就是返回的到期时间是服务器端的时间，这样存在一个问题，如果客户端的时间与服务器的时间相差很大，那么误差就很大，所以在HTTP 1.1版开始，使用Cache-Control: max-age=秒替代。
+>
+>Expires =max-age + “每次下载时的当前的request时间”
+>
+>所以一旦重新下载的页面后，expires就重新计算一次，但last-modified不会变化.
+>
+>**8、基于nginx配置使用总结**
+>分布式系统(有ng-ha 和 应用的负载均衡),最好使用Last-Modified和Expires,把Etag关闭掉。
+>1) 关闭etag
+>
+>```
+>http {``    ``etag off;
+>```
+>
+>关闭etag, 使用Last-Modified和Expires
+>
+>2) 配置last-modified(默认开启)和expires
+>
+>```
+>location ~.*\.(gif|jpg|jpeg|png|bmp|swf)$``    ``{``        ``expires   30d;``    ``}` `location ~.*\.(js|css)?$``    ``{``        ``expires   12h;``    ``}
+>```
+>
+>对于配置了多个location(upstream)的，可以:
+>
+>```
+>location ``/filebase/` `{``      ``root ``/hskj/file/``;``      ``autoindex on;` `      ``if` `($request_filename ~* ^.*?\.(txt|doc|pdf|rar|gz|zip|docx|exe|xlsx|ppt|pptx)$){``        ``add_header Content-Disposition: ``'attachment;'``;``      ``}` `      ``if` `($request_filename ~* ^.*?\.(gif|jpg|jpeg|png|bmp|swf)$){``        ``expires   30d;``      ``}` `      ``if` `($request_filename ~* ^.*?\.(js|css)$){``        ``expires   12h;``      ``}``}
+>```
+>
+>效果如下：
+>
+>![img](https://img2018.cnblogs.com/blog/907596/201903/907596-20190302015728575-190872568.png)
+>
+>​                           **这里顺便看一个配置实例: nginx设置不使用缓存 add_header Cache-Control no-cache**                         
+>
+>```
+>server {``  ``listen    443;``  ``server_name www.kevin.com;``  ``charset utf-8;` `  ``ssl         on;``  ``ssl_certificate   ``/daka/program/nginx/conf/server``.cer;``  ``ssl_certificate_key ``/daka/program/nginx/conf/server``.key;``  ``ssl_session_timeout 5m;``  ``ssl_protocols SSLv2 SSLv3 TLSv1;``  ``ssl_ciphers HIGH:!aNULL:!MD5;``  ``ssl_prefer_server_ciphers  on;` `  ``#设置浏览器缓存``  ``add_header Cache-Control no-cache;``  ``add_header Cache-Control private;`` ` ` ` `  ``location ``/yp` `{``    ``proxy_redirect off;``    ``proxy_set_header Host $host;``    ``proxy_set_header X-Real-IP $remote_addr;``    ``proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;``    ``proxy_pass http:``//192``.168.0.221:8082``/yp/yp``;`` ` `    ``if` `($request_filename ~* .*.(html|htm)$)``     ``{``     ``expires -1s;``     ``}` `     ``if` `($request_filename ~* .*.(gif|jpg|jpeg|png|bmp|swf)$)``     ``{``     ``expires 30d;``     ``}` `     ``if` `($request_filename ~ .*.(js|css)$)``     ``{``     ``expires 12h;``     ``}``  ``}` `    ``location ``/static` `{``    ``proxy_redirect off;``    ``proxy_set_header Host $host;``    ``proxy_set_header X-Real-IP $remote_addr;``    ``proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;``    ``proxy_pass http:``//192``.168.0.221:8082``/static``;`` ` `    ``if` `($request_filename ~* .*.(html|htm)$)``     ``{``     ``expires -1s;``     ``}` `     ``if` `($request_filename ~* .*.(gif|jpg|jpeg|png|bmp|swf)$)``     ``{``     ``expires 30d;``     ``}` `     ``if` `($request_filename ~ .*.(js|css)$)``     ``{``     ``expires 12h;``     ``}` `  ``}`` ` `  ``location / {``    ``proxy_redirect off;``    ``proxy_set_header Host $host;``    ``proxy_set_header X-Real-IP $remote_addr;``    ``proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;``    ``proxy_pass http:``//192``.168.0.221:8080/;``#     if (-e $request_filename){``#      rewrite ^/$ https://www.kevin.com:443/invest/index.jhtml permanent;``#     }`` ` ` ` `    ``if` `($request_filename ~* .*.(html|htm)$)``     ``{``#     expires -1s;``     ``}` `     ``if` `($request_filename ~* .*.(gif|jpg|jpeg|png|bmp|swf)$)``     ``{``     ``expires 30d;``     ``}` `     ``if` `($request_filename ~ .*.(js|css)$)``     ``{``     ``expires 12h;``     ``}``     ` `  ``}``}
+>```
+>
+>​                                  **运维****案例分享: Nginx增加缓存控制字段cache-control**                              
+>下面是开发部门同事发过来的配置需求:
+>1) 禁用html文件缓存，即cache control设置为no-cache;
+>2) 对于js，图片，css，字体等，设置max-age=2592000. 也就是30天;
+>
+>注意点:
+>  \- 缓存控制字段cache-control的配置(add_header)要放在http, server, location区域, 或是放在location的if判断里, 例如"add_header Cache-Control no-cache;".
+>  \- 如果前面有LB负载代理层, 则缓存控制字段cache-control配置要放在后端的真实服务器nginx的location区域, 并且要指定root根路径, 否则访问会出现404 (即找不到访问路径);
+>
+>针对上面的案例需求, 操作记录如下:
+>**1) 本案中在实际场景中, 有LB层. LB层的nginx配置不需要配置, 这里只是粘贴下负载配置:**
+>
+>```
+>[root@fvtlb01 ~]``# cat /data/nginx/conf/vhosts/fvtkevin-web.kevin.com.conf``upstream fvtkevin-web-inc {``   ``ip_hash;``   ``server 172.16.50.73:80 max_fails=3 fail_timeout=15s;``   ``server 172.16.50.74:80 max_fails=3 fail_timeout=15s;``}` ` ``server {``   ``listen   80;``   ``server_name fvtkevin-web.kevin.com;``  ` `   ``access_log ``/data/nginx/logs/fvtkevin-web``.kevin.com-access.log main;``   ``error_log ``/data/nginx/logs/fvtkevin-web``.kevin.com-error.log;` ` ``location / {``     ``proxy_pass http:``//fvtkevin-web-inc``;``     ``proxy_redirect off ;``     ``proxy_set_header Host $host;``     ``proxy_set_header X-Real-IP $remote_addr;``     ``proxy_set_header REMOTE-HOST $remote_addr;``     ``proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;``     ``proxy_connect_timeout 300;``     ``proxy_send_timeout 300;``     ``proxy_read_timeout 600;``     ``proxy_buffer_size 256k;``     ``proxy_buffers 4 256k;``     ``proxy_busy_buffers_size 256k;``     ``proxy_temp_file_write_size 256k;``     ``proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504 http_404;``     ``proxy_max_temp_file_size 128m;``     ``#proxy_cache mycache;                ``     ``#proxy_cache_valid 200 302 1h;``     ``#proxy_cache_valid 301 1d;``     ``#proxy_cache_valid any 1m;``}``} 　
+>```
+>
+>**2) 缓存控制字段cache-control的配置要放在后端两台真实服务器172.16.50.73和172.16.50.74上.**
+>a) 172.16.60.73 (即fvtkevin-dmz01.kevin.com)服务器上缓存控制字段cache-control的配置如下:
+>
+>```
+>[root@fvtkevin-dmz01 ~]``# cat /data/nginx/conf/vhosts/fvtkevin-web01.kevin.com.conf``server {``   ``listen   80;``   ``server_name fvtkevin-dmz01.kevin.com;``  ` `   ``access_log ``/data/nginx/logs/fvtkevin-dmz01``.kevin.com-access.log main;``   ``error_log ``/data/nginx/logs/fvtkevin-dmz01``.kevin.com-error.log;` `   ``location / {``   ``root ``/data/web/kevin``;``   ``index index.php index.html index.htm;``   ``}` `   ``location ~ \.(css|js|gif|jpg|jpeg|png|bmp|swf|ttf|woff|otf|ttc|pfa)$ {``   ``root ``/data/web/kevin``;``      ``expires 30d;``    ``}` `   ``location ~ \.(html|htm)$ {``     ``root ``/data/web/kevin``;``     ``add_header Cache-Control no-cache;``    ``}` `   ``location ``/document/` `{``   ``alias` `/data/web/document/``;``   ``}` `   ``location ~ \.(css|js|gif|jpg|jpeg|png|bmp|swf|ttf|woff|otf|ttc|pfa)$ {``   ``root ``/data/web/document``;``      ``expires 30d;``    ``}` `   ``location ~ \.(html|htm)$ {``     ``root ``/data/web/document``;``     ``add_header Cache-Control no-cache;``    ``}` ` ``}
+>```
+>
+>b) 172.16.60.74 (即fvtkevin-dmz02.kevin.com)服务器上缓存控制字段cache-control的配置如下:
+>
+>```
+>[root@fvtkevin-dmz02 ~]``# cat /data/nginx/conf/vhosts/fvtkevin-web02.kevin.com.conf``server {``   ``listen   80;``   ``server_name fvtkevin-web02.kevin.com;``  ` `   ``access_log ``/data/nginx/logs/fvtkevin-web02``.kevin.com-access.log main;``   ``error_log ``/data/nginx/logs/fvtkevin-web02``.kevin.com-error.log;``  ` `   ``location / {``   ``root ``/data/web/kevin``;``   ``index index.php index.html index.htm;``   ``}` `   ``location ~ \.(css|js|gif|jpg|jpeg|png|bmp|swf|ttf|woff|otf|ttc|pfa)$ {``   ``root ``/data/web/kevin``;``      ``expires 30d;``    ``}` `   ``location ~ \.(html|htm)$ {``   ``root ``/data/web/kevin``;``   ``add_header Cache-Control no-cache;``    ``}` `   ``location ``/document/` `{``   ``alias` `/data/web/document/``;``   ``}` `   ``location ~ \.(css|js|gif|jpg|jpeg|png|bmp|swf|ttf|woff|otf|ttc|pfa)$ {``   ``root ``/data/web/document``;``      ``expires 30d;``    ``}` `   ``location ~ \.(html|htm)$ {``     ``root ``/data/web/document``;``     ``add_header Cache-Control no-cache;``    ``}` ` ``}
+>```
+>
+>以上配置中, 关于缓存控制字段cache-control的配置主要有两个:
+>1) http://fvtkevin-web.kevin.com/ 下:
+>   对于html, html格式的文件，cache control设置为no-cache;
+>   对于js，图片，css，字体等，设置max-age=2592000;
+>   这是基于/data/web/kevin的root根目录下的
+>2) http://fvtkevin-web.kevin.com/document 下:
+>   对于html, html格式的文件，cache control设置为no-cache;
+>   对于js，图片，css，字体等，设置max-age=2592000;
+>   这是基于/data/web/document的root根目录下的
+>
+>以上配置后, 访问http://fvtkevin-web.kevin.com/ 或者 http://fvtkevin-web.kevin.com/document 进行验证. 这里验证下http://fvtkevin-web.kevin.com/, 效果如下:
+>
+> ![img](https://img2018.cnblogs.com/blog/907596/201903/907596-20190302014938631-3140.png)
+>
+>上面显示了http://fvtkevin-web.kevin.com/ 首页(即index.html文件)访问头部信息里有"no-cache"信息! 
+>
+>![img](https://img2018.cnblogs.com/blog/907596/201903/907596-20190302014950193-1878690348.png)
+>
+>上面显示了http://fvtkevin-web.kevin.com/*.js文件访问的头部信息里的缓存时间设置! 
 
-(4)、防盗链
 
-(5)、禁止访问目录
 
-## 反向代理proxy_pass
+#### (2)、动静分离
+
+>所谓的动静分离，就是对请求进行分拣
+>
+>
+>
+>||||||||
+>
+>
+>
+>静态
+>
+>> ```shell
+>> location ~* .*\.(jpg|png|gif)$ {
+>> 	root /code/images;
+>> }
+>> ```
+>>
+>> 
+>
+>
+
+#### (3)、路由重写rewrite
+
+#### (4)、防盗链
+
+### 2、正向代理(跳板机)
+
+#### (1)、简介描述
+
+>![正向代理](static/yunwei/%E6%AD%A3%E5%90%91%E4%BB%A3%E7%90%86.png)
+>
+>**正向代理即是客户端代理, 代理客户端, 服务端不知道实际发起请求的客户端.**
+
+### 3、反向代理(分发机)
+
+#### (1)简介描述
+
+> ​	![反向代理](static/yunwei/%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86.png)
+>
+> **反向代理即是服务端代理, 代理服务端, 客户端不知道实际提供服务的服务端**
+
+#### (2)、普通反向代理
+
+##### (a)、案例一
 
 >```shell
 >location / {
->    add_header Cache-Control no-cache;#测试的时候最好加这个，不然浏览器主动会去缓存
->    proxy_pass http://www.baidu.com:80;#代理支持【域名】和【ip】
+>add_header Cache-Control no-cache;#测试的时候最好加这个，不然浏览器主动会去缓存
+>proxy_pass http://www.baidu.com:80;#代理支持【域名】和【ip】
 >}
 >```
+
+##### (b)、案例二
+
+==url会变==
+
+>```shell
+>location ~ /a/ {
+>	proxy_pass http://www.aliyun.com:80;
+>}
+>
+>location ~ /b/ {
+>	proxy_pass http://www.bilibili.com:80;
+>}
+>```
+>
+>访问：http://www.13sui.cn/a/
+>
+>展示页面效果：https://www.aliyun.com/notfound/
+>
+>展示浏览器中url:https://www.aliyun.com/notfound/
+>
+>>由http://www.13sui.cn/a/代理到了https://www.aliyun.com/a/:80,
+>>
+>>然后https://www.aliyun.com/a/:80没有真实存在的页面，故aliyun内部跳转了notfound
+>
+>
+>
+>访问：http://www.13sui.cn/b/
+>
+>展示页面效果：https://www.bilibili.com/b/
+>
+>展示浏览器中url:https://www.bilibili.com/b/
+
+
+
+#### (3)、负载均衡
+
+>##### upstream
+>
+>官方文档：http://nginx.org/en/docs/http/ngx_http_upstream_module.html
+>
+>
+>
+>
+>
+>>```shell
+>>http{
+>>    upstream myupstream {
+>>       #[least_conn|ip_hash];
+>>       zone upstream_dynamic 64k;#定义共享内存区域的name和size【商业】
+>>       server example.com:8080;
+>>       server 192.168.0.101:8080;
+>>       server 192.168.0.102:8080 weight=2;
+>>       server 192.168.0.103:8080 max_fails=3 fail_timeout=15;
+>>       server 192.168.0.104:8080 backup;
+>>       server 192.168.0.105:8080 down;
+>>       server 192.168.0.106:8080 max_conns=1000;
+>>    }
+>>}
+>>```
+>
+>
+>
+>
+>
+>| 序号 | 类型     | KEY              | 注释                             |
+>| ---- | -------- | ---------------- | -------------------------------- |
+>|      | 轮询     |                  | 默认                             |
+>|      | 最少连接 | least_conn       | 优先分配给连接数少的             |
+>|      | 会话持续 | ip_hash          | 同一个用户保证一直在同一台机子上 |
+>|      | 权重     |                  | 权重大的分配活儿更多，占比       |
+>|      |          | 第三方的暂未考虑 |                                  |
+>
+>##### server配置
+>
+>| key          | value  | 注释                                                         | 默认 | 备注                                                         |
+>| ------------ | ------ | ------------------------------------------------------------ | ---- | ------------------------------------------------------------ |
+>| weight       | number | 设置服务器的权重                                             | 1    |                                                              |
+>| max_conns    | number | 限制number到代理服务器的同时活动连接的最大数量。0表示无限制  | 0    | V1.11.5                                                      |
+>| max_fails    | number | 允许请求失败的次数默认为1.当超过最大次数时，返回 `proxy_next_upstream`模块定义的错误 | 1    |                                                              |
+>| fail_timeout | time   |                                                              | 10   | 单位秒                                                       |
+>| backup       |        | 备用服务器                                                   |      | 不可与这些共同使用：[hash](http://nginx.org/en/docs/http/ngx_http_upstream_module.html#hash), [ip_hash](http://nginx.org/en/docs/http/ngx_http_upstream_module.html#ip_hash), and [random](http://nginx.org/en/docs/http/ngx_http_upstream_module.html#random) |
+>| down         |        | 停用                                                         |      |                                                              |
+>| resolve      |        | 监视与服务器域名相对应的IP地址的更改，并自动修改上游配置，而无需重新启动nginx |      | 商业                                                         |
+>| route        | string | 设置服务器路由名称                                           |      | 商业                                                         |
+>| service      | name   |                                                              |      | 商业                                                         |
+>| slow_start   | time   |                                                              |      | 商业                                                         |
+>| drain        |        |                                                              |      | 商业                                                         |
+>
+>
+>
+>##### (2)、proxy_pass
+>
+>> ```shell
+>> http{
+>>  server {
+>>      location / {
+>>          proxy_pass http://myupstream;
+>>          health_check;
+>>      }
+>>  }
+>> }
+>> ```
+>>
+>> 
+>
 >
 
 
 
-### 代理缓存
+>##### 负载均衡的分类
+>
+>![阿里P8架构师谈：负载均衡的原理、分类、实现架构，以及使用场景](http://p3.pstatp.com/large/pgc-image/15351957983814651d7fac3)
+>
+>1）二层负载均衡（mac）
+>
+>根据OSI模型分的二层负载，一般是用虚拟mac地址方式，外部对虚拟MAC地址请求，负载均衡接收后分配后端实际的MAC地址响应）
+>
+>2）三层负载均衡（ip）
+>
+>一般采用虚拟IP地址方式，外部对虚拟的ip地址请求，负载均衡接收后分配后端实际的IP地址响应）
+>
+>3）四层负载均衡（tcp）
+>
+>在三次负载均衡的基础上，用ip+port接收请求，再转发到对应的机器。
+>
+>4）七层负载均衡（http）
+>
+>根据虚拟的url或IP，主机名接收请求，再转向相应的处理服务器。
+>
+>##### 最常见的四层和七层负载均衡
+>
+>1）四层的负载均衡就是基于IP+端口的负载均衡：在三层负载均衡的基础上，通过发布三层的IP地址（VIP），然后加四层的端口号，来决定哪些流量需要做负载均衡。
+>
+>对应的负载均衡器称为四层交换机（L4 switch），主要分析IP层及TCP/UDP层，实现四层负载均衡。此种负载均衡器不理解应用协议（如HTTP/FTP/MySQL等等）。
+>
+>**实现四层负载均衡的软件有：**
+>
+>- F5：硬件负载均衡器，功能很好，但是成本很高。
+>- lvs：重量级的四层负载软件
+>- nginx：轻量级的四层负载软件，带缓存功能，正则表达式较灵活
+>- haproxy：模拟四层转发，较灵活
+>
+>2）七层的负载均衡就是基于虚拟的URL或主机IP的负载均衡
+>
+>对应的负载均衡器称为七层交换机（L7 switch），除了支持四层负载均衡以外，还有分析应用层的信息，如HTTP协议URI或Cookie信息，实现七层负载均衡。此种负载均衡器能理解应用协议。
+>
+>**实现七层负载均衡的软件有：**
+>
+>- haproxy：天生负载均衡技能，全面支持七层代理，会话保持，标记，路径转移；
+>- nginx：只在http协议和mail协议上功能比较好，性能与haproxy差不多；
+>- apache：功能较差
+>- Mysql proxy：功能尚可。
+>
+>总的来说，一般是lvs做4层负载；nginx做7层负载；haproxy比较灵活，4层和7层负载均衡都能做。
+>
+>
+
+
+
+>#### **1、负载均衡的实现（DNS > 数据链路层 > IP层 > Http层）**
+>
+>##### (1)、**DNS域名解析负载均衡（延迟）**
+>
+>![dns域名解析负载均衡](static/yunwei/dns%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1.jpg)
+>
+>
+>
+>
+>
+>利用DNS处理域名解析请求的同时进行负载均衡是另一种常用的方案。在DNS服务器中配置多个A记录，如：www.mysite.com IN A 114.100.80.1、www.mysite.com IN A 114.100.80.2、www.mysite.com IN A 114.100.80.3.
+>
+>每次域名解析请求都会根据负载均衡算法计算一个不同的IP地址返回，这样A记录中配置的多个服务器就构成一个集群，并可以实现负载均衡。
+>
+>DNS域名解析负载均衡的优点是将负载均衡工作交给DNS，省略掉了网络管理的麻烦，缺点就是**DNS可能缓存A记录，不受网站控制**。事实上，大型网站总是部分使用DNS域名解析，作为第一级负载均衡手段，然后再在内部做第二级负载均衡。
+>
+>
+>
+>
+>
+>##### (2)、**数据链路层负载均衡(LVS)**
+>
+>![数据链路层负载均衡(LVS)](static/yunwei/%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1(LVS).jpg)
+>
+>
+>
+>
+>
+>数据链路层负载均衡是指在通信协议的数据链路层修改mac地址进行负载均衡。
+>
+>这种数据传输方式又称作三角传输模式，负载均衡数据分发过程中不修改IP地址，**只修改目的的mac地址**，通过配置真实物理服务器集群所有机器虚拟IP和负载均衡服务器IP地址一样，从而达到负载均衡，这种负载均衡方式又称为直接路由方式（DR）.
+>
+>在上图中，用户请求到达负载均衡服务器后，负载均衡服务器将请求数据的目的mac地址修改为真是WEB服务器的mac地址，并不修改数据包目标IP地址，因此数据可以正常到达目标WEB服务器，该服务器在处理完数据后可以经过网管服务器而不是负载均衡服务器直接到达用户浏览器。
+>
+>使用三角传输模式的链路层负载均衡是目前大型网站所使用的最广的一种负载均衡手段。在linux平台上最好的链路层负载均衡开源产品是LVS(linux virtual server)。
+>
+>
+>
+>##### (3)、**IP负载均衡(SNAT)**
+>
+>![IP负载均衡(SNAT)](static/yunwei/IP%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1(SNAT).jpg)
+>
+>IP负载均衡：即**在网络层通过修改请求目标地址**进行负载均衡。
+>
+>用户请求数据包到达负载均衡服务器后，负载均衡服务器在操作系统内核进行获取网络数据包，根据负载均衡算法计算得到一台真实的WEB服务器地址，然后将数据包的IP地址修改为真实的WEB服务器地址，不需要通过用户进程处理。真实的WEB服务器处理完毕后，相应数据包回到负载均衡服务器，负载均衡服务器再将数据包源地址修改为自身的IP地址发送给用户浏览器。
+>
+>这里的关键在于真实WEB服务器相应数据包如何返回给负载均衡服务器，一种是负载均衡服务器在修改目的IP地址的同时修改源地址，将数据包源地址改为自身的IP，即源地址转换（SNAT），另一种方案是将负载均衡服务器同时作为真实物理服务器的网关服务器，这样所有的数据都会到达负载均衡服务器。
+>
+>IP负载均衡在内核进程完成数据分发，较反向代理均衡有更好的处理性能。但由于所有请求响应的数据包都需要经过负载均衡服务器，**因此负载均衡的网卡带宽成为系统的瓶颈**。
+>
+>
+>
+>##### (4)、**HTTP重定向负载均衡(少见)**
+>
+>![HTTP重定向负载均衡](static/yunwei/HTTP%E9%87%8D%E5%AE%9A%E5%90%91%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1.jpg)
+>
+>HTTP重定向服务器是一台普通的应用服务器，其唯一的功能就是根据用户的HTTP请求计算一台真实的服务器地址，并将真实的服务器地址写入HTTP重定向响应中（响应状态吗302）返回给浏览器，然后浏览器再自动请求真实的服务器。
+>
+>这种负载均衡方案的优点是比较简单，缺点是浏览器需要每次请求两次服务器才能拿完成一次访问，性能较差；使用HTTP302响应码重定向，可能是搜索引擎判断为SEO作弊，降低搜索排名。重定向服务器自身的处理能力有可能成为瓶颈。因此这种方案在实际使用中并不见多。
+>
+>
+>
+>##### (5)、**反向代理负载均衡(nginx)**
+>
+>![反向代理负载均衡(nginx)](static/yunwei/%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1(nginx).jpg)
+>
+>
+>
+>传统代理服务器位于浏览器一端，代理浏览器将HTTP请求发送到互联网上。而反向代理服务器则位于网站机房一侧，代理网站web服务器接收http请求。
+>
+>反向代理的作用是保护网站安全，所有互联网的请求都必须经过代理服务器，相当于在web服务器和可能的网络攻击之间建立了一个屏障。
+>
+>除此之外，代理服务器也可以配置缓存加速web请求。当用户第一次访问静态内容的时候，静态内存就被缓存在反向代理服务器上，这样当其他用户访问该静态内容时，就可以直接从反向代理服务器返回，加速web请求响应速度，减轻web服务器负载压力。
+>
+>另外，反向代理服务器也可以实现负载均衡的功能。
+>
+>
+
+#### (4)、相关配置(代理缓存)
 
 | 指令                              | 说明                                                         |
 | --------------------------------- | ------------------------------------------------------------ |
@@ -1635,238 +2290,25 @@ split_nginx_log.sh         加入定时器，每小时跑
 | proxy_cache_valid                 | 缓存的有效期；指定对200、301或者302有效代码缓存的时间长度。特定参数any表示对任何响应都缓存一定时间长度。 |
 | proxy_cache_methods               | 缓存支持的方法，默认为GET，可以改为POST，OPTIONS等           |
 
-## 负载均衡
 
-### **1、负载均衡的实现（DNS > 数据链路层 > IP层 > Http层）**
 
-#### (1)、**DNS域名解析负载均衡（延迟）**
+### 4、邮件代理
 
-![dns域名解析负载均衡](static/yunwei/dns%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1.jpg)
 
 
 
 
-
-利用DNS处理域名解析请求的同时进行负载均衡是另一种常用的方案。在DNS服务器中配置多个A记录，如：www.mysite.com IN A 114.100.80.1、www.mysite.com IN A 114.100.80.2、www.mysite.com IN A 114.100.80.3.
-
-每次域名解析请求都会根据负载均衡算法计算一个不同的IP地址返回，这样A记录中配置的多个服务器就构成一个集群，并可以实现负载均衡。
-
-DNS域名解析负载均衡的优点是将负载均衡工作交给DNS，省略掉了网络管理的麻烦，缺点就是**DNS可能缓存A记录，不受网站控制**。事实上，大型网站总是部分使用DNS域名解析，作为第一级负载均衡手段，然后再在内部做第二级负载均衡。
-
-
-
-
-
-#### (2)、**数据链路层负载均衡(LVS)**
-
-![数据链路层负载均衡(LVS)](static/yunwei/%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1(LVS).jpg)
-
-
-
-
-
-数据链路层负载均衡是指在通信协议的数据链路层修改mac地址进行负载均衡。
-
-这种数据传输方式又称作三角传输模式，负载均衡数据分发过程中不修改IP地址，**只修改目的的mac地址**，通过配置真实物理服务器集群所有机器虚拟IP和负载均衡服务器IP地址一样，从而达到负载均衡，这种负载均衡方式又称为直接路由方式（DR）.
-
-在上图中，用户请求到达负载均衡服务器后，负载均衡服务器将请求数据的目的mac地址修改为真是WEB服务器的mac地址，并不修改数据包目标IP地址，因此数据可以正常到达目标WEB服务器，该服务器在处理完数据后可以经过网管服务器而不是负载均衡服务器直接到达用户浏览器。
-
-使用三角传输模式的链路层负载均衡是目前大型网站所使用的最广的一种负载均衡手段。在linux平台上最好的链路层负载均衡开源产品是LVS(linux virtual server)。
-
-
-
-#### (3)、**IP负载均衡(SNAT)**
-
-![IP负载均衡(SNAT)](static/yunwei/IP%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1(SNAT).jpg)
-
-IP负载均衡：即**在网络层通过修改请求目标地址**进行负载均衡。
-
-用户请求数据包到达负载均衡服务器后，负载均衡服务器在操作系统内核进行获取网络数据包，根据负载均衡算法计算得到一台真实的WEB服务器地址，然后将数据包的IP地址修改为真实的WEB服务器地址，不需要通过用户进程处理。真实的WEB服务器处理完毕后，相应数据包回到负载均衡服务器，负载均衡服务器再将数据包源地址修改为自身的IP地址发送给用户浏览器。
-
-这里的关键在于真实WEB服务器相应数据包如何返回给负载均衡服务器，一种是负载均衡服务器在修改目的IP地址的同时修改源地址，将数据包源地址改为自身的IP，即源地址转换（SNAT），另一种方案是将负载均衡服务器同时作为真实物理服务器的网关服务器，这样所有的数据都会到达负载均衡服务器。
-
-IP负载均衡在内核进程完成数据分发，较反向代理均衡有更好的处理性能。但由于所有请求响应的数据包都需要经过负载均衡服务器，**因此负载均衡的网卡带宽成为系统的瓶颈**。
-
-
-
-#### (4)、**HTTP重定向负载均衡(少见)**
-
-![HTTP重定向负载均衡](static/yunwei/HTTP%E9%87%8D%E5%AE%9A%E5%90%91%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1.jpg)
-
-HTTP重定向服务器是一台普通的应用服务器，其唯一的功能就是根据用户的HTTP请求计算一台真实的服务器地址，并将真实的服务器地址写入HTTP重定向响应中（响应状态吗302）返回给浏览器，然后浏览器再自动请求真实的服务器。
-
-这种负载均衡方案的优点是比较简单，缺点是浏览器需要每次请求两次服务器才能拿完成一次访问，性能较差；使用HTTP302响应码重定向，可能是搜索引擎判断为SEO作弊，降低搜索排名。重定向服务器自身的处理能力有可能成为瓶颈。因此这种方案在实际使用中并不见多。
-
-
-
-#### (5)、**反向代理负载均衡(nginx)**
-
-![反向代理负载均衡(nginx)](static/yunwei/%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1(nginx).jpg)
-
-
-
-传统代理服务器位于浏览器一端，代理浏览器将HTTP请求发送到互联网上。而反向代理服务器则位于网站机房一侧，代理网站web服务器接收http请求。
-
-反向代理的作用是保护网站安全，所有互联网的请求都必须经过代理服务器，相当于在web服务器和可能的网络攻击之间建立了一个屏障。
-
-除此之外，代理服务器也可以配置缓存加速web请求。当用户第一次访问静态内容的时候，静态内存就被缓存在反向代理服务器上，这样当其他用户访问该静态内容时，就可以直接从反向代理服务器返回，加速web请求响应速度，减轻web服务器负载压力。
-
-另外，反向代理服务器也可以实现负载均衡的功能。
-
-
-
-
-
-#### 杂货
-
-##### 负载均衡的分类
-
-![阿里P8架构师谈：负载均衡的原理、分类、实现架构，以及使用场景](http://p3.pstatp.com/large/pgc-image/15351957983814651d7fac3)
-
-1）二层负载均衡（mac）
-
-根据OSI模型分的二层负载，一般是用虚拟mac地址方式，外部对虚拟MAC地址请求，负载均衡接收后分配后端实际的MAC地址响应）
-
-2）三层负载均衡（ip）
-
-一般采用虚拟IP地址方式，外部对虚拟的ip地址请求，负载均衡接收后分配后端实际的IP地址响应）
-
-3）四层负载均衡（tcp）
-
-在三次负载均衡的基础上，用ip+port接收请求，再转发到对应的机器。
-
-4）七层负载均衡（http）
-
-根据虚拟的url或IP，主机名接收请求，再转向相应的处理服务器。
-
-##### 最常见的四层和七层负载均衡
-
-1）四层的负载均衡就是基于IP+端口的负载均衡：在三层负载均衡的基础上，通过发布三层的IP地址（VIP），然后加四层的端口号，来决定哪些流量需要做负载均衡。
-
-对应的负载均衡器称为四层交换机（L4 switch），主要分析IP层及TCP/UDP层，实现四层负载均衡。此种负载均衡器不理解应用协议（如HTTP/FTP/MySQL等等）。
-
-**实现四层负载均衡的软件有：**
-
-- F5：硬件负载均衡器，功能很好，但是成本很高。
-- lvs：重量级的四层负载软件
-- nginx：轻量级的四层负载软件，带缓存功能，正则表达式较灵活
-- haproxy：模拟四层转发，较灵活
-
-2）七层的负载均衡就是基于虚拟的URL或主机IP的负载均衡
-
-对应的负载均衡器称为七层交换机（L7 switch），除了支持四层负载均衡以外，还有分析应用层的信息，如HTTP协议URI或Cookie信息，实现七层负载均衡。此种负载均衡器能理解应用协议。
-
-**实现七层负载均衡的软件有：**
-
-- haproxy：天生负载均衡技能，全面支持七层代理，会话保持，标记，路径转移；
-- nginx：只在http协议和mail协议上功能比较好，性能与haproxy差不多；
-- apache：功能较差
-- Mysql proxy：功能尚可。
-
-总的来说，一般是lvs做4层负载；nginx做7层负载；haproxy比较灵活，4层和7层负载均衡都能做。
-
-
-
-
-
-### 2、**负载均衡(nginx)**[upstream+proxy_pass]
-
-#### (1)、upstream
-
-官方文档：http://nginx.org/en/docs/http/ngx_http_upstream_module.html
-
-
-
-
-
->```shell
->http{
->    upstream myupstream {
->        #[least_conn|ip_hash];
->        zone upstream_dynamic 64k;#定义共享内存区域的name和size【商业】
->        server example.com:8080;
->        server 192.168.0.101:8080;
->        server 192.168.0.102:8080 weight=2;
->        server 192.168.0.103:8080 max_fails=3 fail_timeout=15;
->        server 192.168.0.104:8080 backup;
->        server 192.168.0.105:8080 down;
->        server 192.168.0.106:8080 max_conns=1000;
->    }
->}
->```
-
-
-
-
-
-| 序号 | 类型     | KEY              | 注释                             |
-| ---- | -------- | ---------------- | -------------------------------- |
-|      | 轮询     |                  | 默认                             |
-|      | 最少连接 | least_conn       | 优先分配给连接数少的             |
-|      | 会话持续 | ip_hash          | 同一个用户保证一直在同一台机子上 |
-|      | 权重     |                  | 权重大的分配活儿更多，占比       |
-|      |          | 第三方的暂未考虑 |                                  |
-
-##### server配置
-
-| key          | value  | 注释                                                         | 默认 | 备注                                                         |
-| ------------ | ------ | ------------------------------------------------------------ | ---- | ------------------------------------------------------------ |
-| weight       | number | 设置服务器的权重                                             | 1    |                                                              |
-| max_conns    | number | 限制number到代理服务器的同时活动连接的最大数量。0表示无限制  | 0    | V1.11.5                                                      |
-| max_fails    | number | 允许请求失败的次数默认为1.当超过最大次数时，返回 `proxy_next_upstream`模块定义的错误 | 1    |                                                              |
-| fail_timeout | time   |                                                              | 10   | 单位秒                                                       |
-| backup       |        | 备用服务器                                                   |      | 不可与这些共同使用：[hash](http://nginx.org/en/docs/http/ngx_http_upstream_module.html#hash), [ip_hash](http://nginx.org/en/docs/http/ngx_http_upstream_module.html#ip_hash), and [random](http://nginx.org/en/docs/http/ngx_http_upstream_module.html#random) |
-| down         |        | 停用                                                         |      |                                                              |
-| resolve      |        | 监视与服务器域名相对应的IP地址的更改，并自动修改上游配置，而无需重新启动nginx |      | 商业                                                         |
-| route        | string | 设置服务器路由名称                                           |      | 商业                                                         |
-| service      | name   |                                                              |      | 商业                                                         |
-| slow_start   | time   |                                                              |      | 商业                                                         |
-| drain        |        |                                                              |      | 商业                                                         |
-
-
-
-#### (2)、proxy_pass
-
-> ```shell
-> http{
->     server {
->         location / {
->             proxy_pass http://myupstream;
->             health_check;
->         }
->     }
-> }
-> ```
->
-> 
-
-## 动静分离
-
-所谓的动静分离，就是对请求进行分拣
-
-
-
-||||||||
-
-
-
-静态
-
-> ```shell
-> location ~* .*\.(jpg|png|gif)$ {
-> 	root /code/images;
-> }
-> ```
->
-> 
-
-
-
-
-
-
+| 配置文件     | 作用                              |
+| ------------ | --------------------------------- |
+| nginx.conf   | nginx的基本配置文件               |
+| fastcgi.conf | 与fastcgi相关的配置文件           |
+| mime.types   | MIME类型关联的扩展文件            |
+| proxy.conf   | 与proxy相关的配置                 |
+| sites.conf   | 配置nginx提供的网站，包括虚拟主机 |
 
 ## 问题：
+
+### 惊群现象
 
 ### 403 Forbidden
 
@@ -1890,390 +2332,22 @@ HTTP重定向服务器是一台普通的应用服务器，其唯一的功能就�
 
 
 
-## nginx下关于缓存控制cache-control的配置说明
 
- 
 
-HTTP协议的Cache -Control指定请求和响应遵循的缓存机制。在请求消息或响应消息中设置 Cache-Control并不会影响另一个消息处理过程中的缓存处理过程。
-**请求时的缓存指令**包括: no-cache、no-store、max-age、 max-stale、min-fresh、only-if-cached等。
-**响应消息中的指令**包括: public、private、no-cache、no- store、no-transform、must-revalidate、proxy-revalidate、max-age。
+# php-fpm/php-fastcgi
 
-下面做一详细总结, 方便在以后的运维工作中理解和运用.
+# 网络协议
 
-### **一.  浏览器中关于Cache的3属性:**
+## TCP/IP协议
 
-#### **1. Cache-Control:**
+![TCP-IP](static/yunwei/TCP-IP.png)
 
-设置相对过期时间, max-age指明以秒为单位的缓存时间. 若对静态资源只缓存一次, 可以设置max-age的值为315360000000 (一万年). 比如对于提交的订单，为了防止浏览器回退重新提交，可以使用Cache-Control之no-store绝对禁止缓存，即便浏览器回退依然请求的是服务器，进而判断订单的状态给出相应的提示信息！
 
-**Http协议的cache-control的常见取值及其组合释义:**
-no-cache: 数据内容不能被缓存, 每次请求都重新访问服务器, 若有max-age, 则缓存期间不访问服务器.
-no-store: 不仅不能缓存, 连暂存也不可以(即: 临时文件夹中不能暂存该资源).
-private(默认): 只能在浏览器中缓存, 只有在第一次请求的时候才访问服务器, 若有max-age, 则缓存期间不访问服务器.
-public: 可以被任何缓存区缓存, 如: 浏览器、服务器、代理服务器等.
-max-age: 相对过期时间, 即以秒为单位的缓存时间.
-no-cache, private: 打开新窗口时候重新访问服务器, 若设置max-age, 则缓存期间不访问服务器.
-\- private, 正数的max-age: 后退时候不会访问服务器.
-\- no-cache, 正数的max-age: 后退时会访问服务器.
 
-#### **2. Expires:**
 
-设置以分钟为单位的绝对过期时间, 优先级比Cache-Control低, 同时设置Expires和Cache-Control则后者生效. **也就是说要注意一点: Cache-Control的优先级高于Expires**
 
-expires起到控制页面缓存的作用，合理配置expires可以减少很多服务器的请求, expires的配置可以在http段中或者server段中或者location段中. 比如控制图片等过期时间为30天, 可以配置如下:
 
-```
-location ~ \.(gif|jpg|jpeg|png|bmp|ico)$ {``      ``root ``/var/www/img/``;``      ``expires 30d;``    ``}
-```
 
-再比如:
 
-```
-location ~ \.(wma|wmv|asf|mp3|mmf|zip|rar|swf|flv)$ {``       ``root ``/var/www/upload/``;``       ``expires max;``   ``}
-```
 
-#### **3. Last-Modified:**
-
-该资源的最后修改时间, 在浏览器下一次请求资源时, 浏览器将先发送一个请求到服务器上, 并附上If-Unmodified-Since头来说明浏览器所缓存资源的最后修改时间, 如果服务器发现没有修改, 则直接返回304(Not Modified)回应信息给浏览器(内容很少), 如果服务器对比时间发现修改了, 则照常返回所请求的资源. 
-
-**需要注意:**
-1) Last-Modified属性通常和Expires或Cache-Control属性配合使用, 因为即使浏览器设置缓存, 当用户点击”刷新”按钮时, 浏览器会忽略缓存继续向服务器发送请求, 这时Last-Modified将能够很好的减小回应开销.
-
-2) ETag将返回给浏览器一个资源ID, 如果有了新版本则正常发送并附上新ID, 否则返回304， 但是在服务器集群情况下, 每个服务器将返回不同的ID, 因此不建议使用ETag.
-
-以上描述的客户端浏览器缓存是指存储位置在客户端浏览器, 但是对客户端浏览器缓存的实际设置工作是在服务器上的资源中完成的. 虽然上面介绍了有关于客户端浏览器缓存的属性, 但是实际上对这些属性的设置工作都需要在服务器的资源中做设置. 通常有两种操作手段对浏览器缓存进行设置, 一个是通过页面指令声明来设置, 另外一个是通过编程方式来设置.
-
-下面是相关页面设置Cache-Control头信息的几个简单配置:
-例一:
-
-```
-if` `($request_uri ~* ``"^/$|^/search/.+/|^/company/.+/"``) {``  ``add_header  Cache-Control max-age=3600;`` ``}
-```
-
-个人理解的max-age意思是：客户端本地的缓存，在配置的生存时间内的，客户端可以直接使用，超出生存时间的，到服务器上取新数据。当然这些还要看客户端浏览器的设置。
-
-例二:
-
-```
-location ~ .*\.(css|js|swf|php|htm|html )$ {``   ``add_header Cache-Control no-store;``}
-```
-
-例三:
-
-```
-location ~ .*\.(js|css)$ {``   ``expires 10d;``}
-```
-
-例四: 将html结尾的请求加上no-cache
-
-```
-location / {``  ``access_log ``/data/nginx/log/xxx``.log api;``  ``root ``/home/www/html``;``  ``if` `($request_filename ~ .*\.(htm|html)$)``   ``{``      ``add_header Cache-Control no-cache;``   ``}``}
-```
-
-### **二.  http Headers模块 (设置HTTP报文的头标)**
-
-Nginx的ngx_http_headers_module模块可以对Cache-Control头相关的东西进行配置, 比如:
-
-```
-expires   24h;``expires   0;``expires   -1;``expires   epoch;``add_header Cache-Control private;
-```
-
-**指令**
-
-#### add_header add_header
-
-#### expires expires
-
-**增加头标**
-语法： add_header name value
-默认值： none
-作用域： http, server, location
-当HTTP应答状态码为 200、204、301、302 或 304 的时候，增加指定的HTTP头标。其中头标的值可以使用变量。
-
-**expires**
-语法： expires [time|epoch|max|off
-默认值： expires off
-作用域： http, server, location
-使用本指令可以控制HTTP应答中的“Expires”和“Cache-Control”的头标,（起到控制页面缓存的作用）。
-
-可以在time值中使用正数或负数。“Expires”头标的值将通过当前系统时间加上您设定的 time 值来获得。
-
-```
-epoch
-```
-
-指定“Expires”的值为 1 January, 1970, 00:00:01 GMT。
-
-```
-max
-```
-
-指定“Expires”的值为 31 December 2037 23:59:59 GMT，“Cache-Control”的值为10年。
-
- 
-
-指定“Expires”的值为 服务器当前时间 -1s,即永远过期.
-
-"Cache-Control"头标的值由您指定的时间来决定：
-  \- 负数
-
-```
-Cache-Control: no-cache
-```
-
-  \- 正数或零
-
-```
-Cache-Control: max-age = ``#
-```
-
-\# 为您指定时间的秒数。
-
-"off" 表示不修改“Expires”和“Cache-Control”的值;
-
-### **三.  Cache-Control**
-
-Cache-Control 通用消息头字段被用于在http 请求和响应中通过指定指令来实现缓存机制。缓存指令是单向的, 这意味着在请求设置的指令，在响应中不一定包含相同的指令。
-
-响应头：Cache-Control：no-cache，强制每次请求直接发送给源服务器，而不经过本地缓存版本的校验。这对于需要确认认证应用很有用（可以和public结合使用），或者严格要求使用最新数据 的应用（不惜牺牲使用缓存的所有好处）. 通俗解释：浏览器通知服务器，本地没有缓存数据.
-
-cache-control :
-    max-age>0时 直接从游览器缓存中提取;
-    max-age<=0 时向server发送http请求确认 ,该资源是否有修改, 有的话 返回200 , 无的话 返回304。
-
-通俗解释：响应头中的 Cache-Control:max-age=315360000 是通知浏览器: 315360000 秒之内不要烦我, 就自己从缓冲区中刷新。
-
-**语法**
-指令不区分大小写，并且具有可选参数，可以用令牌或者带引号的字符串语法。多个指令以逗号分隔。
-
-**指令**
-**-  可缓存性**
-public
-   表明响应可以被任何对象（包括：发送请求的客户端，代理服务器，等等）缓存。表示相应会被缓存，并且在多用户间共享。默认是public。
-private
-   表明响应只能被单个用户缓存，不能作为共享缓存（即代理服务器不能缓存它）,可以缓存响应内容。响应只作为私有的缓存，不能在用户间共享。如果要求HTTP认证，响应会自动设置为private。
-no-cache
-   在释放缓存副本之前，强制高速缓存将请求提交给原始服务器进行验证。指定不缓存响应，表明资源不进行缓存。但是设置了no-cache之后并不代表浏览器不缓存，而是在缓存前要向服务器确认资源是否被更改。因此有的时候只设置no-cache防止缓存还是不够保险，还可以加上private指令，将过期时间设为过去的时间。
-only-if-cached
-   表明客户端只接受已缓存的响应，并且不要向原始服务器检查是否有更新的拷贝.
-
-**-  到期**
-max-age=<seconds>
-   设置缓存存储的最大周期，超过这个时间缓存被认为过期(单位秒)。与Expires相反，时间是相对于请求的时间。max-age会覆盖掉Expires。
-s-maxage=<seconds>
-   覆盖max-age 或者 Expires 头，但是仅适用于共享缓存(比如各个代理)，并且私有缓存中它被忽略。也就是说s-maxage只用于共享缓存，比如CDN缓存（s -> share）。与max-age 的区别是：     max-age用于普通缓存，而s-maxage用于代理缓存。如果存在s-maxage,则会覆盖max-age 和 Expires.
-max-stale[=<seconds>]
-   表明客户端愿意接收一个已经过期的资源。 可选的设置一个时间(单位秒)，表示响应不能超过的过时时间。
-min-fresh=<seconds>
-   表示客户端希望在指定的时间内获取最新的响应。
-stale-while-revalidate=<seconds>
-   表明客户端愿意接受陈旧的响应，同时在后台异步检查新的响应。秒值指示客户愿意接受陈旧响应的时间长度。
-stale-if-error=<seconds>
-   表示如果新的检查失败，则客户愿意接受陈旧的响应。秒数值表示客户在初始到期后愿意接受陈旧响应的时间。
-
-**-  重新验证和重新加载**
-must-revalidate
-   缓存必须在使用之前验证旧资源的状态，并且不可使用过期资源。表示如果页面过期，则去服务器进行获取。
-proxy-revalidate
-   与must-revalidate作用相同，但它仅适用于共享缓存（例如代理），并被私有缓存忽略。
-immutable
-   表示响应正文不会随时间而改变。资源（如果未过期）在服务器上不发生改变，因此客户端不应发送重新验证请求头（例如If-None-Match或If-Modified-Since）来检查更新，即使用户显式地刷新页面。在Firefox中，immutable只能被用在 https:// transactions.
-
-**-  其他**
-no-store
-   缓存不应存储有关客户端请求或服务器响应的任何内容。表示绝对禁止缓存!
-no-transform
-   不得对资源进行转换或转变。Content-Encoding, Content-Range, Content-Type等HTTP头不能由代理修改。例如，非透明代理可以对图像格式进行转换，以便节省缓存空间或者减少缓慢链路上的流量。 no-transform指令不允许这样做。
-
-**两个小示例**
-\- 禁止缓存
-发送如下指令可以关闭缓存。此外，可以参考Expires 和 Pragma 标题。
-
-```
-Cache-Control: no-cache, no-store, must-revalidate
-```
-
-\- 缓存静态资源节
-对于应用程序中不会改变的文件，通常可以在发送响应头前添加积极缓存。这包括例如由应用程序提供的静态文件，例如图像，CSS文件和JavaScript文件。另请参阅Expires标题。
-
-```
-Cache-Control:public, max-age=31536000
-```
-
-**这里扩展一下:**
-**HTTP1.0**
-HTTP1.0中通过Pragma 控制页面缓存，通常设置的值为no- cache，不过这个值不这么保险，通常还加上Expires置为0来达到目的。但是如我们刻意需要浏览器或缓存服务器缓存住我们的页面这个值则要设置为 Pragma。
-
-**HTTP1.1**
-HTTP1.1中启用Cache-Control 来控制页面的缓存与否，Cache-Control是http1.1 中的标准，可以看成是 expires 的补充, 使用的是相对时间的概念。注意几个常用的参数：
-no-cache: 浏览器和缓存服务器都不应该缓存页面信息；
-public: 浏览器和缓存服务器都可以缓存页面信息；
-no-store: 请求和响应的信息都不应该被存储在对方的磁盘系统中；
-must-revalidate: 对于客户机的每次请求，代理服务器必须想服务器验证缓存是否过时
-
-目前Cache-Control请求字段被各个浏览器支持的较好，其优先级也比较高，当和别的字段（如Expires）一起用时，会覆盖其他字段。
-
-### **四. nginx配置管理浏览器静态缓存策略**
-
-浏览器缓存: **expires**, **cache-control**, **last-modified**, **etag**.  先来看一张图:
-
-![img](https://img2018.cnblogs.com/blog/907596/201903/907596-20190302011346217-1805589363.png)
-
-每个状态的详细说明如下：
-**1、Last-Modified**
-在浏览器第一次请求某一个URL时，服务器端的返回状态会是200，内容是你请求的资源，同时有一个Last-Modified的属性标记(HttpReponse Header)此文件在服务期端最后被修改的时间，格式类似这样:
-
-```
-Last-Modified:Tue, 24 Feb 2019 08:01:04 GMT
-```
-
-客户端第二次请求此URL时，根据HTTP协议的规定，浏览器会向服务器传送If-Modified-Since报头(HttpRequest Header)，询问该时间之后文件是否有被修改过:
-
-```
-If-Modified-Since:Tue, 24 Feb 2019 08:01:04 GMT
-```
-
-如果服务器端的资源没有变化，则自动返回HTTP304（NotChanged.）状态码，内容为空，这样就节省了传输数据量。当服务器端代码发生改变或者重启服务器时，则重新发出资源，返回和第一次请求时类似。从而保证不向客户端重复发出资源，也保证当服务器有变化时，客户端能够得到最新的资源。
-
-**注意:** 如果If-Modified-Since的时间比服务器当前时间(当前的请求时间request_time)还晚，会认为是个非法请求
-
-**2、Etag工作原理**
-HTTP协议规格说明定义ETag为“被请求变量的实体标记”（参见14.19）。简单点即服务器响应时给请求URL标记，并在HTTP响应头中将其传送到客户端，类似服务器端返回的格式:
-
-```
-Etag:“5d8c72a5edda8d6a:3239″
-```
-
-客户端的查询更新格式是这样的:
-
-```
-If-None-Match:“5d8c72a5edda8d6a:3239″
-```
-
-如果ETag没改变，则返回状态304。即: 在客户端发出请求后，HttpReponse Header中包含Etag:“5d8c72a5edda8d6a:3239″
-标识，等于告诉Client端，你拿到的这个的资源有表示ID：5d8c72a5edda8d6a:3239。当下次需要发Request索要同一个URI的时候，浏览器同时发出一个If-None-Match报头(Http RequestHeader)此时包头中信息包含上次访问得到的Etag:“5d8c72a5edda8d6a:3239″标识。
-
-```
-If-None-Match:“5d8c72a5edda8d6a:3239“
-```
-
-这样，Client端等于Cache了两份，服务器端就会比对2者的etag。如果If-None-Match为False，不返回200，返回304(Not Modified) Response。
-
-**3、Expires**
-给出的日期/时间后，被响应认为是过时。如 Expires:Thu, 02 Apr 2009 05:14:08 GMT需和Last-Modified结合使用。用于控制请求文件的有效时间，当请求数据在有效期内时客户端浏览器从缓存请求数据而不是服务器端.当缓存中数据失效或过期，才决定从服务器更新数据。
-
-**4、Last-Modified和Expires**
-Last-Modified标识能够节省一点带宽，但是还是逃不掉发一个HTTP请求出去，而且要和Expires一起用。而Expires标识却使得浏览器干脆连HTTP请求都不用发，比如当用户F5或者点击Refresh按钮的时候就算对于有Expires的URI，一样也会发一个HTTP请求出去，所以，Last-Modified还是要用的，而且要和Expires一起用。
-
-**5、Etag和Expires**
-如果服务器端同时设置了Etag和Expires时，Etag原理同样，即与 Last-Modified/Etag 对应的 HttpRequestHeader:If-Modified-Since 和 If-None-Match。我们可以看到这两个Header的值和WebServer发出的Last-Modified,Etag值完全一样；在完全匹配If-Modified-Since和If-None-Match即检查完修改时间和Etag之后，服务器才能返回304.
-
-**6、Last-Modified和Etag**
-分布式系统里多台机器间文件的last-modified必须保持一致，以免负载均衡到不同机器导致比对失败. 分布式系统尽量关闭掉Etag(每台机器生成的etag都会不一样)
-
-Last-Modified和ETags请求的http报头一起使用，服务器首先产生Last-Modified/Etag标记，服务器可在稍后使用它来判断页面是否已经被修改，来决定文件是否继续缓存
-
-过程如下:
-1) 客户端请求一个页面（A）。
-2) 服务器返回页面A，并在给A加上一个Last-Modified/ETag。
-3) 客户端展现该页面，并将页面连同Last-Modified/ETag一起缓存。
-4) 客户再次请求页面A，并将上次请求时服务器返回的Last-Modified/ETag一起传递给服务器。
-5) 服务器检查该Last-Modified或ETag，并判断出该页面自上次客户端请求之后还未被修改，直接返回响应304和一个空的响应体。
-
-需要注意:
-1) Last-Modified和Etag头都是由WebServer发出的HttpReponse Header，WebServer应该同时支持这两种头。
-2) WebServer发送完Last-Modified/Etag头给客户端后，客户端会缓存这些头；
-3) 客户端再次发起相同页面的请求时，将分别发送与Last-Modified/Etag对应的HttpRequestHeader:If-Modified-Since和If-None-Match。我们可以看到这两个Header的值和WebServer发出的Last-Modified,Etag值完全一样；
-4) 通过上述值到服务器端检查，判断文件是否继续缓存；
-
-**7、关于 Cache-Control: max-age=秒 和 Expires**
-Expires = 时间，HTTP 1.0 版本，缓存的载止时间，允许客户端在这个时间之前不去检查（发请求）
-max-age = 秒，HTTP 1.1版本，资源在本地缓存多少秒。
-如果max-age和Expires同时存在，则被Cache-Control的max-age覆盖。
-
-**Expires 的一个缺点**: 就是返回的到期时间是服务器端的时间，这样存在一个问题，如果客户端的时间与服务器的时间相差很大，那么误差就很大，所以在HTTP 1.1版开始，使用Cache-Control: max-age=秒替代。
-
-Expires =max-age + “每次下载时的当前的request时间”
-
-所以一旦重新下载的页面后，expires就重新计算一次，但last-modified不会变化.
-
-**8、基于nginx配置使用总结**
-分布式系统(有ng-ha 和 应用的负载均衡),最好使用Last-Modified和Expires,把Etag关闭掉。
-1) 关闭etag
-
-```
-http {``    ``etag off;
-```
-
-关闭etag, 使用Last-Modified和Expires
-
-2) 配置last-modified(默认开启)和expires
-
-```
-location ~.*\.(gif|jpg|jpeg|png|bmp|swf)$``    ``{``        ``expires   30d;``    ``}` `location ~.*\.(js|css)?$``    ``{``        ``expires   12h;``    ``}
-```
-
-对于配置了多个location(upstream)的，可以:
-
-```
-location ``/filebase/` `{``      ``root ``/hskj/file/``;``      ``autoindex on;` `      ``if` `($request_filename ~* ^.*?\.(txt|doc|pdf|rar|gz|zip|docx|exe|xlsx|ppt|pptx)$){``        ``add_header Content-Disposition: ``'attachment;'``;``      ``}` `      ``if` `($request_filename ~* ^.*?\.(gif|jpg|jpeg|png|bmp|swf)$){``        ``expires   30d;``      ``}` `      ``if` `($request_filename ~* ^.*?\.(js|css)$){``        ``expires   12h;``      ``}``}
-```
-
-效果如下：
-
-![img](https://img2018.cnblogs.com/blog/907596/201903/907596-20190302015728575-190872568.png)
-
-​                           **这里顺便看一个配置实例: nginx设置不使用缓存 add_header Cache-Control no-cache**                         
-
-```
-server {``  ``listen    443;``  ``server_name www.kevin.com;``  ``charset utf-8;` `  ``ssl         on;``  ``ssl_certificate   ``/daka/program/nginx/conf/server``.cer;``  ``ssl_certificate_key ``/daka/program/nginx/conf/server``.key;``  ``ssl_session_timeout 5m;``  ``ssl_protocols SSLv2 SSLv3 TLSv1;``  ``ssl_ciphers HIGH:!aNULL:!MD5;``  ``ssl_prefer_server_ciphers  on;` `  ``#设置浏览器缓存``  ``add_header Cache-Control no-cache;``  ``add_header Cache-Control private;`` ` ` ` `  ``location ``/yp` `{``    ``proxy_redirect off;``    ``proxy_set_header Host $host;``    ``proxy_set_header X-Real-IP $remote_addr;``    ``proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;``    ``proxy_pass http:``//192``.168.0.221:8082``/yp/yp``;`` ` `    ``if` `($request_filename ~* .*.(html|htm)$)``     ``{``     ``expires -1s;``     ``}` `     ``if` `($request_filename ~* .*.(gif|jpg|jpeg|png|bmp|swf)$)``     ``{``     ``expires 30d;``     ``}` `     ``if` `($request_filename ~ .*.(js|css)$)``     ``{``     ``expires 12h;``     ``}``  ``}` `    ``location ``/static` `{``    ``proxy_redirect off;``    ``proxy_set_header Host $host;``    ``proxy_set_header X-Real-IP $remote_addr;``    ``proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;``    ``proxy_pass http:``//192``.168.0.221:8082``/static``;`` ` `    ``if` `($request_filename ~* .*.(html|htm)$)``     ``{``     ``expires -1s;``     ``}` `     ``if` `($request_filename ~* .*.(gif|jpg|jpeg|png|bmp|swf)$)``     ``{``     ``expires 30d;``     ``}` `     ``if` `($request_filename ~ .*.(js|css)$)``     ``{``     ``expires 12h;``     ``}` `  ``}`` ` `  ``location / {``    ``proxy_redirect off;``    ``proxy_set_header Host $host;``    ``proxy_set_header X-Real-IP $remote_addr;``    ``proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;``    ``proxy_pass http:``//192``.168.0.221:8080/;``#     if (-e $request_filename){``#      rewrite ^/$ https://www.kevin.com:443/invest/index.jhtml permanent;``#     }`` ` ` ` `    ``if` `($request_filename ~* .*.(html|htm)$)``     ``{``#     expires -1s;``     ``}` `     ``if` `($request_filename ~* .*.(gif|jpg|jpeg|png|bmp|swf)$)``     ``{``     ``expires 30d;``     ``}` `     ``if` `($request_filename ~ .*.(js|css)$)``     ``{``     ``expires 12h;``     ``}``     ` `  ``}``}
-```
-
-​                                  **运维****案例分享: Nginx增加缓存控制字段cache-control**                              
-下面是开发部门同事发过来的配置需求:
-1) 禁用html文件缓存，即cache control设置为no-cache;
-2) 对于js，图片，css，字体等，设置max-age=2592000. 也就是30天;
-
-注意点:
-  \- 缓存控制字段cache-control的配置(add_header)要放在http, server, location区域, 或是放在location的if判断里, 例如"add_header Cache-Control no-cache;".
-  \- 如果前面有LB负载代理层, 则缓存控制字段cache-control配置要放在后端的真实服务器nginx的location区域, 并且要指定root根路径, 否则访问会出现404 (即找不到访问路径);
-
-针对上面的案例需求, 操作记录如下:
-**1) 本案中在实际场景中, 有LB层. LB层的nginx配置不需要配置, 这里只是粘贴下负载配置:**
-
-```
-[root@fvtlb01 ~]``# cat /data/nginx/conf/vhosts/fvtkevin-web.kevin.com.conf``upstream fvtkevin-web-inc {``   ``ip_hash;``   ``server 172.16.50.73:80 max_fails=3 fail_timeout=15s;``   ``server 172.16.50.74:80 max_fails=3 fail_timeout=15s;``}` ` ``server {``   ``listen   80;``   ``server_name fvtkevin-web.kevin.com;``  ` `   ``access_log ``/data/nginx/logs/fvtkevin-web``.kevin.com-access.log main;``   ``error_log ``/data/nginx/logs/fvtkevin-web``.kevin.com-error.log;` ` ``location / {``     ``proxy_pass http:``//fvtkevin-web-inc``;``     ``proxy_redirect off ;``     ``proxy_set_header Host $host;``     ``proxy_set_header X-Real-IP $remote_addr;``     ``proxy_set_header REMOTE-HOST $remote_addr;``     ``proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;``     ``proxy_connect_timeout 300;``     ``proxy_send_timeout 300;``     ``proxy_read_timeout 600;``     ``proxy_buffer_size 256k;``     ``proxy_buffers 4 256k;``     ``proxy_busy_buffers_size 256k;``     ``proxy_temp_file_write_size 256k;``     ``proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504 http_404;``     ``proxy_max_temp_file_size 128m;``     ``#proxy_cache mycache;                ``     ``#proxy_cache_valid 200 302 1h;``     ``#proxy_cache_valid 301 1d;``     ``#proxy_cache_valid any 1m;``}``} 　
-```
-
-**2) 缓存控制字段cache-control的配置要放在后端两台真实服务器172.16.50.73和172.16.50.74上.**
-a) 172.16.60.73 (即fvtkevin-dmz01.kevin.com)服务器上缓存控制字段cache-control的配置如下:
-
-```
-[root@fvtkevin-dmz01 ~]``# cat /data/nginx/conf/vhosts/fvtkevin-web01.kevin.com.conf``server {``   ``listen   80;``   ``server_name fvtkevin-dmz01.kevin.com;``  ` `   ``access_log ``/data/nginx/logs/fvtkevin-dmz01``.kevin.com-access.log main;``   ``error_log ``/data/nginx/logs/fvtkevin-dmz01``.kevin.com-error.log;` `   ``location / {``   ``root ``/data/web/kevin``;``   ``index index.php index.html index.htm;``   ``}` `   ``location ~ \.(css|js|gif|jpg|jpeg|png|bmp|swf|ttf|woff|otf|ttc|pfa)$ {``   ``root ``/data/web/kevin``;``      ``expires 30d;``    ``}` `   ``location ~ \.(html|htm)$ {``     ``root ``/data/web/kevin``;``     ``add_header Cache-Control no-cache;``    ``}` `   ``location ``/document/` `{``   ``alias` `/data/web/document/``;``   ``}` `   ``location ~ \.(css|js|gif|jpg|jpeg|png|bmp|swf|ttf|woff|otf|ttc|pfa)$ {``   ``root ``/data/web/document``;``      ``expires 30d;``    ``}` `   ``location ~ \.(html|htm)$ {``     ``root ``/data/web/document``;``     ``add_header Cache-Control no-cache;``    ``}` ` ``}
-```
-
-b) 172.16.60.74 (即fvtkevin-dmz02.kevin.com)服务器上缓存控制字段cache-control的配置如下:
-
-```
-[root@fvtkevin-dmz02 ~]``# cat /data/nginx/conf/vhosts/fvtkevin-web02.kevin.com.conf``server {``   ``listen   80;``   ``server_name fvtkevin-web02.kevin.com;``  ` `   ``access_log ``/data/nginx/logs/fvtkevin-web02``.kevin.com-access.log main;``   ``error_log ``/data/nginx/logs/fvtkevin-web02``.kevin.com-error.log;``  ` `   ``location / {``   ``root ``/data/web/kevin``;``   ``index index.php index.html index.htm;``   ``}` `   ``location ~ \.(css|js|gif|jpg|jpeg|png|bmp|swf|ttf|woff|otf|ttc|pfa)$ {``   ``root ``/data/web/kevin``;``      ``expires 30d;``    ``}` `   ``location ~ \.(html|htm)$ {``   ``root ``/data/web/kevin``;``   ``add_header Cache-Control no-cache;``    ``}` `   ``location ``/document/` `{``   ``alias` `/data/web/document/``;``   ``}` `   ``location ~ \.(css|js|gif|jpg|jpeg|png|bmp|swf|ttf|woff|otf|ttc|pfa)$ {``   ``root ``/data/web/document``;``      ``expires 30d;``    ``}` `   ``location ~ \.(html|htm)$ {``     ``root ``/data/web/document``;``     ``add_header Cache-Control no-cache;``    ``}` ` ``}
-```
-
-以上配置中, 关于缓存控制字段cache-control的配置主要有两个:
-1) http://fvtkevin-web.kevin.com/ 下:
-   对于html, html格式的文件，cache control设置为no-cache;
-   对于js，图片，css，字体等，设置max-age=2592000;
-   这是基于/data/web/kevin的root根目录下的
-2) http://fvtkevin-web.kevin.com/document 下:
-   对于html, html格式的文件，cache control设置为no-cache;
-   对于js，图片，css，字体等，设置max-age=2592000;
-   这是基于/data/web/document的root根目录下的
-
-以上配置后, 访问http://fvtkevin-web.kevin.com/ 或者 http://fvtkevin-web.kevin.com/document 进行验证. 这里验证下http://fvtkevin-web.kevin.com/, 效果如下:
-
- ![img](https://img2018.cnblogs.com/blog/907596/201903/907596-20190302014938631-3140.png)
-
-上面显示了http://fvtkevin-web.kevin.com/ 首页(即index.html文件)访问头部信息里有"no-cache"信息! 
-
-![img](https://img2018.cnblogs.com/blog/907596/201903/907596-20190302014950193-1878690348.png)
-
-上面显示了http://fvtkevin-web.kevin.com/*.js文件访问的头部信息里的缓存时间设置! 
+![TCP-IP数据封装过程](static/yunwei/TCP-IP%E6%95%B0%E6%8D%AE%E5%B0%81%E8%A3%85%E8%BF%87%E7%A8%8B.png)
