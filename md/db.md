@@ -56,6 +56,10 @@
 >| 外键     |              | 支持               |          |       |      |
 >| 索引     | B树+fulltext | B树+fulltext(5.6+) | B树+hash |       | hash |
 
+
+
+## Query
+
 ## 索引
 
 | 序号 | 索引类型         | 约束                  | x    |
@@ -263,14 +267,364 @@
 
 ## 存储过程/函数
 
-示例：
+### 1、官方定义
+
+> ```sql
+> CREATE
+>     [DEFINER = user]
+>     PROCEDURE sp_name ([proc_parameter[,...]])
+>     [characteristic ...] routine_body
+> 
+> CREATE
+>     [DEFINER = user]
+>     FUNCTION sp_name ([func_parameter[,...]])
+>     RETURNS type
+>     [characteristic ...] routine_body
+>     
+> #**********************************************************************************************#
+> 
+> proc_parameter:
+>     [ IN | OUT | INOUT ] param_name type
+> 
+> func_parameter:
+>     param_name type
+> 
+> type:
+>     Any valid MySQL data type
+> 
+> characteristic: {
+>     COMMENT 'string'
+>   | LANGUAGE SQL
+>   | [NOT] DETERMINISTIC
+>   | { CONTAINS SQL | NO SQL | READS SQL DATA | MODIFIES SQL DATA }
+>   | SQL SECURITY { DEFINER | INVOKER }
+> }
+> 
+> routine_body:
+>     Valid SQL routine statement
+> ```
+>
+> 
+
+### 2、参数
+
+> ```sql
+> delimiter //
+> 
+> CREATE PROCEDURE citycount (IN country CHAR(3), OUT cities INT)
+> BEGIN
+>   SELECT COUNT(*) INTO cities FROM world.city
+>   WHERE CountryCode = country;
+> END//
+> 
+> delimiter ;
+> 
+> #调用
+>  CALL citycount('JPN', @cities);
+>  SELECT @cities;
+> ```
+>
+> 
+
+### 3、定义变量
+
+> ```sql
+> declare v0 int 0;
+> declare v1 int 1;
+> declare v2 int 2;
+> declare v3 varchar(10) default "";
+> ```
+
+### 4、变量运算
+
+> ```sql
+> set v0 = v1 + v2;            #等号和+号可以用空格优化格式
+> ```
+>
+> 
+
+### 5、逻辑判断
+
+| 功能     | 符号 | 示例 | 备注 |
+| -------- | ---- | ---- | ---- |
+| 等于     |      |      |      |
+| 不等于   |      |      |      |
+| 大于     |      |      |      |
+| 大于等于 |      |      |      |
+| 小于     |      |      |      |
+| 小于等于 |      |      |      |
+|          |      |      |      |
+| 且       |      |      |      |
+| 或       |      |      |      |
+
+
+
+### 6、判断
+
+#### (1)、if(条件，exp1，exp2)
+
+`条件?exp1:exp2`
+
+这个有点像==三目运算==
+
+可以在==平时sql中==也可以在==存储过程中==
+
+
+
+##### 存储过程：
+
+> ```sql
+> delimiter $$
+> create PROCEDURE aa2()
+> BEGIN
+> 		DECLARE v1 int DEFAULT 1;
+> 		DECLARE v2 int DEFAULT 2;
+> 		
+> 		DECLARE v0 int DEFAULT 0;
+> 		DECLARE v00 int DEFAULT 0;
+> 		
+> 		set v0 = if(v1=1,11,99);
+> 		set v00 = if(v2>1,22,99);
+> 		SELECT v0,v00;
+> END$$
+> delimiter ;
+> 
+> CALL aa2()
+> 
+> 
+> #v0输出11，v00输出22
+> CALL aa()
+> ```
+
+
+
+##### 平时sql:
+
+> ```sql
+> SELECT id,if(timezone>0,'大于0', timezone) from shop_facebook_40 
+> 
+> #输出结果集
+> id  timezone
+> 1	大于0
+> 2	-7
+> ```
+
+#### (2)、ifnull(exp1,exp2)
+
+`exp1 is null ? exp2 : exp1`
+
+如果exp1为空，则输出exp2
+
+> ```sql
+> select ifnull(null,'a')#输出a
+> select ifnull(1+9,'a') #输出10
+> ```
+
+#### (3)、if...（elseif）
+
+可以由“=、<、<=、>、>=、!=”等条件运算符组成，
+
+并且可以使用AND、OR、NOT对多个表达式进行组合
+
+> ```sql
+> IF search_condition THEN 
+>     statement_list  
+> [ELSEIF search_condition THEN]  
+>     statement_list ...  
+> [ELSE 
+>     statement_list]  
+> END IF;#这里需要一个结束符号，标识if语句结束 
+> ```
+
+#### (4)、case...end
+
+##### 字段挨着case
+
+> ```sql
+> SELECT
+> CASE
+> 	timezone 
+> 	WHEN 8 THEN '东8' 
+> 	WHEN -7 THEN '负7' 
+> 	ELSE '其他时区' 
+> END AS aa 
+> FROM
+> shop_facebook_40
+> ```
+
+##### 字段挨着when
+
+> ```sql
+> 
+> update shop_facebook_40
+> set timezone = (
+> 	case 
+> 		when timezone between 1 and 12 then  1
+> 		when timezone between -12 and -1 then  -1
+> 		else  0
+> 	end
+> );
+> ```
+
+### 7、循环
+
+#### while...do
+
+> ```sql
+> WHILE expression DO  
+>    Statements  
+> END WHILE;  
+> ```
+>
+> 
+
+
+
+#### repeat
+
+> ```sql
+> REPEAT  
+> 	Statements;  
+> UNTIL expression END REPEAT;
+> ```
+>
+> 
+
+#### loop
+
+> ```sql
+> loop
+> 	Statements;  #leave-break;iterate-continue
+> end loop;
+> ```
+>
+> 
+
+
+
+#### 游标遍历
+
+> ```sql
+> 
+> declare v_f1 int default 0;#定义两个变量接收游标读取的数据
+> declare v_f2 int default 0;
+> 
+> declare v_cursor CURSOR FOR select f1,f2 from tabel_name;#定义游标
+> open v_cursor;#开启游标
+> 循环开始标志
+> 	fetch v_cursor into v_f1,v_f2;//从游标中获取对应变量
+> 	#业务处理
+> 循环结束标志
+> 
+> close v_cursor;#关闭游标
+> ```
+>
+> 
+
+
+
+### 8、异常处理
+
+==declare……handler语句必须出现在变量或条件声明的后面。==
+
+> ```sql
+> DECLARE handler_action HANDLER
+>     FOR condition_value [, condition_value] ...
+>     statement
+> 
+> handler_action:
+>     CONTINUE       #继续执行当前的程序(接着执行出错的SQL的下一条语句)；
+>     | EXIT         #当前程序终止(退出当前declare所在的begin end)； 
+> 
+> condition_value:
+>     mysql_error_code
+>     | SQLSTATE [VALUE] sqlstate_value
+>     | condition_name
+>     | SQLWARNING
+>     | NOT FOUND
+>     | SQLEXCEPTION
+> ```
+>
+>  
+>
+> > ```sql
+> > DECLARE CONTINUE HANDLER FOR 1329 SET v_flag=1;
+> > ```
+
+
+
+### 示例
+
+#### (1)、代替union
+
+原sql:
+
+> ```sql
+> (SELECT shop,COUNT(id) from shop_22 where shop='shop' and  created_at BETWEEN '2020-10-12 11:10:00' AND '2020-10-12 15:00:00')
+> UNION
+> (SELECT shop,COUNT(id) from shop_33 where shop='shop' and  created_at BETWEEN  '2020-10-12 11:10:00' AND '2020-10-12 15:00:00')
+> UNION
+> (SELECT shop,COUNT(id) from shop_36 where shop='shop' and  created_at BETWEEN  '2020-10-12 11:10:00' AND '2020-10-12 15:00:00')
+> UNION
+> (SELECT shop,COUNT(id) from shop_40 where shop='shop' and  created_at BETWEEN  '2020-10-12 11:10:00' AND '2020-10-12 15:00:00')
+> UNION
+> (SELECT shop,COUNT(id) from shop_44 where shop='shop' and  created_at BETWEEN  '2020-10-12 11:10:00' AND '2020-10-12 15:00:00')
+> ```
+
+用存储过程
+
+> ```sql
+> delimiter $$ # 声明存储过程的结束符号为$$
+> CREATE DEFINER=`root`@`localhost` PROCEDURE `k`(IN shop VARCHAR(100),IN begin_at VARCHAR(100),IN end_at VARCHAR(100))
+> BEGIN
+> 
+> DECLARE v_table_name VARCHAR(50) DEFAULT "";
+> DECLARE v_sql LONGTEXT DEFAULT "";
+> DECLARE v_sub_sql LONGTEXT DEFAULT "";
+> DECLARE v_count INT DEFAULT 0;
+> 
+> #如果11行和12行调换上下位置，会报错
+> DECLARE v_all_tables CURSOR for (SELECT TABLE_NAME from information_schema.`TABLES` where TABLE_NAME REGEXP "shop_[0-99999]" and TABLE_SCHEMA="local_exit");
+> set v_count=(SELECT COUNT(DISTINCT TABLE_NAME) from information_schema.`TABLES` where TABLE_NAME REGEXP "shop_[0-99999]" and TABLE_SCHEMA="local_exit");
+> 
+> OPEN v_all_tables;
+> 
+> WHILE v_count>0 DO
+> 	 FETCH v_all_tables INTO v_table_name;	
+>  
+> 	 set v_sub_sql=concat('(SELECT shop,COUNT(id) as num from ',v_table_name, ' where ',if(shop='','',CONCAT(' `shop`="', shop,'" and ')),' created_at BETWEEN  "',begin_at,'" AND "',end_at,'")');
+> 	 
+> 	 if v_sql='' then
+> 			set v_sql=v_sub_sql;
+> 	 else
+> 			set v_sql=CONCAT(v_sql," union ", v_sub_sql);
+> 	 end if;
+> 	 
+> 	 set v_count=v_count-1;
+> END WHILE;
+> CLOSE v_all_tables;#记得关闭游标
+> 
+> set @varsql=v_sql;#文档上没有强制全局变量，但是不用全局变量，下一行会报错
+> PREPARE tmpsql FROM @varsql;
+> EXECUTE tmpsql;
+> DEALLOCATE PREPARE tmpsql;
+> 
+> SELECT v_sql;
+> 
+> END$$
+> delimiter ; # 声明存储过程的结束符号为$$
+> ```
+
+
+
+#### (2)、产生随机记录
 
 > ```sql
 > delimiter $$ # 声明存储过程的结束符号为$$
 > create procedure randData5(IN num INT)
 > BEGIN
 > 		#声明必须放在最前面
->     declare i int default 1;
+>  declare i int default 1;
 > 		declare a int DEFAULT 0;
 > 		declare b int DEFAULT 0;
 > 		declare c VARCHAR(20) DEFAULT '';
@@ -292,32 +646,20 @@
 > 				set num=num;#只是为了写完整的if...else..
 > 		END IF;
 > 	
->     while(i<num)do
+>  while(i<num)do
 > 				set a=FLOOR(100+(RAND()*1900));#随机数字 RAND()取值0-1的小数
 > 				set b=FLOOR(100+(RAND()*1900));
 > 				set c=substring(MD5(RAND()),1,20);#随机字符串-用随机数字演变的
 > 				set d=substring(MD5(RAND()),1,20);
 > 				
->         insert into tp_tt (`id`,`a`,`b`,`c`,`d`) values(i,a,b,c,d);
->         set i=i+1;
->     end while;
+>      insert into tp_tt (`id`,`a`,`b`,`c`,`d`) values(i,a,b,c,d);
+>      set i=i+1;
+>  end while;
 > END$$ # $$结束
 > delimiter ; # 重新声明分号为结束符号
 > ```
 
-### 逻辑
 
-if（a=1 && b=2 || c=3）如何表达
-
-### 循环体
-
-if...else(if)...
-
-while
-
-do...while
-
-repeat...until..end repeat
 
 ## 主从分离
 
