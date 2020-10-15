@@ -1,5 +1,535 @@
 # mysql
 
+## (一)、基础语法
+
+### 1、注释
+
+> 三种注释方式
+
+单行注释
+
+> ```sql
+> select * from table #我是注释
+> select * from table -- 我是注释
+> ```
+>
+> --后面必须带==至少一个空格和控制符==
+
+多行注释
+
+> ```sql
+> /*
+> select * from table
+> */
+> ```
+
+
+
+### 2、命名规范及大小写
+
+https://dev.mysql.com/doc/refman/5.7/en/identifier-length.html
+
+|                 | Identifier Type          | 最大长度(字符)                                               | 区分大小写 |
+| --------------- | :----------------------- | :----------------------------------------------------------- | ---------- |
+| 数据库名称      | Database                 | 64 ([`NDB`](https://dev.mysql.com/doc/refman/5.7/en/mysql-cluster.html) storage engine: 63) |            |
+| 表名            | Table                    | 64 ([`NDB`](https://dev.mysql.com/doc/refman/5.7/en/mysql-cluster.html) storage engine: 63) |            |
+| 列名            | Column                   | 64                                                           |            |
+| 索引名          | Index                    | 64                                                           |            |
+| 约束            | Constraint               | 64                                                           |            |
+| 存储过程/函数名 | Stored Program           | 64                                                           |            |
+| 视图名          | View                     | 64                                                           |            |
+|                 | Tablespace               | 64                                                           |            |
+|                 | Server                   | 64                                                           |            |
+|                 | Log File Group           | 64                                                           |            |
+| 别名            | Alias                    | 256 (see exception following table)                          |            |
+| label标签       | Compound Statement Label | 16                                                           |            |
+| 用户变量名称    | User-Defined Variable    | 64                                                           |            |
+
+#### 大小写问题
+
+>
+>
+>列，索引，存储的例程和事件名称在任何平台上都不区分大小写，列别名也不区分大小写。
+>
+>但是，日志文件组的名称区分大小写。这与标准SQL不同。
+>
+>默认情况下，表别名在Unix上区分大小写，但在Windows或macOS上不区分大小写。
+>
+>
+>
+>大小写问题受全局变量影响：       
+>
+>[**mysqld**](https://dev.mysql.com/doc/refman/5.7/en/mysqld.html). [`lower_case_table_names`](https://dev.mysql.com/doc/refman/5.7/en/server-system-variables.html#sysvar_lower_case_table_names)
+>
+>
+>
+>```sql
+>SHOW GLOBAL VARIABLES
+>或者
+>SHOW VARIABLES
+>或
+>SHOW GLOBAL VARIABLES LIKE 'lower_case_table_names'
+>或者
+>SELECT  @@lower_case_table_names;
+>```
+>
+>
+
+### 3、变量
+
+#### (1)、用户变量
+
+https://dev.mysql.com/doc/refman/5.7/en/user-variables.html
+
+语法
+
+> ```sql
+> SET @var_name = expr [, @var_name = expr] ...
+> ```
+
+举例
+
+>```sql
+>set @var1=1;
+>set @var2:=2;
+>#select @var3=3; #这个是错误的，会用@var3变量与数字3作比较，是否相等
+>select @var3:=3; #
+>
+>SELECT @var1,@var2,@var3;
+>```
+>
+
+
+
+>| 关键字 | =      | :=   | 输出显示 |          |
+>| ------ | ------ | ---- | -------- | -------- |
+>| set    | 支持   | 支持 | 不显示   | 建议用   |
+>| select | 不支持 | 支持 | 会显示   | 不建议用 |
+
+#### (2)、局部变量
+
+https://dev.mysql.com/doc/refman/5.7/en/declare-local-variable.html
+
+语法
+
+> ```sql
+> DECLARE var_name [, var_name] ... type [DEFAULT value]
+> ```
+>
+> 如果没有default设置，则默认是null
+
+举例
+
+> ```sql
+> declare var1 varchar(50);
+> ```
+
+#### (3)、全局变量(系统变量)
+
+https://dev.mysql.com/doc/refman/5.7/en/server-system-variable-reference.html
+
+> 调用使用两个@：@@
+>
+> ```sql
+> SELECT  @@lower_case_table_names;
+> ```
+
+### 4、运算符
+
+https://dev.mysql.com/doc/refman/5.7/en/non-typed-operators.html
+
+>| 优先级 | 名称                                                         | 描述                                                         |
+>| ------ | :----------------------------------------------------------- | :----------------------------------------------------------- |
+>| 1      | [`INTERVAL`](https://dev.mysql.com/doc/refman/5.7/en/expressions.html#temporal-intervals) | 时间间隔                                                     |
+>| 2      | [`BINARY`](https://dev.mysql.com/doc/refman/5.7/en/cast-functions.html#operator_binary) | 将字符串转换为二进制字符串                                   |
+>| 3      | [`!`](https://dev.mysql.com/doc/refman/5.7/en/logical-operators.html#operator_not) | 取反值                                                       |
+>| 4      | [`-`](https://dev.mysql.com/doc/refman/5.7/en/arithmetic-functions.html#operator_unary-minus) | 取反(正数取反)                                               |
+>| 4      | [`~`](https://dev.mysql.com/doc/refman/5.7/en/bit-functions.html#operator_bitwise-invert) | 按位反转                                                     |
+>| 5      | [`^`](https://dev.mysql.com/doc/refman/5.7/en/bit-functions.html#operator_bitwise-xor) | 按位异或                                                     |
+>| 6      | [`*`](https://dev.mysql.com/doc/refman/5.7/en/arithmetic-functions.html#operator_times) [`DIV`](https://dev.mysql.com/doc/refman/5.7/en/arithmetic-functions.html#operator_div) [`/`](https://dev.mysql.com/doc/refman/5.7/en/arithmetic-functions.html#operator_divide) [`%`， `MOD`](https://dev.mysql.com/doc/refman/5.7/en/arithmetic-functions.html#operator_mod) | 乘/除/取模                                                   |
+>| 7      | [`+`](https://dev.mysql.com/doc/refman/5.7/en/arithmetic-functions.html#operator_plus) [`-`](https://dev.mysql.com/doc/refman/5.7/en/arithmetic-functions.html#operator_minus) | 加减                                                         |
+>| 8      | [`>>`](https://dev.mysql.com/doc/refman/5.7/en/bit-functions.html#operator_right-shift) [`<<`](https://dev.mysql.com/doc/refman/5.7/en/bit-functions.html#operator_left-shift) | 右移 右移                                                    |
+>| 9      | [`&`](https://dev.mysql.com/doc/refman/5.7/en/bit-functions.html#operator_bitwise-and) | 按位与                                                       |
+>| 10     | [`|`](https://dev.mysql.com/doc/refman/5.7/en/bit-functions.html#operator_bitwise-or) | 按位或                                                       |
+>| 11     | [`=`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_equal) | 平等算子                                                     |
+>| 11     | [`<=>`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_equal-to) | NULL安全等于运算符                                           |
+>| 11     | [`>=`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_greater-than-or-equal) | 大于或等于运算符                                             |
+>| 11     | [`>`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_greater-than) | 大于运算符                                                   |
+>| 11     | [`<=`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_less-than-or-equal) | 小于或等于运算符                                             |
+>| 11     | [`<`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_less-than) | 少于运算符                                                   |
+>| 11     | [`<>`， `!=`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_not-equal) | 不等于运算符                                                 |
+>| 11     | [`IS`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_is) | 针对布尔值测试值                                             |
+>| 11     | [`LIKE`](https://dev.mysql.com/doc/refman/5.7/en/string-comparison-functions.html#operator_like) | 简单模式匹配                                                 |
+>| 11     | [`REGEXP`](https://dev.mysql.com/doc/refman/5.7/en/regexp.html#operator_regexp) | 字符串是否匹配正则表达式                                     |
+>| 11     | [`IN()`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_in) | 一个值是否在一组值内                                         |
+>| 12     | [`BETWEEN ... AND ...`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_between) | 值是否在值范围内                                             |
+>| 12     | [`CASE`](https://dev.mysql.com/doc/refman/5.7/en/flow-control-functions.html#operator_case) | 案例操作员                                                   |
+>| 13     | [`NOT`](https://dev.mysql.com/doc/refman/5.7/en/logical-operators.html#operator_not) | 取反值                                                       |
+>| 14     | [`AND`， `&&`](https://dev.mysql.com/doc/refman/5.7/en/logical-operators.html#operator_and) | 逻辑与                                                       |
+>| 15     | [`XOR`](https://dev.mysql.com/doc/refman/5.7/en/logical-operators.html#operator_xor) | 逻辑异或                                                     |
+>| 16     | [`OR`， `||`](https://dev.mysql.com/doc/refman/5.7/en/logical-operators.html#operator_or) | 逻辑或                                                       |
+>| 17     | [`:=`](https://dev.mysql.com/doc/refman/5.7/en/assignment-operators.html#operator_assign-value) | 赋值                                                         |
+>| 17     | [`=`](https://dev.mysql.com/doc/refman/5.7/en/assignment-operators.html#operator_assign-equal) | 分配值（作为[`SET`](https://dev.mysql.com/doc/refman/5.7/en/set-variable.html) 语句的一部分 ，或作为语句的`SET`子句的 一部分[`UPDATE`](https://dev.mysql.com/doc/refman/5.7/en/update.html)） |
+>|        | [`->`](https://dev.mysql.com/doc/refman/5.7/en/json-search-functions.html#operator_json-column-path) | 评估路径后从JSON列返回值；等效于JSON_EXTRACT（）。           |
+>|        | [`->>`](https://dev.mysql.com/doc/refman/5.7/en/json-search-functions.html#operator_json-inline-path) （介绍5.7.13） | 在评估路径并取消引用结果后，从JSON列返回值；等效于JSON_UNQUOTE（JSON_EXTRACT（））。 |
+>|        | [`IS NOT`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_is-not) | 针对布尔值测试值                                             |
+>|        | [`IS NOT NULL`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_is-not-null) | 非空值测试                                                   |
+>|        | [`IS NULL`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_is-null) | 空值测试                                                     |
+>|        | [`NOT BETWEEN ... AND ...`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_not-between) | 值是否不在值范围内                                           |
+>|        | [`NOT IN()`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_not-in) | 一个值是否不在一组值内                                       |
+>|        | [`NOT LIKE`](https://dev.mysql.com/doc/refman/5.7/en/string-comparison-functions.html#operator_not-like) | 否定简单模式匹配                                             |
+>|        | [`NOT REGEXP`](https://dev.mysql.com/doc/refman/5.7/en/regexp.html#operator_not-regexp) | 否REGEXP                                                     |
+>|        | [`RLIKE`](https://dev.mysql.com/doc/refman/5.7/en/regexp.html#operator_regexp) | 字符串是否匹配正则表达式                                     |
+>|        | [`SOUNDS LIKE`](https://dev.mysql.com/doc/refman/5.7/en/string-functions.html#operator_sounds-like) | 比较声音                                                     |
+
+### 5、表达式
+
+https://dev.mysql.com/doc/refman/5.7/en/expressions.html
+
+>```sql
+>expr:
+>    expr OR expr
+>  | expr || expr
+>  | expr XOR expr
+>  | expr AND expr
+>  | expr && expr
+>  | NOT expr
+>  | ! expr
+>  | boolean_primary IS [NOT] {TRUE | FALSE | UNKNOWN}
+>  | boolean_primary
+>
+>boolean_primary:
+>    boolean_primary IS [NOT] NULL
+>  | boolean_primary <=> predicate
+>  | boolean_primary comparison_operator predicate
+>  | boolean_primary comparison_operator {ALL | ANY} (subquery)
+>  | predicate
+>
+>comparison_operator: = | >= | > | <= | < | <> | !=
+>
+>predicate:
+>    bit_expr [NOT] IN (subquery)
+>  | bit_expr [NOT] IN (expr [, expr] ...)
+>  | bit_expr [NOT] BETWEEN bit_expr AND predicate
+>  | bit_expr SOUNDS LIKE bit_expr
+>  | bit_expr [NOT] LIKE simple_expr [ESCAPE simple_expr]
+>  | bit_expr [NOT] REGEXP bit_expr
+>  | bit_expr
+>
+>bit_expr:
+>    bit_expr | bit_expr
+>  | bit_expr & bit_expr
+>  | bit_expr << bit_expr
+>  | bit_expr >> bit_expr
+>  | bit_expr + bit_expr
+>  | bit_expr - bit_expr
+>  | bit_expr * bit_expr
+>  | bit_expr / bit_expr
+>  | bit_expr DIV bit_expr
+>  | bit_expr MOD bit_expr
+>  | bit_expr % bit_expr
+>  | bit_expr ^ bit_expr
+>  | bit_expr + interval_expr
+>  | bit_expr - interval_expr
+>  | simple_expr
+>
+>simple_expr:
+>    literal
+>  | identifier
+>  | function_call
+>  | simple_expr COLLATE collation_name
+>  | param_marker
+>  | variable
+>  | simple_expr || simple_expr
+>  | + simple_expr
+>  | - simple_expr
+>  | ~ simple_expr
+>  | ! simple_expr
+>  | BINARY simple_expr
+>  | (expr [, expr] ...)
+>  | ROW (expr, expr [, expr] ...)
+>  | (subquery)
+>  | EXISTS (subquery)
+>  | {identifier expr}
+>  | match_expr
+>  | case_expr
+>  | interval_expr
+>```
+
+### 6、流程控制
+
+存储过程和函数，触发器和事件
+
+#### (1)、case
+
+https://dev.mysql.com/doc/refman/5.7/en/case.html
+
+>```sql
+>CASE case_value
+>    WHEN when_value THEN statement_list
+>    [WHEN when_value THEN statement_list] ...
+>    [ELSE statement_list]
+>END CASE
+>```
+>
+>Or:
+>
+>```sql
+>CASE
+>    WHEN search_condition THEN statement_list
+>    [WHEN search_condition THEN statement_list] ...
+>    [ELSE statement_list]
+>END CASE
+>```
+
+#### (2)、if
+
+https://dev.mysql.com/doc/refman/5.7/en/if.html
+
+> ```sql
+> IF search_condition THEN statement_list
+>     [ELSEIF search_condition THEN statement_list] ...
+>     [ELSE statement_list]
+> END IF
+> ```
+
+
+
+#### (3)、loop
+
+https://dev.mysql.com/doc/refman/5.7/en/loop.html
+
+> ```sql
+> [begin_label:] LOOP
+>     statement_list
+> END LOOP [end_label]
+> ```
+
+#### (4)、repeat
+
+https://dev.mysql.com/doc/refman/5.7/en/repeat.html
+
+> ```sql
+> [begin_label:] REPEAT
+>     statement_list
+> UNTIL search_condition
+> END REPEAT [end_label]
+> ```
+
+#### (5)、while
+
+https://dev.mysql.com/doc/refman/5.7/en/while.html
+
+> ```sql
+> [begin_label:] WHILE search_condition DO
+>     statement_list
+> END WHILE [end_label]
+> ```
+
+#### (6)、iterate(continue)
+
+https://dev.mysql.com/doc/refman/5.7/en/iterate.html
+
+> 仅限使用于 [`LOOP`](https://dev.mysql.com/doc/refman/5.7/en/loop.html), [`REPEAT`](https://dev.mysql.com/doc/refman/5.7/en/repeat.html), 和[`WHILE`](https://dev.mysql.com/doc/refman/5.7/en/while.html)
+>
+> ```sql
+> ITERATE label
+> ```
+
+##### (7)、leave(break)
+
+https://dev.mysql.com/doc/refman/5.7/en/leave.html
+
+> 可使用于 [`LOOP`](https://dev.mysql.com/doc/refman/5.7/en/loop.html), [`REPEAT`](https://dev.mysql.com/doc/refman/5.7/en/repeat.html), 和[`WHILE`](https://dev.mysql.com/doc/refman/5.7/en/while.html)
+>
+> ==也可使用于begin...end==
+>
+> ```sql
+> LEAVE label
+> ```
+
+### 7、标签label
+
+https://dev.mysql.com/doc/refman/5.7/en/statement-labels.html
+
+> ```sql
+> [begin_label:] BEGIN
+>     [statement_list]
+> END [end_label]
+> 
+> [begin_label:] LOOP
+>     statement_list
+> END LOOP [end_label]
+> 
+> [begin_label:] REPEAT
+>     statement_list
+> UNTIL search_condition
+> END REPEAT [end_label]
+> 
+> [begin_label:] WHILE search_condition DO
+>     statement_list
+> END WHILE [end_label]
+> ```
+
+### 8、declare
+
+#### (1)、var定义局部变量
+
+> ```sql
+> DECLARE var_name [, var_name] ... type [DEFAULT value]
+> ```
+
+#### (2)、handler
+
+https://dev.mysql.com/doc/refman/5.7/en/declare-handler.html
+
+> ```sql
+> DECLARE handler_action HANDLER
+>     FOR condition_value [, condition_value] ...
+>     statement
+> 
+> handler_action: {
+>     CONTINUE
+>   | EXIT
+>   | UNDO
+> }
+> 
+> condition_value: {
+>     mysql_error_code
+>   | SQLSTATE [VALUE] sqlstate_value
+>   | condition_name
+>   | SQLWARNING
+>   | NOT FOUND
+>   | SQLEXCEPTION
+> }
+> ```
+>
+> 
+
+#### (3)、condition
+
+https://dev.mysql.com/doc/refman/5.7/en/declare-condition.html
+
+> ```sql
+> DECLARE condition_name CONDITION FOR condition_value
+> 
+> condition_value: {
+>     mysql_error_code
+>   | SQLSTATE [VALUE] sqlstate_value
+> }
+> ```
+
+
+
+>-- 定义主键重复错误
+>
+>-- ERROR 1062 (23000): Duplicate entry '60' for key 'PRIMARY'
+>
+> 
+>
+>-- 方法一：使用sqlstate_value 
+>
+>DECLARE primary_key_duplicate CONDITION FOR SQLSTATE '23000' ; 
+>
+> 
+>
+>-- 方法二：使用mysql_error_code 
+>
+>DECLARE primary_key_duplicate CONDITION FOR 1062 ;
+
+
+
+#### (4)、游标
+
+https://dev.mysql.com/doc/refman/5.7/en/declare-cursor.html
+
+### 9、游标
+
+>定义游标
+>
+>```sql
+>DECLARE cursor_name CURSOR FOR select_statement
+>```
+>
+> 打开游标
+>
+>```sql
+>OPEN cursor_name
+>```
+>
+> 从游标中数据塞入到变量   (放在循环中)
+>
+>```sql
+>FETCH [[NEXT] FROM] cursor_name INTO var_name [, var_name] ...
+>```
+>
+> 关闭游标
+>
+>```sql
+>CLOSE cursor_name
+>```
+
+
+
+
+
+### 10、预处理prepare
+
+>接收需要处理得sql
+>
+>```sql
+>PREPARE stmt_name FROM preparable_stmt
+>
+>#preparable_stmt 必须是用户变量
+>```
+>
+> 给sql绑定值并执行
+>
+>```sql
+>EXECUTE stmt_name
+>    [USING @var_name [, @var_name] ...]
+>```
+>
+> 回收预处理
+>
+>```sql
+>{DEALLOCATE | DROP} PREPARE stmt_name
+>#回收是避免触及可执行得上限
+>#上限由全局变量决定： @@max_prepared_stmt_count 
+>```
+>
+>
+
+
+
+### 11、事务
+
+https://dev.mysql.com/doc/refman/5.7/en/commit.html
+
+> ```sql
+> 
+> ```
+>
+> 
+
+### 12、官方错误编码
+
+client：    https://dev.mysql.com/doc/mysql-errors/5.7/en/client-error-reference.html
+
+service：  https://dev.mysql.com/doc/mysql-errors/5.7/en/server-error-reference.html
+
+全局：       https://dev.mysql.com/doc/mysql-errors/5.7/en/global-error-reference.html
+
+## (二)、功能
+
+存储过程/函数
+
+触发器
+
+
+
+# mysql
+
 ## cli
 
 | 序号 | cli                     | 功能     | 注释         |
@@ -58,7 +588,35 @@
 
 
 
-## Query
+## 语言结构
+
+
+
+【语言结构】【功能和运算符】【SQL语句->复合陈述】
+
+>
+
+### 注释
+
+> 内置函数
+
+https://dev.mysql.com/doc/refman/5.7/en/sql-function-reference.html
+
+### 1、变量
+
+https://blog.csdn.net/u012060033/article/details/96328410
+
+用户变量
+
+局部变量
+
+系统变量
+
+
+
+### 1、流程控制
+
+### 2、游标
 
 ## 索引
 
@@ -343,7 +901,11 @@
 >
 > 
 
-### 5、逻辑判断
+### 5、表达式
+
+用于条件
+
+https://dev.mysql.com/doc/refman/5.7/en/expressions.html
 
 | 功能     | 符号 | 示例 | 备注 |
 | -------- | ---- | ---- | ---- |
@@ -557,7 +1119,7 @@
 
 #### (1)、代替union
 
-原sql:
+##### 原sql:
 
 > ```sql
 > (SELECT shop,COUNT(id) from shop_22 where shop='shop' and  created_at BETWEEN '2020-10-12 11:10:00' AND '2020-10-12 15:00:00')
@@ -571,7 +1133,7 @@
 > (SELECT shop,COUNT(id) from shop_44 where shop='shop' and  created_at BETWEEN  '2020-10-12 11:10:00' AND '2020-10-12 15:00:00')
 > ```
 
-用存储过程
+##### 用存储过程(方法一，用记录总条数循环)
 
 > ```sql
 > delimiter $$ # 声明存储过程的结束符号为$$
@@ -615,7 +1177,48 @@
 > delimiter ; # 声明存储过程的结束符号为$$
 > ```
 
+##### 用存储过程(方法二，用游标异常结束)
 
+> ```sql
+> CREATE DEFINER=`root`@`localhost` PROCEDURE `fb_time_subnum5`(IN shop VARCHAR(100),IN begin_at VARCHAR(100),IN end_at VARCHAR(100))
+> BEGIN
+> 
+> DECLARE v_table_name VARCHAR(50) DEFAULT "";
+> DECLARE v_sql LONGTEXT DEFAULT "";
+> DECLARE v_sub_sql LONGTEXT DEFAULT "";
+> 
+> DECLARE v_flag INT DEFAULT 0;
+> DECLARE v_all_tables CURSOR for (SELECT TABLE_NAME from information_schema.`TABLES` where TABLE_NAME REGEXP "shop_facebook_[0-99999]" and TABLE_SCHEMA="local_exit");
+> DECLARE CONTINUE HANDLER FOR 1329 SET v_flag=1;
+> OPEN v_all_tables;
+> 
+> lable_1:WHILE v_flag=0 DO
+> 	 FETCH v_all_tables INTO v_table_name;	
+> 	 if v_flag!=0 then
+> 			iterate lable_1;
+> 	 end if;
+> 	 
+> 	 set v_sub_sql=concat('(SELECT shop,COUNT(id) as num from ',v_table_name, ' where ',if(shop='','',CONCAT(' `shop`="', shop,'" and ')),' created_at BETWEEN  "',begin_at,'" AND "',end_at,'")');
+> 	 
+> 	 if v_sql='' then
+> 			set v_sql=v_sub_sql;
+> 	 else
+> 			set v_sql=CONCAT(v_sql," union ", v_sub_sql);
+> 	 end if;	 
+> END WHILE;
+> CLOSE v_all_tables;
+> 
+> set @varsql=v_sql;
+> PREPARE tmpsql FROM @varsql;
+> EXECUTE tmpsql;
+> DEALLOCATE PREPARE tmpsql;
+> 
+> SELECT v_sql;
+> 
+> END
+> ```
+>
+> 
 
 #### (2)、产生随机记录
 
@@ -757,6 +1360,67 @@
 >在从服务器中查看：show databases;
 
 ## 备份？
+
+## 问题
+
+游标遍历。最后一条记录输出两次(重复了)
+
+
+
+>  在fetch...into...之后，一定要检查一下异常标志v_flag
+>
+>  #如果没有这个判断。fetch失败会抛出异常，异常处理是continue，会继续走下面的程序，v_table_name会用上一轮的值，
+>
+> > ```sql
+> > FETCH v_all_tables INTO v_table_name;	
+> > if v_flag=0 then   #一定要在这里判断一下
+> > 	处理程序
+> > end if;
+> > 	 
+> > ```
+> >
+> > 
+>
+>  
+>
+> ```sql
+> CREATE DEFINER=`root`@`localhost` PROCEDURE `fb_time_subnum4`(IN shop VARCHAR(100),IN begin_at VARCHAR(100),IN end_at VARCHAR(100))
+> BEGIN
+> 
+> DECLARE v_table_name VARCHAR(50) DEFAULT "";
+> DECLARE v_sql LONGTEXT DEFAULT "";
+> DECLARE v_sub_sql LONGTEXT DEFAULT "";
+> 
+> DECLARE v_flag INT DEFAULT 0;
+> DECLARE v_all_tables CURSOR for (SELECT TABLE_NAME from information_schema.`TABLES` where TABLE_NAME REGEXP "shop_facebook_[0-99999]" and TABLE_SCHEMA="local_exit");
+> DECLARE CONTINUE HANDLER FOR 1329 SET v_flag=1;
+> OPEN v_all_tables;
+> 
+> WHILE v_flag=0 DO
+> 	 FETCH v_all_tables INTO v_table_name;	
+> 	 if v_flag=0 then  ######################
+> 				 set v_sub_sql=concat('(SELECT shop,COUNT(id) as num from ',v_table_name, ' where ',if(shop='','',CONCAT(' `shop`="', shop,'" and ')),' created_at BETWEEN  "',begin_at,'" AND "',end_at,'")');
+> 				 
+> 				 if v_sql='' then
+> 						set v_sql=v_sub_sql;
+> 				 else
+> 						set v_sql=CONCAT(v_sql," union ", v_sub_sql);
+> 				 end if;	 
+> 	 end if;
+> END WHILE;
+> CLOSE v_all_tables;
+> 
+> set @varsql=v_sql;
+> PREPARE tmpsql FROM @varsql;
+> EXECUTE tmpsql;
+> DEALLOCATE PREPARE tmpsql;
+> 
+> SELECT v_sql;
+> 
+> END
+> ```
+>
+> 
 
 # redis-server/cli
 

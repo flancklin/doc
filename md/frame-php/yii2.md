@@ -1380,18 +1380,22 @@ simple_expr:
 >config/main.php
 >
 >* ```php
->  'defaultRoute' => 'hello-world',///或者hello-world/say-hello
->  ```
+> 'defaultRoute' => 'hello-world',///或者hello-world/say-hello
+> ```
+> ```
 >
->```
+> ```
 >
 >
 >在controller中设置默认action
 >
 >* ```php
-> class HelloWorldController extends \yii\web\Controller{
->  	public $defaultAction = 'say-hello';//设置默认方法
->  }
+>  class HelloWorldController extends \yii\web\Controller{
+>   	public $defaultAction = 'say-hello';//设置默认方法
+>   }
+>  ```
+>```
+>
 >```
 
 
@@ -1925,6 +1929,10 @@ Event::trigger(Foo::className(), Foo::EVENT_HELLO);
 ```
 
 ## (三)、migrate
+
+## (四)、RBAC
+
+https://www.yiiframework.com/doc/guide/2.0/en/security-authorization#role-based-access-control-rbac
 
 # 四、功能
 
