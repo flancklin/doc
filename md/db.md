@@ -1,4 +1,4 @@
-# 一、mysql
+# 一、mysql(5.7)
 
 ## (一)、基础语法
 
@@ -443,7 +443,11 @@ https://dev.mysql.com/doc/refman/5.7/en/declare-condition.html
 
 https://dev.mysql.com/doc/refman/5.7/en/declare-cursor.html
 
-### 9、游标
+### 9、set
+
+https://dev.mysql.com/doc/refman/5.7/en/set-statement.html
+
+### 10、游标
 
 >定义游标
 >
@@ -473,7 +477,7 @@ https://dev.mysql.com/doc/refman/5.7/en/declare-cursor.html
 
 
 
-### 10、sql预处理
+### 11、sql预处理
 
 >接收需要处理得sql
 >
@@ -498,11 +502,10 @@ https://dev.mysql.com/doc/refman/5.7/en/declare-cursor.html
 >#上限由全局变量决定： @@max_prepared_stmt_count 
 >```
 >
->
 
 
 
-### 11、官方错误编码
+### 12、官方错误编码
 
 client：    https://dev.mysql.com/doc/mysql-errors/5.7/en/client-error-reference.html
 
@@ -583,13 +586,19 @@ service：  https://dev.mysql.com/doc/mysql-errors/5.7/en/server-error-reference
 
 ### 4、DCL
 
-()、
+()、account管理
+
+https://dev.mysql.com/doc/refman/5.7/en/account-management-statements.html
 
 ()、
 
 ()、
 
 ()、
+
+### show
+
+https://dev.mysql.com/doc/refman/5.7/en/show.html
 
 ### 事务
 
@@ -871,6 +880,10 @@ https://dev.mysql.com/doc/refman/5.7/en/lock-tables.html
 ### 存储过程/函数
 
 ### 触发器
+
+### 复制(主从复制)
+
+https://dev.mysql.com/doc/refman/5.7/en/sql-replication-statements.html
 
 
 
