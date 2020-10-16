@@ -1,4 +1,4 @@
-# mysql
+# 一、mysql
 
 ## (一)、基础语法
 
@@ -473,7 +473,7 @@ https://dev.mysql.com/doc/refman/5.7/en/declare-cursor.html
 
 
 
-### 10、预处理prepare
+### 10、sql预处理
 
 >接收需要处理得sql
 >
@@ -494,7 +494,7 @@ https://dev.mysql.com/doc/refman/5.7/en/declare-cursor.html
 >
 >```sql
 >{DEALLOCATE | DROP} PREPARE stmt_name
->#回收是避免触及可执行得上限
+>#回收是避免触及预执行的上限
 >#上限由全局变量决定： @@max_prepared_stmt_count 
 >```
 >
@@ -502,17 +502,7 @@ https://dev.mysql.com/doc/refman/5.7/en/declare-cursor.html
 
 
 
-### 11、事务
-
-https://dev.mysql.com/doc/refman/5.7/en/commit.html
-
-> ```sql
-> 
-> ```
->
-> 
-
-### 12、官方错误编码
+### 11、官方错误编码
 
 client：    https://dev.mysql.com/doc/mysql-errors/5.7/en/client-error-reference.html
 
@@ -520,11 +510,367 @@ service：  https://dev.mysql.com/doc/mysql-errors/5.7/en/server-error-reference
 
 全局：       https://dev.mysql.com/doc/mysql-errors/5.7/en/global-error-reference.html
 
+
+
 ## (二)、功能
 
-存储过程/函数
+| 简称 | 全称                       | 功能     | 备注 |
+| ---- | -------------------------- | -------- | ---- |
+| DDL  | Data Definition Language   | 结构定义 |      |
+| DML  | Data Manipulation Language | 操作数据 |      |
+| DQL  | Data Query Language        | 查询     |      |
+| DCL  | Data Control Language      |          |      |
 
-触发器
+
+
+### 1、DDL
+
+官网：https://dev.mysql.com/doc/refman/5.7/en/sql-data-definition-statements.html
+
+#### (1)、database
+
+#### (2)、table
+
+#### (3)、index
+
+#### (4)、view
+
+#### (5)、tablespace
+
+#### (6)、procedure/function
+
+#### (7)、event
+
+#### (8)、trigger
+
+#### (9)、server
+
+#### (10)、logfile group
+
+### 2、DML
+
+官网：https://dev.mysql.com/doc/refman/5.7/en/sql-data-manipulation-statements.html
+
+#### (1)、insert
+
+#### (2)、replace
+
+#### (3)、update
+
+#### (4)、delete
+
+#### (5)、select
+
+#### (6)、call
+
+#### (7)、do
+
+#### (8)、handler
+
+#### (9)、load data
+
+#### (10)、load xml
+
+### 3、DQL
+
+()、
+
+()、
+
+()、
+
+()、
+
+### 4、DCL
+
+()、
+
+()、
+
+()、
+
+()、
+
+### 事务
+
+https://dev.mysql.com/doc/refman/5.7/en/commit.html
+
+> 开启事务
+>
+> ```sql
+> START TRANSACTION
+>     [transaction_characteristic [, transaction_characteristic] ...]
+> 
+> transaction_characteristic: {
+>     WITH CONSISTENT SNAPSHOT
+>   | READ WRITE
+>   | READ ONLY
+> }
+> 或者
+> BEGIN [WORK]
+> #begin在是start stransaction的别名
+> #但是，在【存储过程】、【函数】、【触发器】和【事件】中不能使用。因为begin表示begin...end
+> ```
+>
+>  提交事务
+>
+> ```sql
+> COMMIT [WORK] [AND [NO] CHAIN] [[NO] RELEASE]
+> ```
+>
+>  回滚事务
+>
+> ```sql
+> ROLLBACK [WORK] [AND [NO] CHAIN] [[NO] RELEASE]
+> ```
+
+
+
+#### (1)、自动提交模式
+
+禁用或启用==当前会话==的默认自动提交模式
+
+> ```sql
+> SET autocommit = {0 | 1}
+> ```
+>
+>  
+>
+> 默认情况下是自动提交模式
+>
+> 这意味着，当不在事务内时，每个语句都是原子的，就像它被`START TRANSACTION`和包围一样`COMMIT`。您不能`ROLLBACK`用来撤消效果。但是，如果在语句执行期间发生错误，则会回滚该语句
+>
+> ```sql
+> SELECT @@autocommit
+> #结果为1
+> ```
+>
+> 
+
+
+
+#### (2)、事务隔离
+
+？？？
+
+#### (3)、隐式提交
+
+所谓的隐式提交指的是：无法回滚的语句
+
+https://dev.mysql.com/doc/refman/5.7/en/cannot-roll-back.html
+
+隐式提交：https://dev.mysql.com/doc/refman/5.7/en/implicit-commit.html
+
+##### a、DDL
+
+###### (i)、肯定隐式提交
+
+>| 操作    | 对象                                                         |
+>| ------- | ------------------------------------------------------------ |
+>| create  | [`CREATE DATABASE`](https://dev.mysql.com/doc/refman/5.7/en/create-database.html) |
+>|         | [`CREATE EVENT`](https://dev.mysql.com/doc/refman/5.7/en/create-event.html) |
+>|         | [`CREATE INDEX`](https://dev.mysql.com/doc/refman/5.7/en/create-index.html) |
+>|         | [`CREATE PROCEDURE`](https://dev.mysql.com/doc/refman/5.7/en/create-procedure.html) |
+>|         | [`CREATE SERVER`](https://dev.mysql.com/doc/refman/5.7/en/create-server.html) |
+>|         | [`CREATE TABLE`](https://dev.mysql.com/doc/refman/5.7/en/create-table.html) |
+>|         | [`CREATE TRIGGER`](https://dev.mysql.com/doc/refman/5.7/en/create-trigger.html) |
+>|         | [`CREATE VIEW`](https://dev.mysql.com/doc/refman/5.7/en/create-view.html) |
+>| alert   | [`ALTER DATABASE ... UPGRADE DATA DIRECTORY NAME`](https://dev.mysql.com/doc/refman/5.7/en/alter-database.html) |
+>|         | [`ALTER EVENT`](https://dev.mysql.com/doc/refman/5.7/en/alter-event.html) |
+>|         | index不可修改，只能删除新增                                  |
+>|         | [`ALTER PROCEDURE`](https://dev.mysql.com/doc/refman/5.7/en/alter-procedure.html) |
+>|         | [`ALTER SERVER`](https://dev.mysql.com/doc/refman/5.7/en/alter-server.html) |
+>|         | [`ALTER TABLE`](https://dev.mysql.com/doc/refman/5.7/en/alter-table.html) |
+>|         | trigger不可修改，只能删除新增                                |
+>|         | [`ALTER VIEW`](https://dev.mysql.com/doc/refman/5.7/en/alter-view.html) |
+>|         | [`RENAME TABLE`](https://dev.mysql.com/doc/refman/5.7/en/rename-table.html) |
+>|         | [`TRUNCATE TABLE`](https://dev.mysql.com/doc/refman/5.7/en/truncate-table.html) |
+>| drop    | [`DROP DATABASE`](https://dev.mysql.com/doc/refman/5.7/en/drop-database.html) |
+>|         | [`DROP EVENT`](https://dev.mysql.com/doc/refman/5.7/en/drop-event.html) |
+>|         | [`DROP INDEX`](https://dev.mysql.com/doc/refman/5.7/en/drop-index.html) |
+>|         | [`DROP PROCEDURE`](https://dev.mysql.com/doc/refman/5.7/en/drop-procedure.html) |
+>|         | [`DROP SERVER`](https://dev.mysql.com/doc/refman/5.7/en/drop-server.html) |
+>|         | [`DROP TABLE`](https://dev.mysql.com/doc/refman/5.7/en/drop-table.html) |
+>|         | [`DROP TRIGGER`](https://dev.mysql.com/doc/refman/5.7/en/drop-trigger.html) |
+>|         | [`DROP VIEW`](https://dev.mysql.com/doc/refman/5.7/en/drop-view.html) |
+>| install | [`INSTALL PLUGIN`](https://dev.mysql.com/doc/refman/5.7/en/install-plugin.html) |
+>|         | [`UNINSTALL PLUGIN`](https://dev.mysql.com/doc/refman/5.7/en/uninstall-plugin.html) |
+>
+>
+
+###### (ii)、可能隐式提交
+
+>
+>
+>| 操作   | 对象                                                         | 隐式提交条件   | 备注                   |
+>| ------ | ------------------------------------------------------------ | -------------- | ---------------------- |
+>| create | [`ALTER FUNCTION`](https://dev.mysql.com/doc/refman/5.7/en/alter-function.html) | 存储过程中调用 |                        |
+>| alert  | [`CREATE FUNCTION`](https://dev.mysql.com/doc/refman/5.7/en/create-function.html) | 存储过程中调用 | 只有存储过程中可以修改 |
+>| drop   | [`DROP FUNCTION`](https://dev.mysql.com/doc/refman/5.7/en/drop-function.html) | 存储过程中调用 |                        |
+
+##### b、DQL(mysql库的)
+
+>这些都是操作数据记录
+>
+>| 操作 | 对象                                                         |
+>| ---- | ------------------------------------------------------------ |
+>|      | [`CREATE USER`](https://dev.mysql.com/doc/refman/5.7/en/create-user.html), |
+>|      | [`ALTER USER`](https://dev.mysql.com/doc/refman/5.7/en/alter-user.html) |
+>|      | [`DROP USER`](https://dev.mysql.com/doc/refman/5.7/en/drop-user.html) |
+>|      | [`RENAME USER`](https://dev.mysql.com/doc/refman/5.7/en/rename-user.html) |
+>|      | [`GRANT`](https://dev.mysql.com/doc/refman/5.7/en/grant.html) |
+>|      | [`REVOKE`](https://dev.mysql.com/doc/refman/5.7/en/revoke.html) |
+>|      | [`SET PASSWORD`](https://dev.mysql.com/doc/refman/5.7/en/set-password.html) |
+
+##### c、事务和锁
+
+>| 对象                                                         |
+>| ------------------------------------------------------------ |
+>| [`BEGIN`](https://dev.mysql.com/doc/refman/5.7/en/commit.html) |
+>| [`START TRANSACTION`](https://dev.mysql.com/doc/refman/5.7/en/commit.html) |
+>| `SET autocommit = 1` (if the value is not already 1)         |
+>| [`LOCK TABLES`](https://dev.mysql.com/doc/refman/5.7/en/lock-tables.html) |
+>| [`UNLOCK TABLES`](https://dev.mysql.com/doc/refman/5.7/en/lock-tables.html) |
+
+##### d、导入数据
+
+>
+>| 对象                                                         |
+>| ------------------------------------------------------------ |
+>| [`LOAD DATA`](https://dev.mysql.com/doc/refman/5.7/en/load-data.html) |
+
+##### e、管理语句
+
+>
+>
+>| 对象                                                         |
+>| ------------------------------------------------------------ |
+>| [`ANALYZE TABLE`](https://dev.mysql.com/doc/refman/5.7/en/analyze-table.html) |
+>| [`CHECK TABLE`](https://dev.mysql.com/doc/refman/5.7/en/check-table.html) |
+>| [`OPTIMIZE TABLE`](https://dev.mysql.com/doc/refman/5.7/en/optimize-table.html) |
+>| [`REPAIR TABLE`](https://dev.mysql.com/doc/refman/5.7/en/repair-table.html) |
+>| [`CACHE INDEX`](https://dev.mysql.com/doc/refman/5.7/en/cache-index.html) |
+>| [`LOAD INDEX INTO CACHE`](https://dev.mysql.com/doc/refman/5.7/en/load-index.html) |
+>| [`FLUSH`](https://dev.mysql.com/doc/refman/5.7/en/flush.html) |
+>| [`RESET`](https://dev.mysql.com/doc/refman/5.7/en/reset.html) |
+
+##### f、主从复制语句
+
+>| 对象                                                         |
+>| ------------------------------------------------------------ |
+>| [`START SLAVE`](https://dev.mysql.com/doc/refman/5.7/en/start-slave.html) |
+>| [`STOP SLAVE`](https://dev.mysql.com/doc/refman/5.7/en/stop-slave.html) |
+>| [`RESET SLAVE`](https://dev.mysql.com/doc/refman/5.7/en/reset-slave.html) |
+>| [`CHANGE MASTER TO`](https://dev.mysql.com/doc/refman/5.7/en/change-master-to.html) |
+>
+>
+
+#### (4)、事务point
+
+https://dev.mysql.com/doc/refman/5.7/en/savepoint.html
+
+> ==仅InoDB支持==
+>
+> ==只能在事务之中使用==
+>
+> ```sql
+> SAVEPOINT identifier
+> ROLLBACK [WORK] TO [SAVEPOINT] identifier
+> RELEASE SAVEPOINT identifier
+> ```
+
+举例
+
+> ```sql
+> USE human;
+> SET autocommit = 0;
+> start transaction;
+> INSERT man VALUES(NULL,'caster');
+> savepoint x_point;#设置保存点
+> INSERT man VALUES(NULL,'ruler');
+> SELECT * FROM man;
+> ROLLBACK TO x_point;
+> SELECT * FROM man;
+> ```
+>
+> 第七行的select会检测出插入有两条记录
+>
+> 第九行的select只检测出第一条caster记录
+>
+> 至于ruler,被`ROLLBACK TO x_point;`回滚了
+
+#### (5)、事务隔离级别
+
+https://dev.mysql.com/doc/refman/5.7/en/set-transaction.html
+
+>如果没有采取必要的隔离机制，就会导致各种并发问题:
+>
+>>
+>>
+>>➢**脏读:**对于两个事务T1,T2,T1读取了已经被T2更新但还没有被提交的字段.之后，若T2回滚，T1读取的内容就是临时且无效的.
+>>
+>>
+>>➢**不可重复读:**对于两个事务T1, T2, T1读取了一个字段,然后T2更新了该字段之后，T1再次读取同一个字段,值就不同了，
+>>
+>>
+>>
+>>➢**幻读:**对于两个事务T1,T2,T1从一个表中读取了一个字段,然后T2在该表中插入了一些新的行.之后，如果T1再次读取同一个表,就会多出几行
+>
+>| 序号 | 级别                  | 功能         | 脏读 | 不可重复读 | 幻读 |
+>| ---- | --------------------- | ------------ | ---- | ---------- | ---- |
+>| 1    | READ UNCOMMITTED      | 读未提交数据 |      |            |      |
+>| 2    | READ COMMITED         | 读已提交数据 | 解决 |            |      |
+>| 3    | REPEATABLE READ(默认) | 可重复读     | 解决 | 解决       |      |
+>| 4    | SERIALIZABLE          |              | 解决 | 解决       | 解决 |
+>
+
+##### 设置隔离级别
+
+>```sql
+>SET [GLOBAL | SESSION] TRANSACTION
+>    transaction_characteristic [, transaction_characteristic] ...
+>
+>transaction_characteristic: {
+>    ISOLATION LEVEL level
+>  | access_mode
+>}
+>
+>level: {
+>     REPEATABLE READ
+>   | READ COMMITTED
+>   | READ UNCOMMITTED
+>   | SERIALIZABLE
+>}
+>
+>access_mode: {
+>     READ WRITE
+>   | READ ONLY
+>}
+>```
+>
+>示例
+>
+>```sql
+>SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+>```
+>
+>
+
+#### (6)、XA事务
+
+>支持InnoDB
+>
+>支持分布式事务
+
+### 锁(Lock)
+
+#### (1)、lock table
+
+https://dev.mysql.com/doc/refman/5.7/en/lock-tables.html
+
+### 存储过程/函数
+
+### 触发器
 
 
 
@@ -800,26 +1146,6 @@ https://blog.csdn.net/u012060033/article/details/96328410
 ## 事务
 
 ### 事务隔离级别
-
-如果没有采取必要的隔离机制，就会导致各种并发问题:
-
->
->
->➢**脏读:**对于两个事务T1,T2,T1读取了已经被T2更新但还没有被提交的字段.之后，若T2回滚，T1读取的内容就是临时且无效的.
->
->
->➢**不可重复读:**对于两个事务T1, T2, T1读取了一个字段,然后T2更新了该字段之后，T1再次读取同一个字段,值就不同了，
->
->
->
->➢**幻读:**对于两个事务T1,T2,T1从一个表中读取了一个字段,然后T2在该表中插入了一些新的行.之后，如果T1再次读取同一个表,就会多出几行
-
-| 序号 | 级别                  | 功能         | 脏读 | 不可重复读 | 幻读 |
-| ---- | --------------------- | ------------ | ---- | ---------- | ---- |
-| 1    | READ UNCOMMITTED      | 读未提交数据 |      |            |      |
-| 2    | READ COMMITED         | 读已提交数据 | 解决 |            |      |
-| 3    | REPEATABLE READ(默认) | 可重复读     | 解决 | 解决       |      |
-| 4    | SERIALIZABLE          | 可串行化     | 解决 | 解决       | 解决 |
 
 
 
