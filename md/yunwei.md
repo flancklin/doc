@@ -2433,3 +2433,31 @@ split_nginx_log.sh         加入定时器，每小时跑
 
 
 ![TCP-IP数据封装过程](static/yunwei/TCP-IP%E6%95%B0%E6%8D%AE%E5%B0%81%E8%A3%85%E8%BF%87%E7%A8%8B.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+# http请求体body的几种数据格式
+
+>
+>
+>参考文档：https://blog.csdn.net/qq_41063141/article/details/101505956
+>
+>| 格式                                                         | a                                                            |
+>| ------------------------------------------------------------ | ------------------------------------------------------------ |
+>| [multipart/form-data](https://blog.csdn.net/qq_41063141/article/details/101505956#multipartformdata_1) |                                                              |
+>| [application/x-www-from-urlencoded](https://blog.csdn.net/qq_41063141/article/details/101505956#applicationxwwwfromurlencoded_5) |                                                              |
+>| [raw](https://blog.csdn.net/qq_41063141/article/details/101505956#raw_9) |                                                              |
+>| [binary](https://blog.csdn.net/qq_41063141/article/details/101505956#binary_16) | 通常用来上传文件，由于没有键值，所以，一次只能上传一个文件。(一般用的不多) |
+>| graphQL                                                      |                                                              |
+>|                                                              |                                                              |
+>|                                                              |                                                              |

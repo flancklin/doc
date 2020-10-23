@@ -455,19 +455,1204 @@ https://dev.mysql.com/doc/refman/5.7/en/set-statement.html
 >DECLARE cursor_name CURSOR FOR select_statement
 >```
 >
-> 打开游标
+>打开游标
 >
 >```sql
 >OPEN cursor_name
 >```
 >
-> 从游标中数据塞入到变量   (放在循环中)
+>从游标中数据塞入到变量   (放在循环中)
 >
 >```sql
 >FETCH [[NEXT] FROM] cursor_name INTO var_name [, var_name] ...
 >```
 >
-> 关闭游标
+>#  一、mysql(5.7)
+>
+>## (一)、基础语法
+>
+>### 1、注释
+>
+>> 三种注释方式
+>
+>单行注释
+>
+>> 1
+>>
+>> ```
+>> select * from table #我是注释
+>> ```
+>>
+>> 2
+>>
+>> ```
+>> select * from table -- 我是注释
+>> ```
+>>
+>> --后面必须带至少一个空格和控制符
+>
+>多行注释
+>
+>> 1
+>>
+>> ```
+>> /*
+>> ```
+>>
+>> 2
+>>
+>> ```
+>> select * from table
+>> ```
+>>
+>> 3
+>>
+>> ```
+>> */
+>> ```
+>
+>
+>
+>### 2、命名规范及大小写
+>
+>https://dev.mysql.com/doc/refman/5.7/en/identifier-length.html
+>
+>|                 | Identifier Type          | 最大长度(字符)                                               | 区分大小写 |
+>| --------------- | :----------------------- | :----------------------------------------------------------- | ---------- |
+>| 数据库名称      | Database                 | 64 ([`NDB`](https://dev.mysql.com/doc/refman/5.7/en/mysql-cluster.html) storage engine: 63) |            |
+>| 表名            | Table                    | 64 ([`NDB`](https://dev.mysql.com/doc/refman/5.7/en/mysql-cluster.html) storage engine: 63) |            |
+>| 列名            | Column                   | 64                                                           |            |
+>| 索引名          | Index                    | 64                                                           |            |
+>| 约束            | Constraint               | 64                                                           |            |
+>| 存储过程/函数名 | Stored Program           | 64                                                           |            |
+>| 视图名          | View                     | 64                                                           |            |
+>|                 | Tablespace               | 64                                                           |            |
+>|                 | Server                   | 64                                                           |            |
+>|                 | Log File Group           | 64                                                           |            |
+>| 别名            | Alias                    | 256 (see exception following table)                          |            |
+>| label标签       | Compound Statement Label | 16                                                           |            |
+>| 用户变量名称    | User-Defined Variable    | 64                                                           |            |
+>
+>#### 大小写问题
+>
+>> 列，索引，存储的例程和事件名称在任何平台上都不区分大小写，列别名也不区分大小写。
+>>
+>> 但是，日志文件组的名称区分大小写。这与标准SQL不同。
+>>
+>> 默认情况下，表别名在Unix上区分大小写，但在Windows或macOS上不区分大小写。
+>>
+>> 
+>>
+>> 大小写问题受全局变量影响：       
+>>
+>> [**mysqld**](https://dev.mysql.com/doc/refman/5.7/en/mysqld.html). [`lower_case_table_names`](https://dev.mysql.com/doc/refman/5.7/en/server-system-variables.html#sysvar_lower_case_table_names)
+>>
+>> 
+>>
+>> 1
+>>
+>> ```
+>> SHOW GLOBAL VARIABLES
+>> ```
+>>
+>> 2
+>>
+>> ```
+>> 或者
+>> ```
+>>
+>> 3
+>>
+>> ```
+>> SHOW VARIABLES
+>> ```
+>>
+>> 4
+>>
+>> ```
+>> 或
+>> ```
+>>
+>> 5
+>>
+>> ```
+>> SHOW GLOBAL VARIABLES LIKE 'lower_case_table_names'
+>> ```
+>>
+>> 6
+>>
+>> ```
+>> 或者
+>> ```
+>>
+>> 7
+>>
+>> ```
+>> SELECT  @@lower_case_table_names;
+>> ```
+>
+>### 3、变量
+>
+>#### (1)、用户变量
+>
+>https://dev.mysql.com/doc/refman/5.7/en/user-variables.html
+>
+>语法
+>
+>> 1
+>>
+>> ```
+>> SET @var_name = expr [, @var_name = expr] ...
+>> ```
+>
+>举例
+>
+>> 1
+>>
+>> ```
+>> set @var1=1;
+>> ```
+>>
+>> 2
+>>
+>> ```
+>> set @var2:=2;
+>> ```
+>>
+>> 3
+>>
+>> ```
+>> #select @var3=3; #这个是错误的，会用@var3变量与数字3作比较，是否相等
+>> ```
+>>
+>> 4
+>>
+>> ```
+>> select @var3:=3; #
+>> ```
+>>
+>> 5
+>>
+>> ```
+>> 
+>> ```
+>>
+>> 6
+>>
+>> ```
+>> SELECT @var1,@var2,@var3;
+>> ```
+>
+>
+>
+>> | 关键字 | =      | :=   | 输出显示 |          |
+>> | ------ | ------ | ---- | -------- | -------- |
+>> | set    | 支持   | 支持 | 不显示   | 建议用   |
+>> | select | 不支持 | 支持 | 会显示   | 不建议用 |
+>
+>#### (2)、局部变量
+>
+>https://dev.mysql.com/doc/refman/5.7/en/declare-local-variable.html
+>
+>语法
+>
+>> 1
+>>
+>> ```
+>> DECLARE var_name [, var_name] ... type [DEFAULT value]
+>> ```
+>>
+>> 如果没有default设置，则默认是null
+>
+>举例
+>
+>> 1
+>>
+>> ```
+>> declare var1 varchar(50);
+>> ```
+>
+>#### (3)、全局变量(系统变量)
+>
+>https://dev.mysql.com/doc/refman/5.7/en/server-system-variable-reference.html
+>
+>> 调用使用两个@：@@
+>>
+>> 1
+>>
+>> ```
+>> SELECT  @@lower_case_table_names;
+>> ```
+>
+>### 4、运算符
+>
+>https://dev.mysql.com/doc/refman/5.7/en/non-typed-operators.html
+>
+>> | 优先级 | 名称                                                         | 描述                                                         |
+>> | ------ | :----------------------------------------------------------- | :----------------------------------------------------------- |
+>> | 1      | [`INTERVAL`](https://dev.mysql.com/doc/refman/5.7/en/expressions.html#temporal-intervals) | 时间间隔                                                     |
+>> | 2      | [`BINARY`](https://dev.mysql.com/doc/refman/5.7/en/cast-functions.html#operator_binary) | 将字符串转换为二进制字符串                                   |
+>> | 3      | [`!`](https://dev.mysql.com/doc/refman/5.7/en/logical-operators.html#operator_not) | 取反值                                                       |
+>> | 4      | [`-`](https://dev.mysql.com/doc/refman/5.7/en/arithmetic-functions.html#operator_unary-minus) | 取反(正数取反)                                               |
+>> | 4      | [`~`](https://dev.mysql.com/doc/refman/5.7/en/bit-functions.html#operator_bitwise-invert) | 按位反转                                                     |
+>> | 5      | [`^`](https://dev.mysql.com/doc/refman/5.7/en/bit-functions.html#operator_bitwise-xor) | 按位异或                                                     |
+>> | 6      | [`*`](https://dev.mysql.com/doc/refman/5.7/en/arithmetic-functions.html#operator_times) [`DIV`](https://dev.mysql.com/doc/refman/5.7/en/arithmetic-functions.html#operator_div) [`/`](https://dev.mysql.com/doc/refman/5.7/en/arithmetic-functions.html#operator_divide) [`%`， `MOD`](https://dev.mysql.com/doc/refman/5.7/en/arithmetic-functions.html#operator_mod) | 乘/除/取模                                                   |
+>> | 7      | [`+`](https://dev.mysql.com/doc/refman/5.7/en/arithmetic-functions.html#operator_plus) [`-`](https://dev.mysql.com/doc/refman/5.7/en/arithmetic-functions.html#operator_minus) | 加减                                                         |
+>> | 8      | [`>>`](https://dev.mysql.com/doc/refman/5.7/en/bit-functions.html#operator_right-shift) [`<<`](https://dev.mysql.com/doc/refman/5.7/en/bit-functions.html#operator_left-shift) | 右移 右移                                                    |
+>> | 9      | [`&`](https://dev.mysql.com/doc/refman/5.7/en/bit-functions.html#operator_bitwise-and) | 按位与                                                       |
+>> | 10     | [`|`](https://dev.mysql.com/doc/refman/5.7/en/bit-functions.html#operator_bitwise-or) | 按位或                                                       |
+>> | 11     | [`=`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_equal) | 平等算子                                                     |
+>> | 11     | [`<=>`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_equal-to) | NULL安全等于运算符                                           |
+>> | 11     | [`>=`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_greater-than-or-equal) | 大于或等于运算符                                             |
+>> | 11     | [`>`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_greater-than) | 大于运算符                                                   |
+>> | 11     | [`<=`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_less-than-or-equal) | 小于或等于运算符                                             |
+>> | 11     | [`<`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_less-than) | 少于运算符                                                   |
+>> | 11     | [`<>`， `!=`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_not-equal) | 不等于运算符                                                 |
+>> | 11     | [`IS`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_is) | 针对布尔值测试值                                             |
+>> | 11     | [`LIKE`](https://dev.mysql.com/doc/refman/5.7/en/string-comparison-functions.html#operator_like) | 简单模式匹配                                                 |
+>> | 11     | [`REGEXP`](https://dev.mysql.com/doc/refman/5.7/en/regexp.html#operator_regexp) | 字符串是否匹配正则表达式                                     |
+>> | 11     | [`IN()`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_in) | 一个值是否在一组值内                                         |
+>> | 12     | [`BETWEEN ... AND ...`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_between) | 值是否在值范围内                                             |
+>> | 12     | [`CASE`](https://dev.mysql.com/doc/refman/5.7/en/flow-control-functions.html#operator_case) | 案例操作员                                                   |
+>> | 13     | [`NOT`](https://dev.mysql.com/doc/refman/5.7/en/logical-operators.html#operator_not) | 取反值                                                       |
+>> | 14     | [`AND`， `&&`](https://dev.mysql.com/doc/refman/5.7/en/logical-operators.html#operator_and) | 逻辑与                                                       |
+>> | 15     | [`XOR`](https://dev.mysql.com/doc/refman/5.7/en/logical-operators.html#operator_xor) | 逻辑异或                                                     |
+>> | 16     | [`OR`， `||`](https://dev.mysql.com/doc/refman/5.7/en/logical-operators.html#operator_or) | 逻辑或                                                       |
+>> | 17     | [`:=`](https://dev.mysql.com/doc/refman/5.7/en/assignment-operators.html#operator_assign-value) | 赋值                                                         |
+>> | 17     | [`=`](https://dev.mysql.com/doc/refman/5.7/en/assignment-operators.html#operator_assign-equal) | 分配值（作为[`SET`](https://dev.mysql.com/doc/refman/5.7/en/set-variable.html) 语句的一部分 ，或作为语句的`SET`子句的 一部分[`UPDATE`](https://dev.mysql.com/doc/refman/5.7/en/update.html)） |
+>> |        | [`->`](https://dev.mysql.com/doc/refman/5.7/en/json-search-functions.html#operator_json-column-path) | 评估路径后从JSON列返回值；等效于JSON_EXTRACT（）。           |
+>> |        | [`->>`](https://dev.mysql.com/doc/refman/5.7/en/json-search-functions.html#operator_json-inline-path) （介绍5.7.13） | 在评估路径并取消引用结果后，从JSON列返回值；等效于JSON_UNQUOTE（JSON_EXTRACT（））。 |
+>> |        | [`IS NOT`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_is-not) | 针对布尔值测试值                                             |
+>> |        | [`IS NOT NULL`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_is-not-null) | 非空值测试                                                   |
+>> |        | [`IS NULL`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_is-null) | 空值测试                                                     |
+>> |        | [`NOT BETWEEN ... AND ...`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_not-between) | 值是否不在值范围内                                           |
+>> |        | [`NOT IN()`](https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_not-in) | 一个值是否不在一组值内                                       |
+>> |        | [`NOT LIKE`](https://dev.mysql.com/doc/refman/5.7/en/string-comparison-functions.html#operator_not-like) | 否定简单模式匹配                                             |
+>> |        | [`NOT REGEXP`](https://dev.mysql.com/doc/refman/5.7/en/regexp.html#operator_not-regexp) | 否REGEXP                                                     |
+>> |        | [`RLIKE`](https://dev.mysql.com/doc/refman/5.7/en/regexp.html#operator_regexp) | 字符串是否匹配正则表达式                                     |
+>> |        | [`SOUNDS LIKE`](https://dev.mysql.com/doc/refman/5.7/en/string-functions.html#operator_sounds-like) | 比较声音                                                     |
+>
+>### 5、表达式
+>
+>https://dev.mysql.com/doc/refman/5.7/en/expressions.html
+>
+>> 1
+>>
+>> ```
+>> expr:
+>> ```
+>>
+>> 2
+>>
+>> ```
+>> expr OR expr
+>> ```
+>>
+>> 3
+>>
+>> ```
+>> | expr || expr
+>> ```
+>>
+>> 4
+>>
+>> ```
+>> | expr XOR expr
+>> ```
+>>
+>> 5
+>>
+>> ```
+>> | expr AND expr
+>> ```
+>>
+>> 6
+>>
+>> ```
+>> | expr && expr
+>> ```
+>>
+>> 7
+>>
+>> ```
+>> | NOT expr
+>> ```
+>>
+>> 8
+>>
+>> ```
+>> | ! expr
+>> ```
+>>
+>> 9
+>>
+>> ```
+>> | boolean_primary IS [NOT] {TRUE | FALSE | UNKNOWN}
+>> ```
+>>
+>> 10
+>>
+>> ```
+>> | boolean_primary
+>> ```
+>>
+>> 11
+>>
+>> ```
+>> 
+>> ```
+>>
+>> 12
+>>
+>> ```
+>> boolean_primary:
+>> ```
+>>
+>> 13
+>>
+>> ```
+>> boolean_primary IS [NOT] NULL
+>> ```
+>>
+>> 14
+>>
+>> ```
+>> | boolean_primary <=> predicate
+>> ```
+>>
+>> 15
+>>
+>> ```
+>> | boolean_primary comparison_operator predicate
+>> ```
+>>
+>> 16
+>>
+>> ```
+>> | boolean_primary comparison_operator {ALL | ANY} (subquery)
+>> ```
+>>
+>> 17
+>>
+>> ```
+>> | predicate
+>> ```
+>>
+>> 18
+>>
+>> ```
+>> 
+>> ```
+>>
+>> 19
+>>
+>> ```
+>> comparison_operator: = | >= | > | <= | < | <> | !=
+>> ```
+>>
+>> 20
+>>
+>> ```
+>> 
+>> ```
+>>
+>> 21
+>>
+>> ```
+>> predicate:
+>> ```
+>>
+>> 22
+>>
+>> ```
+>> bit_expr [NOT] IN (subquery)
+>> ```
+>>
+>> 23
+>>
+>> ```
+>> | bit_expr [NOT] IN (expr [, expr] ...)
+>> ```
+>>
+>> 24
+>>
+>> ```
+>> | bit_expr [NOT] BETWEEN bit_expr AND predicate
+>> ```
+>>
+>> 25
+>>
+>> ```
+>> | bit_expr SOUNDS LIKE bit_expr
+>> ```
+>>
+>> 26
+>>
+>> ```
+>> | bit_expr [NOT] LIKE simple_expr [ESCAPE simple_expr]
+>> ```
+>>
+>> 27
+>>
+>> ```
+>> | bit_expr [NOT] REGEXP bit_expr
+>> ```
+>>
+>> 28
+>>
+>> ```
+>> | bit_expr
+>> ```
+>>
+>> 29
+>>
+>> ```
+>> 
+>> ```
+>>
+>> 30
+>>
+>> ```
+>> bit_expr:
+>> ```
+>>
+>> 31
+>>
+>> ```
+>> bit_expr | bit_expr
+>> ```
+>>
+>> 32
+>>
+>> ```
+>> | bit_expr & bit_expr
+>> ```
+>>
+>> 33
+>>
+>> ```
+>> | bit_expr << bit_expr
+>> ```
+>>
+>> 34
+>>
+>> ```
+>> | bit_expr >> bit_expr
+>> ```
+>>
+>> 35
+>>
+>> ```
+>> | bit_expr + bit_expr
+>> ```
+>>
+>> 36
+>>
+>> ```
+>> | bit_expr - bit_expr
+>> ```
+>>
+>> 37
+>>
+>> ```
+>> | bit_expr * bit_expr
+>> ```
+>>
+>> 38
+>>
+>> ```
+>> | bit_expr / bit_expr
+>> ```
+>>
+>> 39
+>>
+>> ```
+>> | bit_expr DIV bit_expr
+>> ```
+>>
+>> 40
+>>
+>> ```
+>> | bit_expr MOD bit_expr
+>> ```
+>>
+>> 41
+>>
+>> ```
+>> | bit_expr % bit_expr
+>> ```
+>>
+>> 42
+>>
+>> ```
+>> | bit_expr ^ bit_expr
+>> ```
+>>
+>> 43
+>>
+>> ```
+>> | bit_expr + interval_expr
+>> ```
+>>
+>> 44
+>>
+>> ```
+>> | bit_expr - interval_expr
+>> ```
+>>
+>> 45
+>>
+>> ```
+>> | simple_expr
+>> ```
+>>
+>> 46
+>>
+>> ```
+>> 
+>> ```
+>>
+>> 47
+>>
+>> ```
+>> simple_expr:
+>> ```
+>>
+>> 48
+>>
+>> ```
+>> literal
+>> ```
+>>
+>> 49
+>>
+>> ```
+>> | identifier
+>> ```
+>>
+>> 50
+>>
+>> ```
+>> | function_call
+>> ```
+>>
+>> 51
+>>
+>> ```
+>> | simple_expr COLLATE collation_name
+>> ```
+>>
+>> 52
+>>
+>> ```
+>> | param_marker
+>> ```
+>>
+>> 53
+>>
+>> ```
+>> | variable
+>> ```
+>>
+>> 54
+>>
+>> ```
+>> | simple_expr || simple_expr
+>> ```
+>>
+>> 55
+>>
+>> ```
+>> | + simple_expr
+>> ```
+>>
+>> 56
+>>
+>> ```
+>> | - simple_expr
+>> ```
+>>
+>> 57
+>>
+>> ```
+>> | ~ simple_expr
+>> ```
+>>
+>> 58
+>>
+>> ```
+>> | ! simple_expr
+>> ```
+>>
+>> 59
+>>
+>> ```
+>> | BINARY simple_expr
+>> ```
+>>
+>> 60
+>>
+>> ```
+>> | (expr [, expr] ...)
+>> ```
+>>
+>> 61
+>>
+>> ```
+>> | ROW (expr, expr [, expr] ...)
+>> ```
+>>
+>> 62
+>>
+>> ```
+>> | (subquery)
+>> ```
+>>
+>> 63
+>>
+>> ```
+>> | EXISTS (subquery)
+>> ```
+>>
+>> 64
+>>
+>> ```
+>> | {identifier expr}
+>> ```
+>>
+>> 65
+>>
+>> ```
+>> | match_expr
+>> ```
+>>
+>> 66
+>>
+>> ```
+>> | case_expr
+>> ```
+>>
+>> 67
+>>
+>> ```
+>> | interval_expr
+>> ```
+>
+>### 6、流程控制
+>
+>存储过程和函数，触发器和事件
+>
+>#### (1)、case
+>
+>https://dev.mysql.com/doc/refman/5.7/en/case.html
+>
+>> 1
+>>
+>> ```
+>> CASE case_value
+>> ```
+>>
+>> 2
+>>
+>> ```
+>> WHEN when_value THEN statement_list
+>> ```
+>>
+>> 3
+>>
+>> ```
+>> [WHEN when_value THEN statement_list] ...
+>> ```
+>>
+>> 4
+>>
+>> ```
+>> [ELSE statement_list]
+>> ```
+>>
+>> 5
+>>
+>> ```
+>> END CASE
+>> ```
+>>
+>> Or:
+>>
+>> 1
+>>
+>> ```
+>> CASE
+>> ```
+>>
+>> 2
+>>
+>> ```
+>> WHEN search_condition THEN statement_list
+>> ```
+>>
+>> 3
+>>
+>> ```
+>> [WHEN search_condition THEN statement_list] ...
+>> ```
+>>
+>> 4
+>>
+>> ```
+>> [ELSE statement_list]
+>> ```
+>>
+>> 5
+>>
+>> ```
+>> END CASE
+>> ```
+>
+>#### (2)、if
+>
+>https://dev.mysql.com/doc/refman/5.7/en/if.html
+>
+>> 1
+>>
+>> ```
+>> IF search_condition THEN statement_list
+>> ```
+>>
+>> 2
+>>
+>> ```
+>>  [ELSEIF search_condition THEN statement_list] ...
+>> ```
+>>
+>> 3
+>>
+>> ```
+>>  [ELSE statement_list]
+>> ```
+>>
+>> 4
+>>
+>> ```
+>> END IF
+>> ```
+>
+>
+>
+>#### (3)、loop
+>
+>https://dev.mysql.com/doc/refman/5.7/en/loop.html
+>
+>> 1
+>>
+>> ```
+>> [begin_label:] LOOP
+>> ```
+>>
+>> 2
+>>
+>> ```
+>>  statement_list
+>> ```
+>>
+>> 3
+>>
+>> ```
+>> END LOOP [end_label]
+>> ```
+>
+>#### (4)、repeat
+>
+>https://dev.mysql.com/doc/refman/5.7/en/repeat.html
+>
+>> 1
+>>
+>> ```
+>> [begin_label:] REPEAT
+>> ```
+>>
+>> 2
+>>
+>> ```
+>>  statement_list
+>> ```
+>>
+>> 3
+>>
+>> ```
+>> UNTIL search_condition
+>> ```
+>>
+>> 4
+>>
+>> ```
+>> END REPEAT [end_label]
+>> ```
+>
+>#### (5)、while
+>
+>https://dev.mysql.com/doc/refman/5.7/en/while.html
+>
+>> 1
+>>
+>> ```
+>> [begin_label:] WHILE search_condition DO
+>> ```
+>>
+>> 2
+>>
+>> ```
+>>  statement_list
+>> ```
+>>
+>> 3
+>>
+>> ```
+>> END WHILE [end_label]
+>> ```
+>
+>#### (6)、iterate(continue)
+>
+>https://dev.mysql.com/doc/refman/5.7/en/iterate.html
+>
+>> 仅限使用于 [`LOOP`](https://dev.mysql.com/doc/refman/5.7/en/loop.html), [`REPEAT`](https://dev.mysql.com/doc/refman/5.7/en/repeat.html), 和[`WHILE`](https://dev.mysql.com/doc/refman/5.7/en/while.html)
+>>
+>> 1
+>>
+>> ```
+>> ITERATE label
+>> ```
+>
+>##### (7)、leave(break)
+>
+>https://dev.mysql.com/doc/refman/5.7/en/leave.html
+>
+>> 可使用于 [`LOOP`](https://dev.mysql.com/doc/refman/5.7/en/loop.html), [`REPEAT`](https://dev.mysql.com/doc/refman/5.7/en/repeat.html), 和[`WHILE`](https://dev.mysql.com/doc/refman/5.7/en/while.html)
+>>
+>> 也可使用于begin...end
+>>
+>> 1
+>>
+>> ```
+>> LEAVE label
+>> ```
+>
+>### 7、标签label
+>
+>https://dev.mysql.com/doc/refman/5.7/en/statement-labels.html
+>
+>> 1
+>>
+>> ```
+>> [begin_label:] BEGIN
+>> ```
+>>
+>> 2
+>>
+>> ```
+>>  [statement_list]
+>> ```
+>>
+>> 3
+>>
+>> ```
+>> END [end_label]
+>> ```
+>>
+>> 4
+>>
+>> ```
+>> 
+>> ```
+>>
+>> 5
+>>
+>> ```
+>> [begin_label:] LOOP
+>> ```
+>>
+>> 6
+>>
+>> ```
+>>  statement_list
+>> ```
+>>
+>> 7
+>>
+>> ```
+>> END LOOP [end_label]
+>> ```
+>>
+>> 8
+>>
+>> ```
+>> 
+>> ```
+>>
+>> 9
+>>
+>> ```
+>> [begin_label:] REPEAT
+>> ```
+>>
+>> 10
+>>
+>> ```
+>>  statement_list
+>> ```
+>>
+>> 11
+>>
+>> ```
+>> UNTIL search_condition
+>> ```
+>>
+>> 12
+>>
+>> ```
+>> END REPEAT [end_label]
+>> ```
+>>
+>> 13
+>>
+>> ```
+>> 
+>> ```
+>>
+>> 14
+>>
+>> ```
+>> [begin_label:] WHILE search_condition DO
+>> ```
+>>
+>> 15
+>>
+>> ```
+>>  statement_list
+>> ```
+>>
+>> 16
+>>
+>> ```
+>> END WHILE [end_label]
+>> ```
+>
+>### 8、declare
+>
+>#### (1)、var定义局部变量
+>
+>> 1
+>>
+>> ```
+>> DECLARE var_name [, var_name] ... type [DEFAULT value]
+>> ```
+>
+>#### (2)、handler
+>
+>https://dev.mysql.com/doc/refman/5.7/en/declare-handler.html
+>
+>> 1
+>>
+>> ```
+>> DECLARE handler_action HANDLER
+>> ```
+>>
+>> 2
+>>
+>> ```
+>>  FOR condition_value [, condition_value] ...
+>> ```
+>>
+>> 3
+>>
+>> ```
+>>  statement
+>> ```
+>>
+>> 4
+>>
+>> ```
+>> 
+>> ```
+>>
+>> 5
+>>
+>> ```
+>> handler_action: {
+>> ```
+>>
+>> 6
+>>
+>> ```
+>>  CONTINUE
+>> ```
+>>
+>> 7
+>>
+>> ```
+>> | EXIT
+>> ```
+>>
+>> 8
+>>
+>> ```
+>> | UNDO
+>> ```
+>>
+>> 9
+>>
+>> ```
+>> }
+>> ```
+>>
+>> 10
+>>
+>> ```
+>> 
+>> ```
+>>
+>> 11
+>>
+>> ```
+>> condition_value: {
+>> ```
+>>
+>> 12
+>>
+>> ```
+>>  mysql_error_code
+>> ```
+>>
+>> 13
+>>
+>> ```
+>> | SQLSTATE [VALUE] sqlstate_value
+>> ```
+>>
+>> 14
+>>
+>> ```
+>> | condition_name
+>> ```
+>>
+>> 15
+>>
+>> ```
+>> | SQLWARNING
+>> ```
+>>
+>> 16
+>>
+>> ```
+>> | NOT FOUND
+>> ```
+>>
+>> 17
+>>
+>> ```
+>> | SQLEXCEPTION
+>> ```
+>>
+>> 18
+>>
+>> ```
+>> }
+>> ```
+>
+>#### (3)、condition
+>
+>https://dev.mysql.com/doc/refman/5.7/en/declare-condition.html
+>
+>> 1
+>>
+>> ```
+>> DECLARE condition_name CONDITION FOR condition_value
+>> ```
+>>
+>> 2
+>>
+>> ```
+>> 
+>> ```
+>>
+>> 3
+>>
+>> ```
+>> condition_value: {
+>> ```
+>>
+>> 4
+>>
+>> ```
+>>  mysql_error_code
+>> ```
+>>
+>> 5
+>>
+>> ```
+>> | SQLSTATE [VALUE] sqlstate_value
+>> ```
+>>
+>> 6
+>>
+>> ```
+>> }
+>> ```
+>
+>
+>
+>> -- 定义主键重复错误
+>>
+>> -- ERROR 1062 (23000): Duplicate entry '60' for key 'PRIMARY'
+>>
+>> 
+>>
+>> -- 方法一：使用sqlstate_value 
+>>
+>> DECLARE primary_key_duplicate CONDITION FOR SQLSTATE '23000' ; 
+>>
+>> 
+>>
+>> -- 方法二：使用mysql_error_code 
+>>
+>> DECLARE primary_key_duplicate CONDITION FOR 1062 ;
+>
+>
+>
+>#### (4)、游标
+>
+>https://dev.mysql.com/doc/refman/5.7/en/declare-cursor.html
+>
+>### 9、set
+>
+>https://dev.mysql.com/doc/refman/5.7/en/set-statement.html
+>
+>### 10、游标
+>
+>> 定义游标
+>>
+>> 1
+>>
+>> ```
+>> DECLARE cursor_name CURSOR FOR select_statement
+>> ```
+>>
+>> 打开游标
+>>
+>> 1
+>>
+>> ```
+>> OPEN cursor_name
+>> ```
+>>
+>> 从游标中数据塞入到变量   (放在循环中)
+>>
+>> 1
+>>
+>> ```
+>> FETCH [[NEXT] FROM] cursor_name INTO var_name [, var_name] ...
+>> ```
+>
+>关闭游标
 >
 >```sql
 >CLOSE cursor_name
@@ -528,53 +1713,1636 @@ service：  https://dev.mysql.com/doc/mysql-errors/5.7/en/server-error-reference
 
 ### 1、DDL
 
+ddl词汇定义：https://dev.mysql.com/doc/refman/5.7/en/glossary.html#glos_ddl
+
 官网：https://dev.mysql.com/doc/refman/5.7/en/sql-data-definition-statements.html
 
 #### (1)、database
 
+##### (a)、create
+
+>```sql
+>CREATE {DATABASE | SCHEMA} [IF NOT EXISTS] db_name
+>    [create_option] ...
+>
+>create_option: [DEFAULT] {
+>    CHARACTER SET [=] charset_name
+>  | COLLATE [=] collation_name
+>}
+>```
+
+##### (b)、drop
+
+> ```sql
+> DROP {DATABASE | SCHEMA} [IF EXISTS] db_name
+> ```
+
+##### (c)、alert
+
+
+
+> 只能修改数据的的字符集信息。==不能更改数据库名==
+>
+> ```sql
+> ALTER {DATABASE | SCHEMA} [db_name]
+>     alter_option ...
+> ALTER {DATABASE | SCHEMA} db_name
+>     UPGRADE DATA DIRECTORY NAME
+> 
+> alter_option: {
+>     [DEFAULT] CHARACTER SET [=] charset_name
+>   | [DEFAULT] COLLATE [=] collation_name
+> }
+> ```
+>
+> ==该`UPGRADE DATA DIRECTORY NAME`子句在MySQL 5.7中已弃用，在MySQL 8.0中已删除==
+
+##### (d)、示例
+
+>| 操作   | 示例                                                     | 备注              |
+>| ------ | -------------------------------------------------------- | ----------------- |
+>| create | CREATE DATABASE IF NOT EXISTS test2 CHARACTER SET='utf8' | 是utf8而不是utf-b |
+>| alter  | ALTER DATABASE test2 CHARACTER SET='utf8mb4'             |                   |
+>| drop   | DROP DATABASE IF EXISTS test1                            |                   |
+
 #### (2)、table
+
+##### (a)、create
+
+>```sql
+>CREATE [TEMPORARY] TABLE [IF NOT EXISTS] tbl_name
+>    (create_definition,...)
+>    [table_options]
+>    [partition_options]
+>
+>CREATE [TEMPORARY] TABLE [IF NOT EXISTS] tbl_name
+>    [(create_definition,...)]
+>    [table_options]
+>    [partition_options]
+>    [IGNORE | REPLACE]
+>    [AS] query_expression
+>
+>CREATE [TEMPORARY] TABLE [IF NOT EXISTS] tbl_name
+>    { LIKE old_tbl_name | (LIKE old_tbl_name) }
+>
+>/*******************************************************************/
+>##字段和索引的定义
+>create_definition: {
+>    col_name column_definition
+>  | {INDEX | KEY} [index_name] [index_type] (key_part,...)
+>      [index_option] ...
+>  | {FULLTEXT | SPATIAL} [INDEX | KEY] [index_name] (key_part,...)
+>      [index_option] ...
+>  | [CONSTRAINT [symbol]] PRIMARY KEY
+>      [index_type] (key_part,...)
+>      [index_option] ...
+>  | [CONSTRAINT [symbol]] UNIQUE [INDEX | KEY]
+>      [index_name] [index_type] (key_part,...)
+>      [index_option] ...
+>  | [CONSTRAINT [symbol]] FOREIGN KEY
+>      [index_name] (col_name,...)
+>      reference_definition
+>  | CHECK (expr)
+>}
+>##字段类型、默认值、字符集等
+>column_definition: {
+>    data_type [NOT NULL | NULL] [DEFAULT default_value]
+>      [AUTO_INCREMENT] [UNIQUE [KEY]] [[PRIMARY] KEY]
+>      [COMMENT 'string']
+>      [COLLATE collation_name]
+>      [COLUMN_FORMAT {FIXED | DYNAMIC | DEFAULT}]
+>      [STORAGE {DISK | MEMORY}]
+>      [reference_definition]
+>  | data_type
+>      [COLLATE collation_name]
+>      [GENERATED ALWAYS] AS (expr)
+>      [VIRTUAL | STORED] [NOT NULL | NULL]
+>      [UNIQUE [KEY]] [[PRIMARY] KEY]
+>      [COMMENT 'string']
+>      [reference_definition]
+>}
+>
+>data_type:
+>    (see Chapter 11, Data Types)
+>
+>key_part:
+>    col_name [(length)] [ASC | DESC]
+>
+>index_type:
+>    USING {BTREE | HASH}
+>
+>index_option: {
+>    KEY_BLOCK_SIZE [=] value
+>  | index_type
+>  | WITH PARSER parser_name
+>  | COMMENT 'string'
+>}
+>
+>reference_definition:
+>    REFERENCES tbl_name (key_part,...)
+>      [MATCH FULL | MATCH PARTIAL | MATCH SIMPLE]
+>      [ON DELETE reference_option]
+>      [ON UPDATE reference_option]
+>
+>reference_option:
+>    RESTRICT | CASCADE | SET NULL | NO ACTION | SET DEFAULT
+>
+>table_options:
+>    table_option [[,] table_option] ...
+>
+>table_option: {
+>    AUTO_INCREMENT [=] value
+>  | AVG_ROW_LENGTH [=] value
+>  | [DEFAULT] CHARACTER SET [=] charset_name
+>  | CHECKSUM [=] {0 | 1}
+>  | [DEFAULT] COLLATE [=] collation_name
+>  | COMMENT [=] 'string'
+>  | COMPRESSION [=] {'ZLIB' | 'LZ4' | 'NONE'}
+>  | CONNECTION [=] 'connect_string'
+>  | {DATA | INDEX} DIRECTORY [=] 'absolute path to directory'
+>  | DELAY_KEY_WRITE [=] {0 | 1}
+>  | ENCRYPTION [=] {'Y' | 'N'}
+>  | ENGINE [=] engine_name
+>  | INSERT_METHOD [=] { NO | FIRST | LAST }
+>  | KEY_BLOCK_SIZE [=] value
+>  | MAX_ROWS [=] value
+>  | MIN_ROWS [=] value
+>  | PACK_KEYS [=] {0 | 1 | DEFAULT}
+>  | PASSWORD [=] 'string'
+>  | ROW_FORMAT [=] {DEFAULT | DYNAMIC | FIXED | COMPRESSED | REDUNDANT | COMPACT}
+>  | STATS_AUTO_RECALC [=] {DEFAULT | 0 | 1}
+>  | STATS_PERSISTENT [=] {DEFAULT | 0 | 1}
+>  | STATS_SAMPLE_PAGES [=] value
+>  | TABLESPACE tablespace_name [STORAGE {DISK | MEMORY}]
+>  | UNION [=] (tbl_name[,tbl_name]...)
+>}
+>
+>partition_options:
+>    PARTITION BY
+>        { [LINEAR] HASH(expr)
+>        | [LINEAR] KEY [ALGORITHM={1 | 2}] (column_list)
+>        | RANGE{(expr) | COLUMNS(column_list)}
+>        | LIST{(expr) | COLUMNS(column_list)} }
+>    [PARTITIONS num]
+>    [SUBPARTITION BY
+>        { [LINEAR] HASH(expr)
+>        | [LINEAR] KEY [ALGORITHM={1 | 2}] (column_list) }
+>      [SUBPARTITIONS num]
+>    ]
+>    [(partition_definition [, partition_definition] ...)]
+>
+>partition_definition:
+>    PARTITION partition_name
+>        [VALUES
+>            {LESS THAN {(expr | value_list) | MAXVALUE}
+>            |
+>            IN (value_list)}]
+>        [[STORAGE] ENGINE [=] engine_name]
+>        [COMMENT [=] 'string' ]
+>        [DATA DIRECTORY [=] 'data_dir']
+>        [INDEX DIRECTORY [=] 'index_dir']
+>        [MAX_ROWS [=] max_number_of_rows]
+>        [MIN_ROWS [=] min_number_of_rows]
+>        [TABLESPACE [=] tablespace_name]
+>        [(subpartition_definition [, subpartition_definition] ...)]
+>
+>subpartition_definition:
+>    SUBPARTITION logical_name
+>        [[STORAGE] ENGINE [=] engine_name]
+>        [COMMENT [=] 'string' ]
+>        [DATA DIRECTORY [=] 'data_dir']
+>        [INDEX DIRECTORY [=] 'index_dir']
+>        [MAX_ROWS [=] max_number_of_rows]
+>        [MIN_ROWS [=] min_number_of_rows]
+>        [TABLESPACE [=] tablespace_name]
+>
+>query_expression:
+>    SELECT ...   (Some valid select or union statement)
+>```
+>
+>==如果带有temporary，不会隐式提交，也不会回滚==
+
+##### (b)、drop
+
+> ```sql
+> DROP [TEMPORARY] TABLE [IF EXISTS]
+>     tbl_name [, tbl_name] ...
+>     [RESTRICT | CASCADE]
+> ```
+>
+> 删除表也
+>
+> 会删除该表的所有触发器。
+>
+> 会删除该表的所有分区
+>
+> ==如果带有temporary，不会隐式提交，也不会回滚==
+
+##### (c)、alert
+
+> ```sql
+> ALTER TABLE tbl_name
+>     [alter_option [, alter_option] ...]
+>     [partition_options]
+> 
+> alter_option: {
+>     table_options
+>   | ADD [COLUMN] col_name column_definition
+>         [FIRST | AFTER col_name]
+>   | ADD [COLUMN] (col_name column_definition,...)
+>   | ADD {INDEX | KEY} [index_name]
+>         [index_type] (key_part,...) [index_option] ...
+>   | ADD {FULLTEXT | SPATIAL} [INDEX | KEY] [index_name]
+>         (key_part,...) [index_option] ...
+>   | ADD [CONSTRAINT [symbol]] PRIMARY KEY
+>         [index_type] (key_part,...)
+>         [index_option] ...
+>   | ADD [CONSTRAINT [symbol]] UNIQUE [INDEX | KEY]
+>         [index_name] [index_type] (key_part,...)
+>         [index_option] ...
+>   | ADD [CONSTRAINT [symbol]] FOREIGN KEY
+>         [index_name] (col_name,...)
+>         reference_definition
+>   | ADD CHECK (expr)
+>   | ALGORITHM [=] {DEFAULT | INPLACE | COPY}
+>   | ALTER [COLUMN] col_name {SET DEFAULT literal | DROP DEFAULT}
+>   | CHANGE [COLUMN] old_col_name new_col_name column_definition
+>         [FIRST | AFTER col_name]
+>   | [DEFAULT] CHARACTER SET [=] charset_name [COLLATE [=] collation_name]
+>   | CONVERT TO CHARACTER SET charset_name [COLLATE collation_name]
+>   | {DISABLE | ENABLE} KEYS
+>   | {DISCARD | IMPORT} TABLESPACE
+>   | DROP [COLUMN] col_name
+>   | DROP {INDEX | KEY} index_name
+>   | DROP PRIMARY KEY
+>   | DROP FOREIGN KEY fk_symbol
+>   | FORCE
+>   | LOCK [=] {DEFAULT | NONE | SHARED | EXCLUSIVE}
+>   | MODIFY [COLUMN] col_name column_definition
+>         [FIRST | AFTER col_name]
+>   | ORDER BY col_name [, col_name] ...
+>   | RENAME {INDEX | KEY} old_index_name TO new_index_name
+>   | RENAME [TO | AS] new_tbl_name
+>   | {WITHOUT | WITH} VALIDATION
+> }
+> 
+> partition_options:
+>     partition_option [partition_option] ...
+> 
+> partition_option: {
+>     ADD PARTITION (partition_definition)
+>   | DROP PARTITION partition_names
+>   | DISCARD PARTITION {partition_names | ALL} TABLESPACE
+>   | IMPORT PARTITION {partition_names | ALL} TABLESPACE
+>   | TRUNCATE PARTITION {partition_names | ALL}
+>   | COALESCE PARTITION number
+>   | REORGANIZE PARTITION partition_names INTO (partition_definitions)
+>   | EXCHANGE PARTITION partition_name WITH TABLE tbl_name [{WITH | WITHOUT} VALIDATION]
+>   | ANALYZE PARTITION {partition_names | ALL}
+>   | CHECK PARTITION {partition_names | ALL}
+>   | OPTIMIZE PARTITION {partition_names | ALL}
+>   | REBUILD PARTITION {partition_names | ALL}
+>   | REPAIR PARTITION {partition_names | ALL}
+>   | REMOVE PARTITIONING
+>   | UPGRADE PARTITIONING
+> }
+> 
+> key_part:
+>     col_name [(length)] [ASC | DESC]
+> 
+> index_type:
+>     USING {BTREE | HASH}
+> 
+> index_option: {
+>     KEY_BLOCK_SIZE [=] value
+>   | index_type
+>   | WITH PARSER parser_name
+>   | COMMENT 'string'
+> }
+> 
+> table_options:
+>     table_option [[,] table_option] ...
+> 
+> table_option: {
+>     AUTO_INCREMENT [=] value
+>   | AVG_ROW_LENGTH [=] value
+>   | [DEFAULT] CHARACTER SET [=] charset_name
+>   | CHECKSUM [=] {0 | 1}
+>   | [DEFAULT] COLLATE [=] collation_name
+>   | COMMENT [=] 'string'
+>   | COMPRESSION [=] {'ZLIB' | 'LZ4' | 'NONE'}
+>   | CONNECTION [=] 'connect_string'
+>   | {DATA | INDEX} DIRECTORY [=] 'absolute path to directory'
+>   | DELAY_KEY_WRITE [=] {0 | 1}
+>   | ENCRYPTION [=] {'Y' | 'N'}
+>   | ENGINE [=] engine_name
+>   | INSERT_METHOD [=] { NO | FIRST | LAST }
+>   | KEY_BLOCK_SIZE [=] value
+>   | MAX_ROWS [=] value
+>   | MIN_ROWS [=] value
+>   | PACK_KEYS [=] {0 | 1 | DEFAULT}
+>   | PASSWORD [=] 'string'
+>   | ROW_FORMAT [=] {DEFAULT | DYNAMIC | FIXED | COMPRESSED | REDUNDANT | COMPACT}
+>   | STATS_AUTO_RECALC [=] {DEFAULT | 0 | 1}
+>   | STATS_PERSISTENT [=] {DEFAULT | 0 | 1}
+>   | STATS_SAMPLE_PAGES [=] value
+>   | TABLESPACE tablespace_name [STORAGE {DISK | MEMORY}]
+>   | UNION [=] (tbl_name[,tbl_name]...)
+> }
+> 
+> partition_options:
+>     (see CREATE TABLE options)
+> ```
+
+##### (d)、示例
+
+>创建表
+
+>> ```sql
+>> CREATE TABLE IF NOT EXISTS `table_name`(
+>>    `id` INT UNSIGNED AUTO_INCREMENT,
+>>    `title` VARCHAR(100) CHARACTER SET 'utf8mb4' NOT NULL,
+>>    `author` VARCHAR(40) NOT NULL,
+>>    `date` DATE,
+>>    PRIMARY KEY ( `id` )
+>> )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+>> ```
+>
+>
+>
+> 删除表
+>
+>> ```sql
+>> DROP TABLE IF EXISTS table_nam
+>> ```
+
+
+
+
+
+>修改
+>
+>ALTER TABLE *tbl_name*
+>
+>| 类型 | 属性                      | 示例                                                         | 备注                                           |
+>| ---- | ------------------------- | ------------------------------------------------------------ | ---------------------------------------------- |
+>| 表   | 名称                      | RENAME [TO\|AS] new_tbl_name                                 |                                                |
+>| 字段 | 改字段定义+名称           | CHANGE [COLUMN] *old_col_name* *new_col_name* *column_definition  [FIRST\|AFTER *col_name*] | 修改备注也算是定义                             |
+>|      | 改字段定义                | MODIFY [COLUMN] *col_name* *column_definition  [FIRST\|AFTER *col_name*] |                                                |
+>|      | 删除                      | DROP [COLUMN] *col_name*                                     |                                                |
+>|      | 默认值                    | ALTER [COLUMN] *col_name* {SET DEFAULT *literal* \| DROP DEFAULT} |                                                |
+>|      | 改字符集(表默认+所有字段) | CONVERT TO CHARACTER SET *charset_name* [COLLATE *collation_name*] | a字段原为utf8,若该sql修改，改表的同时会改a字段 |
+>|      | 改字符集(表默认的)        | [DEFAULT] CHARACTER SET [=] *charset_name* [COLLATE [=] *collation_name*] |                                                |
+>|      | 字段顺序                  | ORDER BY *col_name* [, *col_name*] ...                       |                                                |
+>| 索引 | 名称                      | RENAME {INDEX\|KEY} old_index_name TO new_index_name         |                                                |
+>|      | 删除                      | DROP FOREIGN KEY *fk_symbol*                                 |                                                |
+>|      |                           | DROP PRIMARY KEY                                             |                                                |
+>|      |                           | DROP {INDEX\|KEY} *index_name*                               |                                                |
+
+
+
+##### (e)、table option
+
+| option                                                       | 功能                                                 |
+| ------------------------------------------------------------ | ---------------------------------------------------- |
+| AUTO_INCREMENT [=] *value*                                   | 自增字段的起始值                                     |
+| AVG_ROW_LENGTH [=] *value*                                   |                                                      |
+| [DEFAULT] CHARACTER SET [=] *charset_name*                   | 字符集                                               |
+| [DEFAULT] COLLATE [=] *collation_name*                       | 字符校验                                             |
+| CHECKSUM [=] {0 \| 1}                                        | 记录操作实时校验                                     |
+| COMMENT [=] '*string*'                                       | 备注                                                 |
+| COMPRESSION [=] {'ZLIB' \| 'LZ4' \| 'NONE'}                  | 页面级压缩算法                                       |
+| CONNECTION [=] '*connect_string*'                            | federated表的连接字符串                              |
+| {DATA \| INDEX} DIRECTORY [=] '*absolute path to directory*' | 表或索引存放目录                                     |
+| DELAY_KEY_WRITE [=] {0 \| 1}                                 | 索引先跟新到内存，关闭table时再更新到磁盘            |
+| ENCRYPTION [=] {'Y' \| 'N'}                                  | 页面级数据加密                                       |
+| ENGINE [=] *engine_name*                                     | 存储引擎                                             |
+| INSERT_METHOD [=] { NO \| FIRST \| LAST }                    | 仅限MERGE引擎                                        |
+| KEY_BLOCK_SIZE [=] *value*                                   | MyISAM-索引块的大小[b]<br>InnoDB压缩表的页面大小[kb] |
+| MAX_ROWS [=] *value*                                         | 后期删除。建议该用PARTITION_BALANCE                  |
+| MIN_ROWS [=] *value*                                         |                                                      |
+| PACK_KEYS [=] {0 \| 1 \| DEFAULT}                            | 仅限MyISAM引擎                                       |
+| PASSWORD [=] '*string*'                                      |                                                      |
+| ROW_FORMAT [=] {DEFAULT \| DYNAMIC \| FIXED \| COMPRESSED \| REDUNDANT \|  COMPACT} | 每行存储的物理格式                                   |
+| STATS_AUTO_RECALC [=] {DEFAULT \| 0 \| 1}                    | 统计                                                 |
+| STATS_PERSISTENT [=] {DEFAULT \| 0 \| 1}                     | 统计                                                 |
+| STATS_SAMPLE_PAGES [=] *value*                               |                                                      |
+| TABLESPACE *tablespace_name* [STORAGE {DISK \| MEMORY}]      | 表空间                                               |
+| UNION [=] (*tbl_name*[,*tbl_name*]...)                       | 仅限MERGE引擎                                        |
+
+
 
 #### (3)、index
 
+索引没有编辑，只有删除和新增
+
+##### (a)、create
+
+>```sql
+>CREATE [UNIQUE | FULLTEXT | SPATIAL] INDEX index_name
+>    [index_type]
+>    ON tbl_name (key_part,...)
+>    [index_option]
+>    [algorithm_option | lock_option] ...
+>
+>key_part:
+>    col_name [(length)] [ASC | DESC]
+>
+>index_option: {
+>    KEY_BLOCK_SIZE [=] value
+>  | index_type
+>  | WITH PARSER parser_name
+>  | COMMENT 'string'
+>}
+>
+>index_type:
+>    USING {BTREE | HASH}
+>
+>algorithm_option:
+>    ALGORITHM [=] {DEFAULT | INPLACE | COPY}
+>
+>lock_option:
+>    LOCK [=] {DEFAULT | NONE | SHARED | EXCLUSIVE}
+>```
+
+##### (b)、drop
+
+> ```sql
+> DROP INDEX index_name ON tbl_name
+>     [algorithm_option | lock_option] ...
+> 
+> algorithm_option:
+>     ALGORITHM [=] {DEFAULT | INPLACE | COPY}
+> 
+> lock_option:
+>     LOCK [=] {DEFAULT | NONE | SHARED | EXCLUSIVE}
+> ```
+
+
+
+##### (d)、示例
+
+>
+>
+>```sql
+>#新增索引，这两个是一样的
+>alter table table_name add INDEX table_index (id,title)
+>CREATE INDEX table_index2 ON table_name (id,title)
+>
+>#删除索引，这两个是一样的
+>alter table table_name drop INDEX table_index 
+>drop index table_index on table_name
+>```
+>
+>
+
 #### (4)、view
+
+##### (a)、create
+
+>```sql
+>CREATE
+>    [OR REPLACE]
+>    [ALGORITHM = {UNDEFINED | MERGE | TEMPTABLE}]
+>    [DEFINER = user]
+>    [SQL SECURITY { DEFINER | INVOKER }]
+>    VIEW view_name [(column_list)]
+>    AS select_statement
+>    [WITH [CASCADED | LOCAL] CHECK OPTION]
+>```
+
+##### (b)、drop
+
+> ```sql
+> DROP VIEW [IF EXISTS]
+>     view_name [, view_name] ...
+>     [RESTRICT | CASCADE]
+> ```
+
+##### (c)、alert
+
+> ```sql
+> ALTER
+>     [ALGORITHM = {UNDEFINED | MERGE | TEMPTABLE}]
+>     [DEFINER = user]
+>     [SQL SECURITY { DEFINER | INVOKER }]
+>     VIEW view_name [(column_list)]
+>     AS select_statement
+>     [WITH [CASCADED | LOCAL] CHECK OPTION]
+> ```
+
+
 
 #### (5)、tablespace
 
+##### (a)、create
+
+>```sql
+>CREATE TABLESPACE tablespace_name
+>
+>  InnoDB and NDB:
+>    ADD DATAFILE 'file_name'
+>
+>  InnoDB only:
+>    [FILE_BLOCK_SIZE = value]
+>
+>  NDB only:
+>    USE LOGFILE GROUP logfile_group
+>    [EXTENT_SIZE [=] extent_size]
+>    [INITIAL_SIZE [=] initial_size]
+>    [AUTOEXTEND_SIZE [=] autoextend_size]
+>    [MAX_SIZE [=] max_size]
+>    [NODEGROUP [=] nodegroup_id]
+>    [WAIT]
+>    [COMMENT [=] 'string']
+>
+>  InnoDB and NDB:
+>    [ENGINE [=] engine_name]
+>```
+
+##### (b)、drop
+
+> ```sql
+> DROP TABLESPACE tablespace_name
+>     [ENGINE [=] engine_name]
+> ```
+
+##### (c)、alert
+
+> ```sql
+> ALTER TABLESPACE tablespace_name
+>     {ADD | DROP} DATAFILE 'file_name'
+>     [INITIAL_SIZE [=] size]
+>     [WAIT]
+>     ENGINE [=] engine_name
+> ```
+
+
+
 #### (6)、procedure/function
+
+##### (a)、create
+
+>```sql
+>CREATE
+>    [DEFINER = user]
+>    PROCEDURE sp_name ([proc_parameter[,...]])
+>    [characteristic ...] routine_body
+>
+>CREATE
+>    [DEFINER = user]
+>    FUNCTION sp_name ([func_parameter[,...]])
+>    RETURNS type
+>    [characteristic ...] routine_body
+>
+>proc_parameter:
+>    [ IN | OUT | INOUT ] param_name type
+>
+>func_parameter:
+>    param_name type
+>
+>type:
+>    Any valid MySQL data type
+>
+>characteristic: {
+>    COMMENT 'string'
+>  | LANGUAGE SQL
+>  | [NOT] DETERMINISTIC
+>  | { CONTAINS SQL | NO SQL | READS SQL DATA | MODIFIES SQL DATA }
+>  | SQL SECURITY { DEFINER | INVOKER }
+>}
+>
+>routine_body:
+>    Valid SQL routine statement
+>```
+
+##### (b)、drop
+
+> ```sql
+> DROP {PROCEDURE | FUNCTION} [IF EXISTS] sp_name
+> ```
+
+##### (c)、alert
+
+> ```sql
+> ALTER PROCEDURE proc_name [characteristic ...]
+> 
+> ALTER FUNCTION func_name [characteristic ...]
+> 
+> characteristic: {
+>     COMMENT 'string'
+>   | LANGUAGE SQL
+>   | { CONTAINS SQL | NO SQL | READS SQL DATA | MODIFIES SQL DATA }
+>   | SQL SECURITY { DEFINER | INVOKER }
+> }
+> ```
+
+
+
+##### (d)、示例
+
+###### (i)、procedure示例
+
+> ```sql
+> delimiter //
+> 
+> CREATE PROCEDURE citycount (IN country CHAR(3), OUT cities INT)
+> BEGIN
+> 	SELECT COUNT(*) INTO cities FROM world.city WHERE CountryCode = country;
+> END//
+> 
+> delimiter ;
+> 
+> #调用
+> CALL citycount('JPN', @cities);
+> SELECT @cities;
+> ```
+>
+
+
+
+###### (ii)、代替union(procedure)
+
+> 原sql:
+>
+>> ```sql
+>> (SELECT shop,COUNT(id) from shop_22 where shop='shop' and  created_at BETWEEN '2020-10-12 11:10:00' AND '2020-10-12 15:00:00')
+>> UNION
+>> (SELECT shop,COUNT(id) from shop_33 where shop='shop' and  created_at BETWEEN  '2020-10-12 11:10:00' AND '2020-10-12 15:00:00')
+>> UNION
+>> (SELECT shop,COUNT(id) from shop_36 where shop='shop' and  created_at BETWEEN  '2020-10-12 11:10:00' AND '2020-10-12 15:00:00')
+>> UNION
+>> (SELECT shop,COUNT(id) from shop_40 where shop='shop' and  created_at BETWEEN  '2020-10-12 11:10:00' AND '2020-10-12 15:00:00')
+>> UNION
+>> (SELECT shop,COUNT(id) from shop_44 where shop='shop' and  created_at BETWEEN  '2020-10-12 11:10:00' AND '2020-10-12 15:00:00')
+>> ```
+>
+>##### 用存储过程(方法一，用记录总条数循环)
+>
+>> ```sql
+>> delimiter $$ # 声明存储过程的结束符号为$$
+>> CREATE DEFINER=`root`@`localhost` PROCEDURE `k`(IN shop VARCHAR(100),IN begin_at VARCHAR(100),IN end_at VARCHAR(100))
+>> BEGIN
+>> 
+>> DECLARE v_table_name VARCHAR(50) DEFAULT "";
+>> DECLARE v_sql LONGTEXT DEFAULT "";
+>> DECLARE v_sub_sql LONGTEXT DEFAULT "";
+>> DECLARE v_count INT DEFAULT 0;
+>> 
+>> #如果11行和12行调换上下位置，会报错
+>> DECLARE v_all_tables CURSOR for (SELECT TABLE_NAME from information_schema.`TABLES` where TABLE_NAME REGEXP "shop_[0-99999]" and TABLE_SCHEMA="local_exit");
+>> set v_count=(SELECT COUNT(DISTINCT TABLE_NAME) from information_schema.`TABLES` where TABLE_NAME REGEXP "shop_[0-99999]" and TABLE_SCHEMA="local_exit");
+>> 
+>> OPEN v_all_tables;
+>> 
+>> WHILE v_count>0 DO
+>> 	 FETCH v_all_tables INTO v_table_name;	
+>> 
+>> 	 set v_sub_sql=concat('(SELECT shop,COUNT(id) as num from ',v_table_name, ' where ',if(shop='','',CONCAT(' `shop`="', shop,'" and ')),' created_at BETWEEN  "',begin_at,'" AND "',end_at,'")');
+>> 	 
+>> 	 if v_sql='' then
+>> 			set v_sql=v_sub_sql;
+>> 	 else
+>> 			set v_sql=CONCAT(v_sql," union ", v_sub_sql);
+>> 	 end if;
+>> 	 
+>> 	 set v_count=v_count-1;
+>> END WHILE;
+>> CLOSE v_all_tables;#记得关闭游标
+>> 
+>> set @varsql=v_sql;#文档上没有强制全局变量，但是不用全局变量，下一行会报错
+>> PREPARE tmpsql FROM @varsql;
+>> EXECUTE tmpsql;
+>> DEALLOCATE PREPARE tmpsql;
+>> 
+>> SELECT v_sql;
+>> 
+>> END$$
+>> delimiter ; # 声明存储过程的结束符号为$$
+>> ```
+>
+>##### 用存储过程(方法二，用游标异常结束)
+>
+>> ```sql
+>> CREATE DEFINER=`root`@`localhost` PROCEDURE `fb_time_subnum5`(IN shop VARCHAR(100),IN begin_at VARCHAR(100),IN end_at VARCHAR(100))
+>> BEGIN
+>> 
+>> DECLARE v_table_name VARCHAR(50) DEFAULT "";
+>> DECLARE v_sql LONGTEXT DEFAULT "";
+>> DECLARE v_sub_sql LONGTEXT DEFAULT "";
+>> 
+>> DECLARE v_flag INT DEFAULT 0;
+>> DECLARE v_all_tables CURSOR for (SELECT TABLE_NAME from information_schema.`TABLES` where TABLE_NAME REGEXP "shop_facebook_[0-99999]" and TABLE_SCHEMA="local_exit");
+>> DECLARE CONTINUE HANDLER FOR 1329 SET v_flag=1;
+>> OPEN v_all_tables;
+>> 
+>> lable_1:WHILE v_flag=0 DO
+>> 	 FETCH v_all_tables INTO v_table_name;	
+>> 	 if v_flag!=0 then
+>> 			iterate lable_1;
+>> 	 end if;
+>> 	 
+>> 	 set v_sub_sql=concat('(SELECT shop,COUNT(id) as num from ',v_table_name, ' where ',if(shop='','',CONCAT(' `shop`="', shop,'" and ')),' created_at BETWEEN  "',begin_at,'" AND "',end_at,'")');
+>> 	 
+>> 	 if v_sql='' then
+>> 			set v_sql=v_sub_sql;
+>> 	 else
+>> 			set v_sql=CONCAT(v_sql," union ", v_sub_sql);
+>> 	 end if;	 
+>> END WHILE;
+>> CLOSE v_all_tables;
+>> 
+>> set @varsql=v_sql;
+>> PREPARE tmpsql FROM @varsql;
+>> EXECUTE tmpsql;
+>> DEALLOCATE PREPARE tmpsql;
+>> 
+>> SELECT v_sql;
+>> 
+>> END
+>> ```
+>>
+>> 
+>
+>
+
+###### (iii)、产生随机记录(procedure)
+
+> ```sql
+> delimiter $$ # 声明存储过程的结束符号为$$
+> create procedure randData5(IN num INT)
+> BEGIN
+> 		#声明必须放在最前面
+> declare i int default 1;
+> 		declare a int DEFAULT 0;
+> 		declare b int DEFAULT 0;
+> 		declare c VARCHAR(20) DEFAULT '';
+> 		declare d VARCHAR(20) DEFAULT '';
+> 		#创建测试表
+> 		DROP TABLE IF EXISTS `tp_tt`;
+> 		CREATE TABLE `tp_tt`  (
+> 			`id` int(11) NOT NULL,
+> 			`a` int(10) NULL DEFAULT NULL,
+> 			`b` int(10) NULL DEFAULT NULL,
+> 			`c` varchar(20) NULL DEFAULT NULL,
+> 			`d` varchar(20) NULL DEFAULT NULL,
+> 			PRIMARY KEY (`id`) USING BTREE
+> 		) ENGINE = InnoDB;
+> 		#往测试表中塞入数据
+> 		if num<100 THEN
+> 				set num=100;
+> 		ELSE
+> 				set num=num;#只是为了写完整的if...else..
+> 		END IF;
+> 	
+> while(i<num)do
+> 				set a=FLOOR(100+(RAND()*1900));#随机数字 RAND()取值0-1的小数
+> 				set b=FLOOR(100+(RAND()*1900));
+> 				set c=substring(MD5(RAND()),1,20);#随机字符串-用随机数字演变的
+> 				set d=substring(MD5(RAND()),1,20);
+> 				
+>   insert into tp_tt (`id`,`a`,`b`,`c`,`d`) values(i,a,b,c,d);
+>   set i=i+1;
+> end while;
+> END$$ # $$结束
+> delimiter ; # 重新声明分号为结束符号
+> ```
+
+
 
 #### (7)、event
 
+所谓事件，跟定时器差不多。一个事件可调用一次，也可周期性的启动，它由一个特定的线程来管理的，也就是所谓的“事件调度器”
+
+
+
+配置。开关
+
+> 查看是否开启
+>
+> ```sql
+> SHOW VARIABLES LIKE 'event_scheduler';
+> 
+> SELECT @@event_scheduler
+> ```
+>
+> ```sql
+> set @@event_scheduler=1;##错误。不得性
+> #临时开启
+> SET GLOBAL event_scheduler = ON; 
+> SET @@global.event_scheduler = ON; 
+> SET GLOBAL event_scheduler = 1; 
+> SET @@global.event_scheduler = 1;
+> #永久开启  改物理配置文件
+> ```
+
+查看已有的event
+
+> ```sql
+> show EVENTS;
+> ```
+>
+> | Db    | Name        | Definer        | Time zone | Type      | Execute at | Interval value | Interval field | Starts          | Ends | Status  | Originator | character_set_client | collation_connection | Database Collation |
+> | ----- | ----------- | -------------- | --------- | --------- | ---------- | -------------- | -------------- | --------------- | ---- | ------- | ---------- | -------------------- | -------------------- | ------------------ |
+> | test2 | event_name5 | root@localhost | SYSTEM    | RECURRING |            | 1              | MINUTE         | 44125.486539352 |      | ENABLED | 1          | utf8mb4              | utf8mb4_general_ci   | utf8mb4_general_ci |
+
+
+
+##### (a)、create
+
+>```sql
+>CREATE [DEFINER = user] EVENT [IF NOT EXISTS] event_name
+>   ON SCHEDULE schedule
+>   [ON COMPLETION [NOT] PRESERVE]
+>   [ENABLE | DISABLE | DISABLE ON SLAVE]
+>   [COMMENT 'string']
+>   DO event_body;
+>
+>schedule: {
+>AT timestamp [+ INTERVAL interval] ... | EVERY interval 
+>[STARTS timestamp [+ INTERVAL interval] ...]
+>[ENDS timestamp [+ INTERVAL interval] ...]
+>}
+>
+>interval:
+>quantity {YEAR | QUARTER | MONTH | DAY | HOUR | MINUTE |
+>    WEEK | SECOND | YEAR_MONTH | DAY_HOUR | DAY_MINUTE |
+>    DAY_SECOND | HOUR_MINUTE | HOUR_SECOND | MINUTE_SECOND}
+>```
+>
+>schedule: 决定event的执行时间和频率（注意时间一定要是将来的时间，过去的时间会出错），有两种形式 AT和EVERY
+
+##### (b)、drop
+
+> ```sql
+> DROP EVENT [IF EXISTS] event_name
+> ```
+
+##### (c)、alert
+
+> 更新和重新写，感觉没啥区别
+> 
+>    ```sql
+>    ALTER  [DEFINER = user]  EVENT event_name
+>     [ON SCHEDULE schedule]
+>     [ON COMPLETION [NOT] PRESERVE]
+>     [RENAME TO new_event_name]
+>     [ENABLE | DISABLE | DISABLE ON SLAVE]
+>     [COMMENT 'string']
+>     [DO event_body]
+> ```
+
+##### (d)、示例
+
+> ```sql
+> #每个小时清除一次表
+> CREATE EVENT e_hourly
+>  ON SCHEDULE  EVERY 1 HOUR
+>  COMMENT 'Clears out sessions table each hour.'
+>  DO
+>    DELETE FROM site_activity.sessions;
+> ```
+>
+> 
+>
+> ```sql
+> delimiter $$
+> create event if not exists event_name5
+> ON SCHEDULE EVERY 1 MINUTE 
+> DO
+> 	BEGIN
+> 		DECLARE varA INT;
+> 		DECLARE varB INT;
+> 		DECLARE varID int;
+> 		DECLARE v_flag INT DEFAULT 0;
+> 		
+> 		declare var_cursor CURSOR FOR SELECT `id`,`a`,`b` FROM t_a;
+> 		DECLARE CONTINUE HANDLER FOR 1329 SET v_flag=1;
+> 		
+> 		OPEN var_cursor;
+> 		WHILE v_flag=0 do
+> 			FETCH var_cursor INTO varID,varA,varB;
+> 			update t_a set `c`=varA+varB where `id`=varID;
+> 		end while;
+> 	END$$
+> delimiter ;
+> ```
+>
+> 改写 
+>
+> ```sql
+> delimiter $$
+> create event if not exists event_name4
+> ON SCHEDULE EVERY 1 MINUTE 
+> DO
+> 	BEGIN
+> 		call procedure_name();
+> 	END$$
+> delimiter ;
+> 
+> 
+> CREATE DEFINER=`root`@`localhost` PROCEDURE `procedure_name`()
+> BEGIN
+> 
+> 	DECLARE varA INT;
+> 		DECLARE varB INT;
+> 		DECLARE varID int;
+> 		DECLARE v_flag INT DEFAULT 0;
+> 		
+> 		declare var_cursor CURSOR FOR SELECT `id`,`a`,`b` FROM t_a;
+> 		DECLARE CONTINUE HANDLER FOR 1329 SET v_flag=1;
+> 		
+> 		OPEN var_cursor;
+> 		WHILE v_flag=0 do
+> 			FETCH var_cursor INTO varID,varA,varB;
+> 			update t_a set `c`=varA+varB where `id`=varID;
+> 		end while;
+> end
+> ```
+>
+> 
+
+##### (e)、设置触发时间
+
+> 从现在开始，每隔9天定时执行
+>
+> ```sql
+> ON SCHEDULE EVERY 9 DAY STARTS NOW() 
+> ```
+>
+>   每个月的一号凌晨1 点执行 （下个月开始）
+>
+> ```sql
+> ON SCHEDULE EVERY 1 MONTH STARTS DATE_ADD(DATE_ADD(DATE_SUB(CURDATE(),INTERVAL DAY(CURDATE())-1 DAY), INTERVAL 1 MONTH),INTERVAL 1 HOUR) 
+> ```
+>
+>  
+>
+> ```sql
+> ON SCHEDULE EVERY 1 QUARTER STARTS DATE_ADD(DATE_ADD(DATE( CONCAT(YEAR(CURDATE()),'-',ELT(QUARTER(CURDATE()),1,4,7,10),'-',1)),INTERVAL 1 QUARTER),INTERVAL 2 HOUR)
+> ```
+>
+> 
+
 #### (8)、trigger
+
+| 触发器类型   | 激活触发器的语句           | 能用变量 |
+| ------------ | -------------------------- | -------- |
+| insert触发器 | insert，load data，replace | NEW      |
+| update触发器 | update                     | NEW,OLD  |
+| delete触发器 | delete，replace            | OLD      |
+
+==***MYSQL中触发器中不能对本表进行 insert ,update ,delete 操作，以免递归循环触发***==
+
+一张表同一个类型触发器只能创建一个，【trigger_time和trigger_event】组合算一类
+
+
+
+触发器没有编辑，只有新增和删除
+
+##### (a)、create
+
+>```sql
+>CREATE [DEFINER = user] TRIGGER trigger_name
+>    trigger_time trigger_event
+>    ON tbl_name FOR EACH ROW
+>    [trigger_order]
+>    trigger_body
+>    
+>    trigger_time: { BEFORE | AFTER }
+>
+>trigger_event: { INSERT | UPDATE | DELETE }
+>
+>trigger_order: { FOLLOWS | PRECEDES } other_trigger_name
+>```
+
+##### (b)、drop
+
+> ```sql
+> DROP TRIGGER [IF EXISTS] [schema_name.]trigger_name
+> ```
+
+
+
+##### (d)、示例
+
+>用触发器写自动生成列
+>
+>c=a+b
+>
+>```sql
+>delimiter $$
+>CREATE TRIGGER trigger_name
+>BEFORE INSERT
+>on t_a for EACH ROW
+>BEGIN
+>	SET NEW.c=NEW.a+NEW.b;
+>end$$
+>delimiter ;
+>```
+>
+>
 
 #### (9)、server
 
+==与FEDERATED存储引擎配套使用==
+
+##### (a)、create
+
+>```sql
+>CREATE SERVER server_name
+>    FOREIGN DATA WRAPPER wrapper_name
+>    OPTIONS (option [, option] ...)
+>
+>option: {
+>    HOST character-literal
+>  | DATABASE character-literal
+>  | USER character-literal
+>  | PASSWORD character-literal
+>  | SOCKET character-literal
+>  | OWNER character-literal
+>  | PORT numeric-literal
+>}
+>```
+
+##### (b)、drop
+
+> ```sql
+> DROP SERVER [ IF EXISTS ] server_name
+> ```
+
+##### (c)、update
+
+> ```sql
+> ALTER SERVER  server_name
+>     OPTIONS (option [, option] ...)
+> ```
+
+
+
 #### (10)、logfile group
 
+##### (a)、create
+
+>```sql
+>CREATE LOGFILE GROUP logfile_group
+>    ADD UNDOFILE 'undo_file'
+>    [INITIAL_SIZE [=] initial_size]
+>    [UNDO_BUFFER_SIZE [=] undo_buffer_size]
+>    [REDO_BUFFER_SIZE [=] redo_buffer_size]
+>    [NODEGROUP [=] nodegroup_id]
+>    [WAIT]
+>    [COMMENT [=] 'string']
+>    ENGINE [=] engine_name
+>```
+
+##### (b)、drop
+
+> ```sql
+> DROP LOGFILE GROUP logfile_group
+>     ENGINE [=] engine_name
+> ```
+
+##### (c)、update
+
+> ```sql
+> ALTER LOGFILE GROUP logfile_group
+>     ADD UNDOFILE 'file_name'
+>     [INITIAL_SIZE [=] size]
+>     [WAIT]
+>     ENGINE [=] engine_name
+> ```
+
+
+
 ### 2、DML
+
+dml词汇定义：https://dev.mysql.com/doc/refman/5.7/en/glossary.html#glos_dml
 
 官网：https://dev.mysql.com/doc/refman/5.7/en/sql-data-manipulation-statements.html
 
 #### (1)、insert
 
+| 关键字 | 功能                                                         |
+| ------ | ------------------------------------------------------------ |
+| IGNORE | 忽略错误，比如unique key重复，会报错并中止。<br>使用 `IGNORE`，该行将被丢弃，并且不会发生错误。忽略掉的错误会生成警告 |
+
+
+
+https://dev.mysql.com/doc/refman/5.7/en/insert.html
+
+> ```sql
+> INSERT [LOW_PRIORITY | DELAYED | HIGH_PRIORITY] [IGNORE]
+>     [INTO] tbl_name
+>     [PARTITION (partition_name [, partition_name] ...)]
+>     [(col_name [, col_name] ...)]
+>     {VALUES | VALUE} (value_list) [, (value_list)] ...
+>     [ON DUPLICATE KEY UPDATE assignment_list]
+> 
+> INSERT [LOW_PRIORITY | DELAYED | HIGH_PRIORITY] [IGNORE]
+>     [INTO] tbl_name
+>     [PARTITION (partition_name [, partition_name] ...)]
+>     SET assignment_list
+>     [ON DUPLICATE KEY UPDATE assignment_list]
+> 
+> INSERT [LOW_PRIORITY | HIGH_PRIORITY] [IGNORE]
+>     [INTO] tbl_name
+>     [PARTITION (partition_name [, partition_name] ...)]
+>     [(col_name [, col_name] ...)]
+>     SELECT ...
+>     [ON DUPLICATE KEY UPDATE assignment_list]
+> 
+> value:
+>     {expr | DEFAULT}
+> 
+> value_list:
+>     value [, value] ...
+> 
+> assignment:
+>     col_name = value
+> 
+> assignment_list:
+>     assignment [, assignment] ...
+> ```
+
+##### (a)、insert ... values/value
+
+>  批量插入
+>
+> ```
+> INSERT INTO tablename(filed1,field2...) VALUES(value1,value2...)...;
+> INSERT INTO tablename VALUES(value1,value2...)...;#value的顺序和个数必须严格与ddl的字段一致
+> ```
+>
+> 插入一条
+>
+> ```
+> INSERT INTO tablename(filed1,field2...) VALUE(value1,value2...);
+> INSERT INTO tablename VALUE(value1,value2...);#value的顺序和个数必须严格与ddl的字段一致
+> ```
+
+##### (b)、insert...set
+
+> 插入一条k-v
+>
+> ```
+> INSERT INTO tablename SET column_name1 = value1, column_name2 = value2，…;
+> ```
+
+##### (c)、insert...select
+
+> insert...select
+>
+> ```sql
+>  INSERT INTO db1_name(field1,field2) SELECT field1,field2 FROM db2_name  
+> ```
+
+##### (d)、insert...on duplicate key 要么插入，要么更新
+
+>  有则update，无则insert
+>
+> ```sql
+> INSERT INTO t_a (a,b,c) VALUES (1,2,3) ON DUPLICATE KEY UPDATE b=b+10;
+> 
+> #如果a,b,c中有一个或多个privary key或者unique key 则会先查，有记录则update，没有则insert
+> #如果a,b,c都是privary key或者unique key，查找条件是 a=1 or b=2 or c=3,但即使有存在多条记录，也只修改一条
+> 
+> 示例
+> 一个有四个字段的表（id,a,b,c） id是privary key, a与b是unique key
+> 第一次执行：INSERT INTO t_a (a,b,c) VALUES (1,2,3) ON DUPLICATE KEY UPDATE b=b+10;
+> 结果：数据库中会新加一条记录：（id,a,b,c）= (1,1,2,3)
+> 
+> 第二次执行：INSERT INTO t_a (a,b,c) VALUES (1,2,3) ON DUPLICATE KEY UPDATE b=b+10;
+> 结果：数据库中依旧只有一条记录：（id,a,b,c）= (1,1,12,3)，但b值被修改了
+> 第二次执行的时候等同于下面这句：update t_a set b=b+10 where a=1 or b=2;
+> ```
+>
+> 
+
+
+
+
+
 #### (2)、replace
+
+https://dev.mysql.com/doc/refman/5.7/en/replace.html
+
+> 要么插入，要么删除再插入
+> 
+>    ```sql
+>    REPLACE [LOW_PRIORITY | DELAYED]
+>     [INTO] tbl_name
+>     [PARTITION (partition_name [, partition_name] ...)]
+>  [(col_name [, col_name] ...)]
+>  {VALUES | VALUE} (value_list) [, (value_list)] ...
+>    
+>    REPLACE [LOW_PRIORITY | DELAYED]
+>     [INTO] tbl_name
+>  [PARTITION (partition_name [, partition_name] ...)]
+>  SET assignment_list
+>    
+>    REPLACE [LOW_PRIORITY | DELAYED]
+>     [INTO] tbl_name
+>     [PARTITION (partition_name [, partition_name] ...)]
+>  [(col_name [, col_name] ...)]
+>  SELECT ...
+>    
+> value:
+>  {expr | DEFAULT}
+>    
+> value_list:
+>  value [, value] ...
+>    
+> assignment:
+>  col_name = value
+>    
+> assignment_list:
+> assignment [, assignment] ...
+> ```
+
+>
+
+##### (a)、insert和replace的区别
+
+>| 区别                     | insert                                     | repace                    | 说明                  |
+>| ------------------------ | ------------------------------------------ | ------------------------- | --------------------- |
+>| 优先级                   | [LOW_PRIORITY \| DELAYED \| HIGH_PRIORITY] | [LOW_PRIORITY \| DELAYED] | 是否支持HIGH_PRIORITY |
+>| 忽略错误                 | [IGNORE]                                   | 无                        | 是否支持忽略错误      |
+>| 要么插入，要么更新       | 支持                                       | 不支持                    |                       |
+>| 要么插入，要么删除再插入 | 不支持                                     | 支持                      |                       |
+>
+>* 要么插入，要么更新
+>  * on duplicate key
+>  * 如果表中的旧行与a`PRIMARY KEY`或`UNIQUE` 索引的新行具有相同的值， 则更新旧数据行
+>* 要么插入，要么删除再插入
+>  * 如果表中的旧行与a`PRIMARY KEY`或`UNIQUE` 索引的新行具有相同的值， 则在插入新行之前删除该旧行
 
 #### (3)、update
 
+>单表更新
+>
+>```sql
+>UPDATE [LOW_PRIORITY] [IGNORE] table_reference
+>    SET assignment_list
+>    [WHERE where_condition]
+>    [ORDER BY ...]
+>    [LIMIT row_count]
+>
+>value:
+>    {expr | DEFAULT}
+>
+>assignment:
+>    col_name = value
+>
+>assignment_list:
+>    assignment [, assignment] ...
+>```
+>
+>跨表更新
+>
+>```sql
+>UPDATE [LOW_PRIORITY] [IGNORE] table_references
+>    SET assignment_list
+>    [WHERE where_condition]
+>```
+
+
+
+##### 示例
+
+> 跨表更新
+>
+> ```sql
+> UPDATE items,month
+> SET items.price=month.price
+> WHERE items.id=month.id;
+> ```
+>
+> 
+
 #### (4)、delete
 
-#### (5)、select
+https://dev.mysql.com/doc/refman/5.7/en/delete.html
 
-#### (6)、call
+> ```sql
+> DELETE [LOW_PRIORITY] [QUICK] [IGNORE] FROM tbl_name
+>     [PARTITION (partition_name [, partition_name] ...)]
+>     [WHERE where_condition]
+>     [ORDER BY ...]
+>     [LIMIT row_count]
+> ```
 
-#### (7)、do
 
-#### (8)、handler
-
-#### (9)、load data
-
-#### (10)、load xml
 
 ### 3、DQL
+
+
+
+#### (1)、select
+
+https://dev.mysql.com/doc/refman/5.7/en/select.html
+
+> ```sql
+> SELECT
+>  [ALL | DISTINCT | DISTINCTROW ] #结果集去重
+>  [HIGH_PRIORITY]                 #优先级
+>  [STRAIGHT_JOIN]                 #强制join连表顺序
+>  [SQL_SMALL_RESULT] [SQL_BIG_RESULT] [SQL_BUFFER_RESULT]#是否建临时表
+>  [SQL_CACHE | SQL_NO_CACHE]      #5.7.20弃用
+>  [SQL_CALC_FOUND_ROWS]           #统计结果集总行数，与count差不多
+>  select_expr [, select_expr] ... #字段
+>  [into_option]
+>  [FROM table_references [PARTITION partition_list]]
+>  [WHERE where_condition]
+>  [GROUP BY {col_name | expr | position}  [ASC | DESC], ... [WITH ROLLUP]]
+>  [HAVING where_condition]
+>  [ORDER BY {col_name | expr | position} [ASC | DESC], ...]
+>  [LIMIT {[offset,] row_count | row_count OFFSET offset}]
+>  [PROCEDURE procedure_name(argument_list)]
+>  [into_option]
+>  [FOR UPDATE | LOCK IN SHARE MODE]
+> 
+> into_option: {
+>  INTO OUTFILE 'file_name'
+>      [CHARACTER SET charset_name]
+>      export_options
+> | INTO DUMPFILE 'file_name'
+> | INTO var_name [, var_name] ...
+> }
+> ```
+
+##### (a)、示例
+
+###### (i)、别名
+
+> table别名
+>
+> ```sql
+> SELECT t1.name, t2.salary 
+> FROM employee AS t1, info AS t2
+> WHERE t1.name = t2.name;
+> ```
+>
+> 字段别名
+>
+> ```sql
+> SELECT region AS r, seed AS s 
+> FROM employee
+> ORDER BY r, s;
+> ```
+>
+
+###### (ii)、去重distinct/distinctrow
+
+>  `DISTINCTROW` is a synonym for `DISTINCT` 
+>
+> distinct和distinctrow是一样的
+>
+> ```sql
+> select distinct name,age from students;//查询名字和年龄同时不同的学生
+> ```
+
+###### (iii)、group by ... with rollup统计
+
+>在分组查询的基础上，对所有结果集求一次合计
+>
+>
+>
+>![image-20201023103116512](static/db/image-20201023103116512.png)
+
+###### (iv)、order by/group by的另一种用法
+
+>group和order可以使用字段顺序号
+>
+>```sql
+>SELECT name, money  FROM  test ORDER BY 2
+>SELECT name, money  FROM  test ORDER BY money
+>
+>SELECT name, sum(money)  FROM  test group BY 1
+>SELECT name, sum(money)  FROM  test group BY name
+>```
+
+###### (v)、having
+
+>he `HAVING` clause is applied nearly last, just before items are sent to the client, with no optimization. (`LIMIT` is applied after `HAVING`.)
+>
+>该`HAVING`子句几乎是最后一次应用，即将项目发送到客户端之前，没有进行优化。（`LIMIT`在之后应用 `HAVING`。）
+>
+>==也就是说用不上索引==
+
+###### (vi)、limit
+
+> limit 5,10 取到的结果是第【6，15】
+>
+> limit的偏移量起始是0，不是1
+
+###### (vii)、sql_[small/big/buffer]\_result
+
+>
+>
+>- `SQL_BIG_RESULT`或 `SQL_SMALL_RESULT`可以与`GROUP BY`或`DISTINCT`一起使用， 以告诉优化器结果集分别具有很多行或很小。对于`SQL_BIG_RESULT`，如果创建了基于磁盘的临时表，则MySQL直接使用基于磁盘的临时表，并且更喜欢排序而不是使用在`GROUP BY`元素上带有键的临时表。对于 `SQL_SMALL_RESULT`，MySQL使用内存中临时表来存储结果表，而不是使用排序。通常不需要。
+>
+>  
+>
+>  
+>
+>- `SQL_BUFFER_RESULT`强制将结果放入临时表中。这有助于MySQL及早释放表锁定，并在将结果集发送到客户端花费很长时间的情况下提供帮助。此修饰符只能用于顶级[`SELECT`](https://dev.mysql.com/doc/refman/5.7/en/select.html) 语句，不能用于子查询或following [`UNION`](https://dev.mysql.com/doc/refman/5.7/en/union.html)。
+
+###### (viii)、count和SQL_CALC_FOUND_ROWS
+
+>**第一种方法：**
+>
+>在 SELECT 语句中加入 SQL_CALC_FOUND_ROWS 选项，然后通过 SELECT FOUND_ROWS() 来获取总行数：
+>
+>```
+>SELECT SQL_CALC_FOUND_ROWS * FROM table WHERE id > 100 LIMIT 10;
+>SELECT FOUND_ROWS();
+>```
+>
+>**第二种方式：**
+>
+>使用正常的 SQL 语句，然后再用 SELECT COUNT(*) 来获取总行数：
+>
+>```
+>SELECT * FROM table WHERE id > 100 LIMIT 10;
+>SELECT COUNT(*) FROM table WHERE id > 100;
+>```
+
+##### (b)、select...for update
+
+##### (c)、select...into
+
+>
+>
+>使查询结果可以写入文件或存储在变量中
+
+###### (i)、SELECT ... INTO  var_list
+
+> 查询==单行==结果集，并把结果集赋值给对应的变量
+>
+> 正确示例：
+>
+> ```sql
+> select count(*) into @count from test
+> select count(*) from test  into @count
+> 
+> SELECT name,money into @a,@b FROM test where id=1
+> SELECT name,money FROM test where id=1 into @a,@b
+> ```
+>
+>  错误示例：
+>
+> ```sql
+> SELECT name,money into @a,@b FROM test 
+> #这个就不是单行结果集
+> #报错 
+> # 1172 - Result consisted of more than one row
+> ```
+
+###### (ii)、SELECT ... INTO outfile
+
+> 
+>
+> ```sql
+> show VARIABLES like "%secure%"
+> ```
+>
+> secure_file_prive
+>
+> | value值 | 功能                                                         |
+> | ------- | ------------------------------------------------------------ |
+> | null    | 限制mysqld不允许导入导出                                     |
+> | /path/  | 只能导出到默认的/path/目录下。该目录必须存在；服务器将不会创建它 |
+> | ‘’      | 不限制                                                       |
+
+
+
+> 官方是没有标准sql的。
+>
+> 这个是模仿load data的
+>
+> ```sql
+> sql_statement
+> into outfile file_path
+> [CHARACTER SET charset_name]
+> [{FIELDS | COLUMNS}
+>   [TERMINATED BY 'string']
+>   [[OPTIONALLY] ENCLOSED BY 'char']
+>   [ESCAPED BY 'char']
+> ]
+> [LINES
+>   [STARTING BY 'string']
+>   [TERMINATED BY 'string']
+> ]
+> ```
+>
+> 
+
+示例
+
+> ```sql
+> SELECT * FROM test 
+> INTO OUTFILE "C:/Users/EDZ/Desktop/doc/a2.txt" 
+> CHARACTER SET utf8
+> #FIELDS TERMINATED BY '\t' ENCLOSED BY '' ESCAPED BY '\\'
+> #LINES TERMINATED BY '\n' STARTING BY ''
+> ```
+>
+> * 第一 目录必须==存在==
+>   * doc目录必须存在，否则
+>   * 1 - Can't create/write to file 'C:\Users\EDZ\Desktop\do3c\a2.txt' (Errcode: 2 - No such file or directory)
+> * 第二 文件必须==不存在==
+>   * a2.txt必须不存在，不会自动覆盖
+>   * 1086 - File 'C:/Users/EDZ/Desktop/doc/a2.txt' already exists
+> * 第三 输出格式：fileds必须在lines的前面
+>   * 默认的支持xls
+
+###### (iii)、SELECT ... INTO dumpfile
+
+> ```sql
+> SELECT * FROM test where id=2
+> INTO DUMPFILE "C:/Users/EDZ/Desktop/doc/a2233.txt" 
+> ```
+>
+> * 第一 只对单行记录有效
+>   * 多行记录会报错   1172 - Result consisted of more than one row
+> * 不支持带各种格式 fileds和lines都不支持，会语法报错
+> * 适合导出单个 [`BLOB`](https://dev.mysql.com/doc/refman/5.7/en/blob.html)结果值
+
+##### (f)、union结果集合并
+
+#### (2)、join表连接
+
+https://dev.mysql.com/doc/refman/5.7/en/join.html
+
+>STRAIGHT_JOIN
+>
+>join适用于select，delete，update
+>
+>```sql
+>table_references:
+>    escaped_table_reference [, escaped_table_reference] ...
+>
+>escaped_table_reference: {
+>    table_reference
+>  | { OJ table_reference }
+>}
+>
+>table_reference: {
+>    table_factor
+>  | joined_table
+>}
+>
+>table_factor: {
+>    tbl_name [PARTITION (partition_names)]
+>        [[AS] alias] [index_hint_list]
+>  | table_subquery [AS] alias
+>  | ( table_references )
+>}
+>
+>joined_table: {
+>    table_reference [INNER | CROSS] JOIN table_factor [join_specification]
+>  | table_reference STRAIGHT_JOIN table_factor
+>  | table_reference STRAIGHT_JOIN table_factor ON search_condition
+>  | table_reference {LEFT|RIGHT} [OUTER] JOIN table_reference join_specification
+>  | table_reference NATURAL [{LEFT|RIGHT} [OUTER]] JOIN table_factor
+>}
+>
+>join_specification: {
+>    ON search_condition
+>  | USING (join_column_list)
+>}
+>
+>join_column_list:
+>    column_name [, column_name] ...
+>
+>index_hint_list:
+>    index_hint [, index_hint] ...
+>
+>index_hint: {
+>    USE {INDEX|KEY}
+>      [FOR {JOIN|ORDER BY|GROUP BY}] ([index_list])
+>  | {IGNORE|FORCE} {INDEX|KEY}
+>      [FOR {JOIN|ORDER BY|GROUP BY}] (index_list)
+>}
+>
+>index_list:
+>    index_name [, index_name] ...
+>```
+
+
+
+#### (2)、do
+
+> 与select相似。但是do不返回结果集，只返回执行状态
+>
+> ```sql
+> DO expr [, expr] ...
+> ```
+
+
+
+
 
 ()、
 
@@ -586,6 +3354,14 @@ service：  https://dev.mysql.com/doc/mysql-errors/5.7/en/server-error-reference
 
 ### 4、DCL
 
+dcl词汇定义：https://dev.mysql.com/doc/refman/5.7/en/glossary.html#glos_dcl
+
+#### (1)、grant
+
+#### (2)、revoke
+
+
+
 ()、account管理
 
 https://dev.mysql.com/doc/refman/5.7/en/account-management-statements.html
@@ -596,9 +3372,103 @@ https://dev.mysql.com/doc/refman/5.7/en/account-management-statements.html
 
 ()、
 
-### show
+
+
+
+
+### 其他语句
+
+#### show
 
 https://dev.mysql.com/doc/refman/5.7/en/show.html
+
+
+
+#### call
+
+> 调用存储进程
+>
+> ```sql
+> CALL sp_name([parameter[,...]])
+> CALL sp_name[()]
+> ```
+
+> 
+
+#### (8)、handler
+
+仅支持InnoDB和MyISAM引擎
+
+> ```sql
+> HANDLER tbl_name OPEN [ [AS] alias]
+> 
+> HANDLER tbl_name READ index_name { = | <= | >= | < | > } (value1,value2,...)
+>     [ WHERE where_condition ] [LIMIT ... ]
+> HANDLER tbl_name READ index_name { FIRST | NEXT | PREV | LAST }
+>     [ WHERE where_condition ] [LIMIT ... ]
+> HANDLER tbl_name READ { FIRST | NEXT }
+>     [ WHERE where_condition ] [LIMIT ... ]
+> 
+> HANDLER tbl_name CLOSE
+> ```
+>
+> 
+
+#### (9)、load data
+
+> ```sql
+> LOAD DATA
+>     [LOW_PRIORITY | CONCURRENT] [LOCAL]
+>     INFILE 'file_name'
+>     [REPLACE | IGNORE]
+>     INTO TABLE tbl_name
+>     [PARTITION (partition_name [, partition_name] ...)]
+>     [CHARACTER SET charset_name]
+>     [{FIELDS | COLUMNS}
+>         [TERMINATED BY 'string']
+>         [[OPTIONALLY] ENCLOSED BY 'char']
+>         [ESCAPED BY 'char']
+>     ]
+>     [LINES
+>         [STARTING BY 'string']
+>         [TERMINATED BY 'string']
+>     ]
+>     [IGNORE number {LINES | ROWS}]
+>     [(col_name_or_user_var
+>         [, col_name_or_user_var] ...)]
+>     [SET col_name={expr | DEFAULT}
+>         [, col_name={expr | DEFAULT}] ...]
+> ```
+>
+> 
+
+#### (10)、load xml
+
+> ```sql
+> LOAD XML
+>     [LOW_PRIORITY | CONCURRENT] [LOCAL]
+>     INFILE 'file_name'
+>     [REPLACE | IGNORE]
+>     INTO TABLE [db_name.]tbl_name
+>     [CHARACTER SET charset_name]
+>     [ROWS IDENTIFIED BY '<tagname>']
+>     [IGNORE number {LINES | ROWS}]
+>     [(field_name_or_user_var
+>         [, field_name_or_user_var] ...)]
+>     [SET col_name={expr | DEFAULT},
+>         [, col_name={expr | DEFAULT}] ...]
+> ```
+>
+> 
+
+
+
+#### check/repair
+
+>
+>
+>CHECK TABLE test
+>REPAIR table test
 
 ### 事务
 
@@ -674,36 +3544,36 @@ https://dev.mysql.com/doc/refman/5.7/en/cannot-roll-back.html
 
 ###### (i)、肯定隐式提交
 
->| 操作    | 对象                                                         |
->| ------- | ------------------------------------------------------------ |
->| create  | [`CREATE DATABASE`](https://dev.mysql.com/doc/refman/5.7/en/create-database.html) |
->|         | [`CREATE EVENT`](https://dev.mysql.com/doc/refman/5.7/en/create-event.html) |
->|         | [`CREATE INDEX`](https://dev.mysql.com/doc/refman/5.7/en/create-index.html) |
->|         | [`CREATE PROCEDURE`](https://dev.mysql.com/doc/refman/5.7/en/create-procedure.html) |
->|         | [`CREATE SERVER`](https://dev.mysql.com/doc/refman/5.7/en/create-server.html) |
->|         | [`CREATE TABLE`](https://dev.mysql.com/doc/refman/5.7/en/create-table.html) |
->|         | [`CREATE TRIGGER`](https://dev.mysql.com/doc/refman/5.7/en/create-trigger.html) |
->|         | [`CREATE VIEW`](https://dev.mysql.com/doc/refman/5.7/en/create-view.html) |
->| alert   | [`ALTER DATABASE ... UPGRADE DATA DIRECTORY NAME`](https://dev.mysql.com/doc/refman/5.7/en/alter-database.html) |
->|         | [`ALTER EVENT`](https://dev.mysql.com/doc/refman/5.7/en/alter-event.html) |
->|         | index不可修改，只能删除新增                                  |
->|         | [`ALTER PROCEDURE`](https://dev.mysql.com/doc/refman/5.7/en/alter-procedure.html) |
->|         | [`ALTER SERVER`](https://dev.mysql.com/doc/refman/5.7/en/alter-server.html) |
->|         | [`ALTER TABLE`](https://dev.mysql.com/doc/refman/5.7/en/alter-table.html) |
->|         | trigger不可修改，只能删除新增                                |
->|         | [`ALTER VIEW`](https://dev.mysql.com/doc/refman/5.7/en/alter-view.html) |
->|         | [`RENAME TABLE`](https://dev.mysql.com/doc/refman/5.7/en/rename-table.html) |
->|         | [`TRUNCATE TABLE`](https://dev.mysql.com/doc/refman/5.7/en/truncate-table.html) |
->| drop    | [`DROP DATABASE`](https://dev.mysql.com/doc/refman/5.7/en/drop-database.html) |
->|         | [`DROP EVENT`](https://dev.mysql.com/doc/refman/5.7/en/drop-event.html) |
->|         | [`DROP INDEX`](https://dev.mysql.com/doc/refman/5.7/en/drop-index.html) |
->|         | [`DROP PROCEDURE`](https://dev.mysql.com/doc/refman/5.7/en/drop-procedure.html) |
->|         | [`DROP SERVER`](https://dev.mysql.com/doc/refman/5.7/en/drop-server.html) |
->|         | [`DROP TABLE`](https://dev.mysql.com/doc/refman/5.7/en/drop-table.html) |
->|         | [`DROP TRIGGER`](https://dev.mysql.com/doc/refman/5.7/en/drop-trigger.html) |
->|         | [`DROP VIEW`](https://dev.mysql.com/doc/refman/5.7/en/drop-view.html) |
->| install | [`INSTALL PLUGIN`](https://dev.mysql.com/doc/refman/5.7/en/install-plugin.html) |
->|         | [`UNINSTALL PLUGIN`](https://dev.mysql.com/doc/refman/5.7/en/uninstall-plugin.html) |
+>| 操作    | 对象                                                         | 备注                                                         |
+>| ------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+>| create  | [`CREATE DATABASE`](https://dev.mysql.com/doc/refman/5.7/en/create-database.html) |                                                              |
+>|         | [`CREATE EVENT`](https://dev.mysql.com/doc/refman/5.7/en/create-event.html) |                                                              |
+>|         | [`CREATE INDEX`](https://dev.mysql.com/doc/refman/5.7/en/create-index.html) |                                                              |
+>|         | [`CREATE PROCEDURE`](https://dev.mysql.com/doc/refman/5.7/en/create-procedure.html) |                                                              |
+>|         | [`CREATE SERVER`](https://dev.mysql.com/doc/refman/5.7/en/create-server.html) |                                                              |
+>|         | [`CREATE TABLE`](https://dev.mysql.com/doc/refman/5.7/en/create-table.html) | `CREATE TEMPORARY TABLE`<br>因为带有temporary不会隐式提交，<br/>但也不会回滚 |
+>|         | [`CREATE TRIGGER`](https://dev.mysql.com/doc/refman/5.7/en/create-trigger.html) |                                                              |
+>|         | [`CREATE VIEW`](https://dev.mysql.com/doc/refman/5.7/en/create-view.html) |                                                              |
+>| alert   | [`ALTER DATABASE ... UPGRADE DATA DIRECTORY NAME`](https://dev.mysql.com/doc/refman/5.7/en/alter-database.html) |                                                              |
+>|         | [`ALTER EVENT`](https://dev.mysql.com/doc/refman/5.7/en/alter-event.html) |                                                              |
+>|         | index不可修改，只能删除新增                                  |                                                              |
+>|         | [`ALTER PROCEDURE`](https://dev.mysql.com/doc/refman/5.7/en/alter-procedure.html) |                                                              |
+>|         | [`ALTER SERVER`](https://dev.mysql.com/doc/refman/5.7/en/alter-server.html) |                                                              |
+>|         | [`ALTER TABLE`](https://dev.mysql.com/doc/refman/5.7/en/alter-table.html) |                                                              |
+>|         | trigger不可修改，只能删除新增                                |                                                              |
+>|         | [`ALTER VIEW`](https://dev.mysql.com/doc/refman/5.7/en/alter-view.html) |                                                              |
+>|         | [`RENAME TABLE`](https://dev.mysql.com/doc/refman/5.7/en/rename-table.html) |                                                              |
+>|         | [`TRUNCATE TABLE`](https://dev.mysql.com/doc/refman/5.7/en/truncate-table.html) |                                                              |
+>| drop    | [`DROP DATABASE`](https://dev.mysql.com/doc/refman/5.7/en/drop-database.html) |                                                              |
+>|         | [`DROP EVENT`](https://dev.mysql.com/doc/refman/5.7/en/drop-event.html) |                                                              |
+>|         | [`DROP INDEX`](https://dev.mysql.com/doc/refman/5.7/en/drop-index.html) |                                                              |
+>|         | [`DROP PROCEDURE`](https://dev.mysql.com/doc/refman/5.7/en/drop-procedure.html) |                                                              |
+>|         | [`DROP SERVER`](https://dev.mysql.com/doc/refman/5.7/en/drop-server.html) |                                                              |
+>|         | [`DROP TABLE`](https://dev.mysql.com/doc/refman/5.7/en/drop-table.html) | `DROP TEMPORARY TABLE`<br/>因为带有temporary不会隐式提交，<br/>但也不会回滚 |
+>|         | [`DROP TRIGGER`](https://dev.mysql.com/doc/refman/5.7/en/drop-trigger.html) |                                                              |
+>|         | [`DROP VIEW`](https://dev.mysql.com/doc/refman/5.7/en/drop-view.html) |                                                              |
+>| install | [`INSTALL PLUGIN`](https://dev.mysql.com/doc/refman/5.7/en/install-plugin.html) |                                                              |
+>|         | [`UNINSTALL PLUGIN`](https://dev.mysql.com/doc/refman/5.7/en/uninstall-plugin.html) |                                                              |
 >
 >
 
@@ -877,13 +3747,23 @@ https://dev.mysql.com/doc/refman/5.7/en/set-transaction.html
 
 https://dev.mysql.com/doc/refman/5.7/en/lock-tables.html
 
-### 存储过程/函数
 
-### 触发器
+
+
 
 ### 复制(主从复制)
 
 https://dev.mysql.com/doc/refman/5.7/en/sql-replication-statements.html
+
+
+
+## 后续提升
+
+### NDB
+
+### table space
+
+### LOW_PRIORITY 
 
 
 
@@ -947,35 +3827,13 @@ https://dev.mysql.com/doc/refman/5.7/en/sql-replication-statements.html
 
 
 
-## 语言结构
 
 
 
-【语言结构】【功能和运算符】【SQL语句->复合陈述】
-
->
-
-### 注释
-
-> 内置函数
-
-https://dev.mysql.com/doc/refman/5.7/en/sql-function-reference.html
-
-### 1、变量
-
-https://blog.csdn.net/u012060033/article/details/96328410
-
-用户变量
-
-局部变量
-
-系统变量
 
 
 
-### 1、流程控制
-
-### 2、游标
+### 
 
 ## 索引
 
@@ -1156,450 +4014,9 @@ https://blog.csdn.net/u012060033/article/details/96328410
 >SELECT * FROM INFORMATION_SCHEMA.INNODB_LOCK_WAITS; 
 >```
 
-## 事务
 
-### 事务隔离级别
 
 
-
-## 存储过程/函数
-
-### 1、官方定义
-
-> ```sql
-> CREATE
->     [DEFINER = user]
->     PROCEDURE sp_name ([proc_parameter[,...]])
->     [characteristic ...] routine_body
-> 
-> CREATE
->     [DEFINER = user]
->     FUNCTION sp_name ([func_parameter[,...]])
->     RETURNS type
->     [characteristic ...] routine_body
->     
-> #**********************************************************************************************#
-> 
-> proc_parameter:
->     [ IN | OUT | INOUT ] param_name type
-> 
-> func_parameter:
->     param_name type
-> 
-> type:
->     Any valid MySQL data type
-> 
-> characteristic: {
->     COMMENT 'string'
->   | LANGUAGE SQL
->   | [NOT] DETERMINISTIC
->   | { CONTAINS SQL | NO SQL | READS SQL DATA | MODIFIES SQL DATA }
->   | SQL SECURITY { DEFINER | INVOKER }
-> }
-> 
-> routine_body:
->     Valid SQL routine statement
-> ```
->
-> 
-
-### 2、参数
-
-> ```sql
-> delimiter //
-> 
-> CREATE PROCEDURE citycount (IN country CHAR(3), OUT cities INT)
-> BEGIN
->   SELECT COUNT(*) INTO cities FROM world.city
->   WHERE CountryCode = country;
-> END//
-> 
-> delimiter ;
-> 
-> #调用
->  CALL citycount('JPN', @cities);
->  SELECT @cities;
-> ```
->
-> 
-
-### 3、定义变量
-
-> ```sql
-> declare v0 int 0;
-> declare v1 int 1;
-> declare v2 int 2;
-> declare v3 varchar(10) default "";
-> ```
-
-### 4、变量运算
-
-> ```sql
-> set v0 = v1 + v2;            #等号和+号可以用空格优化格式
-> ```
->
-> 
-
-### 5、表达式
-
-用于条件
-
-https://dev.mysql.com/doc/refman/5.7/en/expressions.html
-
-| 功能     | 符号 | 示例 | 备注 |
-| -------- | ---- | ---- | ---- |
-| 等于     |      |      |      |
-| 不等于   |      |      |      |
-| 大于     |      |      |      |
-| 大于等于 |      |      |      |
-| 小于     |      |      |      |
-| 小于等于 |      |      |      |
-|          |      |      |      |
-| 且       |      |      |      |
-| 或       |      |      |      |
-
-
-
-### 6、判断
-
-#### (1)、if(条件，exp1，exp2)
-
-`条件?exp1:exp2`
-
-这个有点像==三目运算==
-
-可以在==平时sql中==也可以在==存储过程中==
-
-
-
-##### 存储过程：
-
-> ```sql
-> delimiter $$
-> create PROCEDURE aa2()
-> BEGIN
-> 		DECLARE v1 int DEFAULT 1;
-> 		DECLARE v2 int DEFAULT 2;
-> 		
-> 		DECLARE v0 int DEFAULT 0;
-> 		DECLARE v00 int DEFAULT 0;
-> 		
-> 		set v0 = if(v1=1,11,99);
-> 		set v00 = if(v2>1,22,99);
-> 		SELECT v0,v00;
-> END$$
-> delimiter ;
-> 
-> CALL aa2()
-> 
-> 
-> #v0输出11，v00输出22
-> CALL aa()
-> ```
-
-
-
-##### 平时sql:
-
-> ```sql
-> SELECT id,if(timezone>0,'大于0', timezone) from shop_facebook_40 
-> 
-> #输出结果集
-> id  timezone
-> 1	大于0
-> 2	-7
-> ```
-
-#### (2)、ifnull(exp1,exp2)
-
-`exp1 is null ? exp2 : exp1`
-
-如果exp1为空，则输出exp2
-
-> ```sql
-> select ifnull(null,'a')#输出a
-> select ifnull(1+9,'a') #输出10
-> ```
-
-#### (3)、if...（elseif）
-
-可以由“=、<、<=、>、>=、!=”等条件运算符组成，
-
-并且可以使用AND、OR、NOT对多个表达式进行组合
-
-> ```sql
-> IF search_condition THEN 
->     statement_list  
-> [ELSEIF search_condition THEN]  
->     statement_list ...  
-> [ELSE 
->     statement_list]  
-> END IF;#这里需要一个结束符号，标识if语句结束 
-> ```
-
-#### (4)、case...end
-
-##### 字段挨着case
-
-> ```sql
-> SELECT
-> CASE
-> 	timezone 
-> 	WHEN 8 THEN '东8' 
-> 	WHEN -7 THEN '负7' 
-> 	ELSE '其他时区' 
-> END AS aa 
-> FROM
-> shop_facebook_40
-> ```
-
-##### 字段挨着when
-
-> ```sql
-> 
-> update shop_facebook_40
-> set timezone = (
-> 	case 
-> 		when timezone between 1 and 12 then  1
-> 		when timezone between -12 and -1 then  -1
-> 		else  0
-> 	end
-> );
-> ```
-
-### 7、循环
-
-#### while...do
-
-> ```sql
-> WHILE expression DO  
->    Statements  
-> END WHILE;  
-> ```
->
-> 
-
-
-
-#### repeat
-
-> ```sql
-> REPEAT  
-> 	Statements;  
-> UNTIL expression END REPEAT;
-> ```
->
-> 
-
-#### loop
-
-> ```sql
-> loop
-> 	Statements;  #leave-break;iterate-continue
-> end loop;
-> ```
->
-> 
-
-
-
-#### 游标遍历
-
-> ```sql
-> 
-> declare v_f1 int default 0;#定义两个变量接收游标读取的数据
-> declare v_f2 int default 0;
-> 
-> declare v_cursor CURSOR FOR select f1,f2 from tabel_name;#定义游标
-> open v_cursor;#开启游标
-> 循环开始标志
-> 	fetch v_cursor into v_f1,v_f2;//从游标中获取对应变量
-> 	#业务处理
-> 循环结束标志
-> 
-> close v_cursor;#关闭游标
-> ```
->
-> 
-
-
-
-### 8、异常处理
-
-==declare……handler语句必须出现在变量或条件声明的后面。==
-
-> ```sql
-> DECLARE handler_action HANDLER
->     FOR condition_value [, condition_value] ...
->     statement
-> 
-> handler_action:
->     CONTINUE       #继续执行当前的程序(接着执行出错的SQL的下一条语句)；
->     | EXIT         #当前程序终止(退出当前declare所在的begin end)； 
-> 
-> condition_value:
->     mysql_error_code
->     | SQLSTATE [VALUE] sqlstate_value
->     | condition_name
->     | SQLWARNING
->     | NOT FOUND
->     | SQLEXCEPTION
-> ```
->
->  
->
-> > ```sql
-> > DECLARE CONTINUE HANDLER FOR 1329 SET v_flag=1;
-> > ```
-
-
-
-### 示例
-
-#### (1)、代替union
-
-##### 原sql:
-
-> ```sql
-> (SELECT shop,COUNT(id) from shop_22 where shop='shop' and  created_at BETWEEN '2020-10-12 11:10:00' AND '2020-10-12 15:00:00')
-> UNION
-> (SELECT shop,COUNT(id) from shop_33 where shop='shop' and  created_at BETWEEN  '2020-10-12 11:10:00' AND '2020-10-12 15:00:00')
-> UNION
-> (SELECT shop,COUNT(id) from shop_36 where shop='shop' and  created_at BETWEEN  '2020-10-12 11:10:00' AND '2020-10-12 15:00:00')
-> UNION
-> (SELECT shop,COUNT(id) from shop_40 where shop='shop' and  created_at BETWEEN  '2020-10-12 11:10:00' AND '2020-10-12 15:00:00')
-> UNION
-> (SELECT shop,COUNT(id) from shop_44 where shop='shop' and  created_at BETWEEN  '2020-10-12 11:10:00' AND '2020-10-12 15:00:00')
-> ```
-
-##### 用存储过程(方法一，用记录总条数循环)
-
-> ```sql
-> delimiter $$ # 声明存储过程的结束符号为$$
-> CREATE DEFINER=`root`@`localhost` PROCEDURE `k`(IN shop VARCHAR(100),IN begin_at VARCHAR(100),IN end_at VARCHAR(100))
-> BEGIN
-> 
-> DECLARE v_table_name VARCHAR(50) DEFAULT "";
-> DECLARE v_sql LONGTEXT DEFAULT "";
-> DECLARE v_sub_sql LONGTEXT DEFAULT "";
-> DECLARE v_count INT DEFAULT 0;
-> 
-> #如果11行和12行调换上下位置，会报错
-> DECLARE v_all_tables CURSOR for (SELECT TABLE_NAME from information_schema.`TABLES` where TABLE_NAME REGEXP "shop_[0-99999]" and TABLE_SCHEMA="local_exit");
-> set v_count=(SELECT COUNT(DISTINCT TABLE_NAME) from information_schema.`TABLES` where TABLE_NAME REGEXP "shop_[0-99999]" and TABLE_SCHEMA="local_exit");
-> 
-> OPEN v_all_tables;
-> 
-> WHILE v_count>0 DO
-> 	 FETCH v_all_tables INTO v_table_name;	
->  
-> 	 set v_sub_sql=concat('(SELECT shop,COUNT(id) as num from ',v_table_name, ' where ',if(shop='','',CONCAT(' `shop`="', shop,'" and ')),' created_at BETWEEN  "',begin_at,'" AND "',end_at,'")');
-> 	 
-> 	 if v_sql='' then
-> 			set v_sql=v_sub_sql;
-> 	 else
-> 			set v_sql=CONCAT(v_sql," union ", v_sub_sql);
-> 	 end if;
-> 	 
-> 	 set v_count=v_count-1;
-> END WHILE;
-> CLOSE v_all_tables;#记得关闭游标
-> 
-> set @varsql=v_sql;#文档上没有强制全局变量，但是不用全局变量，下一行会报错
-> PREPARE tmpsql FROM @varsql;
-> EXECUTE tmpsql;
-> DEALLOCATE PREPARE tmpsql;
-> 
-> SELECT v_sql;
-> 
-> END$$
-> delimiter ; # 声明存储过程的结束符号为$$
-> ```
-
-##### 用存储过程(方法二，用游标异常结束)
-
-> ```sql
-> CREATE DEFINER=`root`@`localhost` PROCEDURE `fb_time_subnum5`(IN shop VARCHAR(100),IN begin_at VARCHAR(100),IN end_at VARCHAR(100))
-> BEGIN
-> 
-> DECLARE v_table_name VARCHAR(50) DEFAULT "";
-> DECLARE v_sql LONGTEXT DEFAULT "";
-> DECLARE v_sub_sql LONGTEXT DEFAULT "";
-> 
-> DECLARE v_flag INT DEFAULT 0;
-> DECLARE v_all_tables CURSOR for (SELECT TABLE_NAME from information_schema.`TABLES` where TABLE_NAME REGEXP "shop_facebook_[0-99999]" and TABLE_SCHEMA="local_exit");
-> DECLARE CONTINUE HANDLER FOR 1329 SET v_flag=1;
-> OPEN v_all_tables;
-> 
-> lable_1:WHILE v_flag=0 DO
-> 	 FETCH v_all_tables INTO v_table_name;	
-> 	 if v_flag!=0 then
-> 			iterate lable_1;
-> 	 end if;
-> 	 
-> 	 set v_sub_sql=concat('(SELECT shop,COUNT(id) as num from ',v_table_name, ' where ',if(shop='','',CONCAT(' `shop`="', shop,'" and ')),' created_at BETWEEN  "',begin_at,'" AND "',end_at,'")');
-> 	 
-> 	 if v_sql='' then
-> 			set v_sql=v_sub_sql;
-> 	 else
-> 			set v_sql=CONCAT(v_sql," union ", v_sub_sql);
-> 	 end if;	 
-> END WHILE;
-> CLOSE v_all_tables;
-> 
-> set @varsql=v_sql;
-> PREPARE tmpsql FROM @varsql;
-> EXECUTE tmpsql;
-> DEALLOCATE PREPARE tmpsql;
-> 
-> SELECT v_sql;
-> 
-> END
-> ```
->
-> 
-
-#### (2)、产生随机记录
-
-> ```sql
-> delimiter $$ # 声明存储过程的结束符号为$$
-> create procedure randData5(IN num INT)
-> BEGIN
-> 		#声明必须放在最前面
->  declare i int default 1;
-> 		declare a int DEFAULT 0;
-> 		declare b int DEFAULT 0;
-> 		declare c VARCHAR(20) DEFAULT '';
-> 		declare d VARCHAR(20) DEFAULT '';
-> 		#创建测试表
-> 		DROP TABLE IF EXISTS `tp_tt`;
-> 		CREATE TABLE `tp_tt`  (
-> 			`id` int(11) NOT NULL,
-> 			`a` int(10) NULL DEFAULT NULL,
-> 			`b` int(10) NULL DEFAULT NULL,
-> 			`c` varchar(20) NULL DEFAULT NULL,
-> 			`d` varchar(20) NULL DEFAULT NULL,
-> 			PRIMARY KEY (`id`) USING BTREE
-> 		) ENGINE = InnoDB;
-> 		#往测试表中塞入数据
-> 		if num<100 THEN
-> 				set num=100;
-> 		ELSE
-> 				set num=num;#只是为了写完整的if...else..
-> 		END IF;
-> 	
->  while(i<num)do
-> 				set a=FLOOR(100+(RAND()*1900));#随机数字 RAND()取值0-1的小数
-> 				set b=FLOOR(100+(RAND()*1900));
-> 				set c=substring(MD5(RAND()),1,20);#随机字符串-用随机数字演变的
-> 				set d=substring(MD5(RAND()),1,20);
-> 				
->      insert into tp_tt (`id`,`a`,`b`,`c`,`d`) values(i,a,b,c,d);
->      set i=i+1;
->  end while;
-> END$$ # $$结束
-> delimiter ; # 重新声明分号为结束符号
-> ```
 
 
 

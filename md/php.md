@@ -840,16 +840,20 @@ breake
 >  static $a = ['a' => 'a'];     //array类型
 >  static $a = PHP_VERSION;      //调用已定义的常量
 >  static $a = "abcd";           //string类型
->      //string的nowdoc
+>    //string的nowdoc
 >  static $a = <<<'label'
 >  abcd
 >  label;
->      //string的heredoc
+>    //string的heredoc
 >  static $a=<<<label
 >  abcd
 >  label;
 >  static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
 >  ```
+>```
+>
+>```
+>
 >```
 >
 >```
@@ -883,6 +887,10 @@ breake
 >  static $a = function(){echo 'hello!';}  //不可以callback
 >  static $a = new stdClass();             //不可以object
 >  ```
+>```
+>
+>```
+>
 >```
 >
 >```
@@ -3460,6 +3468,82 @@ get_class_methods ($class_name)
 >
 >* ==( ! ) Fatal error: 'break' not in the 'loop' or 'switch' context in C:\code\index.php on line 5==
 >* 也就是说break和continue必须在==循环体==或者==switch==中
+
+
+
+
+
+
+
+# 代码逻辑
+
+## 获取shop-info
+
+> ```php
+> /**
+> *用户获取shop-info
+> */
+> public static function infoGet($shop, $field=''){
+>     static $map = [];
+>     if(isset($map[$shop])){
+>         //一、内存(实时)
+>         $data = $map[$shop];
+>     }else{
+>         $dataCache = RedisHelper::get(self::infoCacheKey($shop));
+>         if($dataCache){
+>             //二、内存(缓存)
+>             $data = json_decode($dataCache, true);
+>         }else{
+>             //三、数据库
+>             $data = self::infoCache($shop);
+>         }
+>     }
+>     $map[$shop] = $data;
+>     if($field){
+>         return $data[$field] ?? false;
+>     }else{
+>         return $data;
+>     }
+> }
+> /**
+> *后台修改shop-info
+> */
+> public static function infoCacheReset($shop){
+>     return self::infoCache($shop, true);
+> }
+> /**
+> *缓存操作
+> */
+> private static function infoCache($shop, $resetCache = false, $lockTryTimes = 3){
+>     $dataCacheTime =86400;
+> 
+>     $lockKey = "lock:info_{$shop}";
+>     $lockTime = 10;//秒
+>     //        $lockTryTimes = 3;//次数
+>     $lockSleepTime = 100000;//十分之一秒（1百万微秒=1秒）
+> 
+>     if($resetCache || LockHelper::lock($lockKey, $lockTime)){//防止缓存穿透
+>         //三、查数据库
+>         $data = ShopifyShop::find()->where(['shop' => $shop])->asArray()->one();
+>         RedisHelper::set(self::infoCacheKey($shop), json_encode($data), $dataCacheTime);
+>         LockHelper::unlock($lockKey);
+>     }else{
+>         //查库被锁，等待查询结束
+>         if($lockTryTimes){
+>             usleep($lockSleepTime);
+>             return self::infoCache($shop, $resetCache, $lockTryTimes - 1);
+>         }else{
+>             throw new \Exception('被锁请求次数耗尽',10000);
+>         }
+>     }
+>     return $data;
+> }
+> private static function infoCacheKey($shop){
+>     return "shop_info:{$shop}";
+> }
+> ```
+>
+> 
 
 
 
