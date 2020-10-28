@@ -2461,3 +2461,13 @@ split_nginx_log.sh         加入定时器，每小时跑
 >| graphQL                                                      |                                                              |
 >|                                                              |                                                              |
 >|                                                              |                                                              |
+
+
+
+
+
+# 一、docker
+
+安装
+
+> https://docs.docker.com/engine/install/centos/

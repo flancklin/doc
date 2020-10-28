@@ -3747,6 +3747,12 @@ https://dev.mysql.com/doc/refman/5.7/en/set-transaction.html
 
 https://dev.mysql.com/doc/refman/5.7/en/lock-tables.html
 
+InnoDB-lock：https://dev.mysql.com/doc/refman/5.7/en/innodb-locking.html
+
+https://dev.mysql.com/doc/refman/5.7/en/innodb-locks-set.html
+
+https://www.jianshu.com/p/ba8f60e9d78a
+
 
 
 
@@ -4528,6 +4534,19 @@ E:\wamp64\bin\apache\apache2.4.23\bin\php.ini添加代码:
 2、windows安装
 
 
+
+# cassandra
+
+>
+>
+>|          | Redis                                                        | Cassandra                                       |
+>| :------- | :----------------------------------------------------------- | :---------------------------------------------- |
+>| 适用场景 | 实时读写大数据量并且要求速度很快                             | 要求写比读更多的场景                            |
+>| 数据结构 | Key-value结构                                                | 表结构                                          |
+>| 操作     | 一般的Key-value操作，不支持范围查询、基于字段的查询等        | 通过CQL操作，可以进行基于列的条件查询           |
+>| 开发语言 | C/C++                                                        | Cassandra是用Java开发的                         |
+>| 存储     | 基于内存存储，磁盘保存备份                                   | 基于磁盘存储                                    |
+>| 其他     | redis支持set/list/hash等数据结构redis支持对集合的逻辑操作redis支持事务redis支持很多原子性操作 | 可以通过设置index，让数据以列或列集合的方式聚集 |
 
 # 数据结构
 

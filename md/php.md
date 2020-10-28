@@ -832,24 +832,34 @@ breake
 >正确的初始化举例
 >
 >* ```php
->  static $a;                    //不初始化，默认是null
->  static $a = null;             //null类型   
->  static $a = false;            //boolean类型
->  static $a = 100;              //integer类型
->  static $a = 100.23;           //float类型
->  static $a = ['a' => 'a'];     //array类型
->  static $a = PHP_VERSION;      //调用已定义的常量
->  static $a = "abcd";           //string类型
->    //string的nowdoc
->  static $a = <<<'label'
->  abcd
->  label;
->    //string的heredoc
->  static $a=<<<label
->  abcd
->  label;
->  static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
->  ```
+> static $a;                    //不初始化，默认是null
+> static $a = null;             //null类型   
+> static $a = false;            //boolean类型
+> static $a = 100;              //integer类型
+> static $a = 100.23;           //float类型
+> static $a = ['a' => 'a'];     //array类型
+> static $a = PHP_VERSION;      //调用已定义的常量
+> static $a = "abcd";           //string类型
+> //string的nowdoc
+> static $a = <<<'label'
+> abcd
+> label;
+> //string的heredoc
+> static $a=<<<label
+> abcd
+> label;
+> static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
+> ```
+> ```
+>
+> ```
+>
+>```
+>
+>```
+>
+>```
+>
 >```
 >
 >```
@@ -883,10 +893,18 @@ breake
 >错误的初始化举例
 >
 >* ```php
->  static $a = bcadd(1,2);                 //不可以调用函数
->  static $a = function(){echo 'hello!';}  //不可以callback
->  static $a = new stdClass();             //不可以object
->  ```
+> static $a = bcadd(1,2);                 //不可以调用函数
+> static $a = function(){echo 'hello!';}  //不可以callback
+> static $a = new stdClass();             //不可以object
+>```
+>```
+>
+>```
+>
+>```
+>
+>```
+>
 >```
 >
 >```
@@ -1625,7 +1643,60 @@ exit();sleep();die;
 
 
 
-## (八)、其他语法
+## (八)、错误与异常
+
+>
+>
+>**Error** 类并非继承自 [Exception](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/class.exception.html)   类，所以不能用 `catch (Exception $e) { ... }` 来捕获   **Error**。你可以用   `catch (Error $e) { ... }`，或者通过注册异常处理函数（   [set_exception_handler()](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/function.set-exception-handler.html)）来捕获 **Error**。 
+
+
+
+
+
+>
+>
+>[PHP Manual] -> [错误处理] -> 预定义常量
+>
+>| 值    | 常量                      | 说明                                                         | 备注                                                         |
+>| ----- | ------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+>| 1     | **`E_ERROR`**             | 致命的运行时错误。这类错误一般是不可恢复的情况，例如内存分配导致的问题。后果是导致脚本终止不再继续运行。 |                                                              |
+>| 2     | **`E_WARNING`**           | 运行时警告 (非致命错误)。仅给出提示信息，但是脚本不会终止运行。 |                                                              |
+>| 4     | **`E_PARSE`**             | 编译时语法解析错误。解析错误仅仅由分析器产生。               |                                                              |
+>| 8     | **`E_NOTICE`**            | 运行时通知。表示脚本遇到可能会表现为错误的情况，但是在可以正常运行的脚本里面也可能会有类似的通知。 |                                                              |
+>| 16    | **`E_CORE_ERROR`**        | 在PHP初始化启动过程中发生的致命错误。该错误类似       **`E_ERROR`**，但是是由PHP引擎核心产生的。 | since PHP 4                                                  |
+>| 32    | **`E_CORE_WARNING`**      | PHP初始化启动过程中发生的警告 (非致命错误) 。类似 **`E_WARNING`**，但是是由PHP引擎核心产生的。 | since PHP 4                                                  |
+>| 64    | **`E_COMPILE_ERROR`**     | 致命编译时错误。类似**`E_ERROR`**,       但是是由Zend脚本引擎产生的。 | since PHP 4                                                  |
+>| 128   | **`E_COMPILE_WARNING`**   | 编译时警告 (非致命错误)。类似       **`E_WARNING`**，但是是由Zend脚本引擎产生的。 | since PHP 4                                                  |
+>| 256   | **`E_USER_ERROR`**        | 用户产生的错误信息。类似       **`E_ERROR`**, 但是是由用户自己在代码中使用PHP函数 [trigger_error()](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/function.trigger-error.html)来产生的。 | since PHP 4                                                  |
+>| 512   | **`E_USER_WARNING`**      | 用户产生的警告信息。类似       **`E_WARNING`**, 但是是由用户自己在代码中使用PHP函数 [trigger_error()](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/function.trigger-error.html)来产生的。 | since PHP 4                                                  |
+>| 1024  | **`E_USER_NOTICE`**       | 用户产生的通知信息。类似       **`E_NOTICE`**, 但是是由用户自己在代码中使用PHP函数 [trigger_error()](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/function.trigger-error.html)来产生的。 | since PHP 4                                                  |
+>| 2048  | **`E_STRICT`**            | 启用 PHP 对代码的修改建议，以确保代码具有最佳的互操作性和向前兼容性。 | since PHP 5                                                  |
+>| 4096  | **`E_RECOVERABLE_ERROR`** | 可被捕捉的致命错误。 它表示发生了一个可能非常危险的错误，但是还没有导致PHP引擎处于不稳定的状态。 如果该错误没有被用户自定义句柄捕获 (参见       [set_error_handler()](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/function.set-error-handler.html))，将成为一个 **`E_ERROR`**　从而脚本会终止运行。 | since PHP 5.2.0                                              |
+>| 8192  | **`E_DEPRECATED`**        | 运行时通知。启用后将会对在未来版本中可能无法正常工作的代码给出警告。 | since PHP 5.3.0                                              |
+>| 16384 | **`E_USER_DEPRECATED`**   | 用户产少的警告信息。 类似       **`E_DEPRECATED`**, 但是是由用户自己在代码中使用PHP函数 [trigger_error()](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/function.trigger-error.html)来产生的。 | since PHP 5.3.0                                              |
+>| 30719 | **`E_ALL`**               | **`E_STRICT`**出外的所有错误和警告信息。                     | 30719 in PHP 5.3.x,      6143 in PHP 5.2.x,      2047 previously |
+
+
+
+>
+>
+>```php
+>    public function actionW5(){
+>        try {
+>            (new \stdClass())->o();//触发捕获error:Call to undefined method stdClass::o()
+>
+>            var_dump(1/0);//触发捕获exception：Division by zero
+>        }catch (\Error $er){
+>            var_dump('error:' .$er->getMessage());
+>        }catch (\Exception $ep){
+>            var_dump('exception:'.$ep->getMessage());
+>        }
+>    }
+>```
+>
+>
+
+## (九)、其他语法
 
 ### 1、引用
 
@@ -2679,6 +2750,493 @@ getTime()
 
 ## (八)、反射reflection
 
+
+
+>|                      |                                      |                    |         |
+>| -------------------- | ------------------------------------ | ------------------ | ------- |
+>| ReflectionException  |                                      |                    |         |
+>| Reflection           |                                      |                    |         |
+>| Reflector(Interface) | ReflectionClass                      | ReflectionObject   |         |
+>| \|                   | ReflectionFunctionAbstract(abstract) | ReflectionFunction |         |
+>| \|                   | \|                                   | ReflectionMethod   |         |
+>| \|                   | ReflectionParameter                  |                    |         |
+>| \|                   | ReflectionProperty                   |                    |         |
+>| \|                   | ReflectionExtension                  |                    |         |
+>| \|                   | ReflectionZendExtension              |                    | 5.4     |
+>| \|                   | ReflectionClassConstant              |                    | 7.1     |
+>| ReflectionGenerator  |                                      |                    | 7.0     |
+>| ReflectionType       | ReflectionNamedType                  |                    | 7.0/7.1 |
+>| ReflectionReference  |                                      |                    | 7.4     |
+
+
+
+
+
+| class结构 | b    | c    | d    |
+| --------- | ---- | ---- | ---- |
+| namespace |      |      |      |
+| classname |      |      |      |
+| extends   |      |      |      |
+| interface |      |      |      |
+|           |      |      |      |
+
+
+
+### 1、ReflectionClass/Object(7.2.0)
+
+使用
+
+>```php
+>$ref = new \ReflectionClass(\common\models\ShopifyShop::class);
+>
+>$oShop = new \common\models\ShopifyShop();
+>$ref = new \ReflectionClass($oShop);
+>```
+>
+>构造函数解析
+>
+>```php
+>public ReflectionClass::__construct( mixed $argument)
+>```
+>
+>- `argument`
+>
+>  既可以是包含类名的字符串（[string](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/language.types.string.html)）也可以是对象（[object](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/language.types.object.html)）。 
+>
+>* 返回初始化完成后的 [ReflectionClass](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/class.reflectionclass.html) 实例。 
+>* 如果要反射的 Class 不存在，抛出异常 ReflectionException
+
+#### (1)、file
+
+>| method              | return | 功能                    |
+>| ------------------- | ------ | ----------------------- |
+>| getFileName( void)  | string | class所在file的filename |
+>| getStartLine( void) | int    | class所在file中的起始行 |
+>| getEndLine( void)   | int    | class所在file中的结束行 |
+
+#### (2)、namespace
+
+> | method                  | return | 功能                             |
+> | ----------------------- | ------ | -------------------------------- |
+> | inNamespace( void)      | bool   | 判断这个class是否使用了namespace |
+> | getNamespaceName( void) | string | 命名空间的名称                   |
+
+#### (3)、classname
+
+> | 方法                                      | ruturn | 功能                              | version |
+> | ----------------------------------------- | ------ | --------------------------------- | ------- |
+> | getDocComment( void)                      | string | 获取注释                          |         |
+> | isAbstract( void)                         | bool   | 这个类是否是abstract              |         |
+> | isInterface(void)                         | bool   | 这个类是否是一个interface         |         |
+> | isTrait( void                             | bool   | 这个类是否是trait                 |         |
+> | isFinal( void)                            | bool   | 这个类是否final                   |         |
+> | isAnonymous( void)                        | bool   | 这个类是否是Anonymous(匿名类)     |         |
+> |                                           |        |                                   |         |
+> | isCloneable( void)                        | bool   | 这个类是否可复制                  |         |
+> | isInstantiable( void)                     | bool   | 这个类是否可实例化                |         |
+> |                                           |        |                                   |         |
+> | isInternal( void)                         | bool   | 这个类是否由扩展或核心在内部定义  |         |
+> | isUserDefined( void)                      | bool   | 这个类是否是用户定义的            |         |
+> |                                           |        |                                   |         |
+> | isIterable( void)                         | bool   | 这个类是否是迭代器                | 7.2.0   |
+> | isIterateable( void)                      | bool   | 这个类是否可迭代                  |         |
+> |                                           |        |                                   |         |
+> | getName( void)                            | string | class类名                         |         |
+> | getShortName( void)                       | string | class类名,不带namespace           |         |
+> |                                           |        |                                   |         |
+> | isInstance( object $object)               | bool   | 判断某个对象是否是这个class的实例 |         |
+> | newInstance( mixed \$args[, mixed $...] ) | object | new class($args....)              |         |
+> | newInstanceArgs([ array $args] )          | object | new class($args....),参数由kv映射 |         |
+> | newInstanceWithoutConstructor( void)      | object | new class()。但是不会调construct  |         |
+>
+> 
+>
+> 获取class的修饰符
+>
+> ```php
+> public ReflectionClass::getModifiers( void) : int
+> /**
+> ReflectionClass 修饰符 
+>      ReflectionClass::IS_IMPLICIT_ABSTRACT   指示了类是一个抽象类（abstract），因为它有抽象（abstract）方法。 
+>      ReflectionClass::IS_EXPLICIT_ABSTRACT   指示了类是一个抽象类（abstract），因为它已明确定义。 
+>      ReflectionClass::IS_FINAL               指示这是一个 final 类。 
+> */
+> ```
+>
+> 
+
+#### (4)、extends
+
+>| method                       | ruturn          | 功能                     |
+>| ---------------------------- | --------------- | ------------------------ |
+>| isSubclassOf( string $class) | bool            | 这个类是否是$class的子类 |
+>| getParentClass( void)        | ReflectionClass | 获取父类的reflection     |
+
+#### (5)、interface
+
+> 
+>
+> | method                                  | return                     | 功能                                   |
+> | --------------------------------------- | -------------------------- | -------------------------------------- |
+> | getInterfaceNames( void)                | array                      | 获取全部接口名称(包括继承)             |
+> | getInterfaces( void)                    | array(interface=>refClass) | 获取全部接口对应的reflection(包括继承) |
+> | implementsInterface( string $interface) | bool                       | 判断是否实现某个接口                   |
+
+#### (6)、constant
+
+>| method                               | return                  | 功能                             | version |
+>| ------------------------------------ | ----------------------- | -------------------------------- | ------- |
+>| hasConstant( string $name)           | bool                    | 判断常量是否已定义(不考虑可见性) |         |
+>| getConstant( string $name)           | mixed                   | 获取某常量的值                   |         |
+>| getConstants( void)                  | array                   | 获取全部常量k-v(不考虑可见性)    |         |
+>| getReflectionConstant( string $name) | ReflectionClassConstant | 获取某个常量的reflection         | 7.1.0   |
+>| getReflectionConstants( void)        | array                   | 获取全部常量的reflection         | 7.1.0   |
+
+#### (7)、property
+
+>| method                                                       | return             | 功能                                                     |
+>| ------------------------------------------------------------ | ------------------ | -------------------------------------------------------- |
+>| hasProperty( string $name)                                   | bool               | 判断属性是否已定义（忽略可见性、static）                 |
+>| getDefaultProperties( void)                                  | array              | 获取类中有默认值的属性(包括继承，且不考虑可见性与static) |
+>| getProperties([ int $filter] )                               | array              | 获取属性的reflection                                     |
+>| getProperty( string $name)                                   | ReflectionProperty | 获取单个属性的reflection                                 |
+>| getStaticProperties( void)                                   | array              | 获取static属性k-v（不考虑可见性）                        |
+>| getStaticPropertyValue( string \$name[, mixed &$def_value] ) | mixed              | 获取某个static属性的值(只能获取public)*                  |
+
+
+
+>* property修饰符
+>  * ReflectionProperty::IS_STATIC     指示了 static 的属性。 
+>  * ReflectionProperty::IS_PUBLIC     指示了 public 的属性。 
+>  * ReflectionProperty::IS_PROTECTED  指示了 protected 的属性。 
+>  * ReflectionProperty::IS_PRIVATE    指示了 private 的属性。
+>
+>* 多个filter可以用 | 或 OR 组合使用
+
+#### (8)、construct
+
+>```php
+>public ReflectionClass::getConstructor( void) : ReflectionMethod
+>```
+>
+>
+>
+>
+
+#### (9)、trait
+
+>返回 trait 别名的一个数组(k-新名，v-原名)
+>
+>```php
+>public ReflectionClass::getTraitAliases( void) : array
+>```
+>
+> 返回这个类所使用 traits 的名称的数组
+>
+>```php
+>public ReflectionClass::getTraitNames( void) : array
+>```
+>
+> 返回这个类所使用的 traits 数组(k-名称， v-ReflectionClass)
+>
+>```php
+>public ReflectionClass::getTraits( void) : array
+>```
+>
+>
+
+#### (10)、method
+
+> 判断method是否已定义（忽略可见性，大小写）
+>
+> ```php
+> public ReflectionClass::hasMethod( string $name) : bool
+> ```
+>
+> 
+>
+> 获取method的reflection
+>
+> ```php
+> public ReflectionClass::getMethods([ int $filter] ) : array
+> /**
+> *method属性
+>  ReflectionMethod::IS_PUBLIC     可见性
+>  ReflectionMethod::IS_PROTECTED
+>  ReflectionMethod::IS_PRIVATE
+>  ReflectionMethod::IS_STATIC     静态 
+>  ReflectionMethod::IS_ABSTRACT   抽象
+>  ReflectionMethod::IS_FINAL      final
+> 
+> 多个filter可以用 | 或 OR 组合使用
+> 
+> */
+> ```
+>
+> 
+>
+> 获取某个method的reflection
+>
+> ```php
+> public ReflectionClass::getMethod( string $name) : ReflectionMethod
+> ```
+>
+> 
+
+#### (11)、extension
+
+>| method                  | return              | 功能                      |
+>| ----------------------- | ------------------- | ------------------------- |
+>| getExtension( void)     | ReflectionExtension | 获取该class所在的扩展     |
+>| getExtensionName( void) | string              | 获取该class所在的扩展名称 |
+>
+>```php
+>$object = new ReflectionFunction(function(){});
+>$ref = new \ReflectionClass($object);
+>var_dump($ref->getExtensionName());//Reflection
+>```
+
+
+
+### 2、ReflectionProperty(7.4.0)
+
+>property修饰符
+>
+>* ReflectionProperty::IS_STATIC     指示了 static 的属性。 
+>* ReflectionProperty::IS_PUBLIC     指示了 public 的属性。 
+>* ReflectionProperty::IS_PROTECTED  指示了 protected 的属性。 
+>* ReflectionProperty::IS_PRIVATE    指示了 private 的属性。
+>
+>```php
+>class Str
+>{
+>    public $length  = 5;
+>}
+>$prop = new ReflectionProperty('Str', 'length');
+>```
+>
+>
+>
+>| method                                   | return          | 功能             | version |
+>| ---------------------------------------- | --------------- | ---------------- | ------- |
+>| getDeclaringClass( void)                 | ReflectionClass | 在哪个class中    |         |
+>| getDocComment( void)                     | string          | 获取备注         |         |
+>| getModifiers( void)                      | int             | 获取修饰符       |         |
+>| getName( void)                           | string          | name             |         |
+>| getType( void)                           | ReflectionType  | 数据类型         | 7.4.0   |
+>| getValue([ object $object] )             | mixed           | value            |         |
+>| hasType( void)                           | bool            | 是否申明数据类型 | 7.4.0   |
+>| isDefault( void)                         | bool            | 是否申明默认数据 |         |
+>| isInitialized([ object $object] )        | bool            | 是否已初始化     | 7.4.0   |
+>| isPrivate( void)                         | bool            |                  |         |
+>| isProtected( void)                       | bool            |                  |         |
+>| isPublic( void）                         | bool            |                  |         |
+>| isStatic( void)                          | bool            |                  |         |
+>| setAccessible( bool $accessible)         | void            | 设置可见性       |         |
+>| setValue( object \$object, mixed $value) | void            |                  |         |
+>| setValue( mixed $value)                  | void            |                  |         |
+>
+>
+
+### 3、ReflectionClassConstant(7.1.0)
+
+>```php
+>public ReflectionClassConstant::__construct( mixed $class, string $name)
+>```
+
+
+
+constant修饰符（和class.method一样）
+
+* ReflectionMethod::IS_STATIC            指示一个方法是静态（static）的。
+* ReflectionMethod::IS_PUBLIC           指示一个方法是 public 的。
+* ReflectionMethod::IS_PROTECTED  指示一个方法是 protected 的。
+* ReflectionMethod::IS_PRIVATE         指示一个方法是 private 的。
+* ReflectionMethod::IS_ABSTRACT     指示一个方法是 abstract 的。
+* ReflectionMethod::IS_FINAL             指示一个方法是 final 的。
+
+
+
+>| method                                                       | return          | 功能                |
+>| ------------------------------------------------------------ | --------------- | ------------------- |
+>| getDeclaringClass( void)                                     | ReflectionClass | 在哪个class中定义的 |
+>| getDocComment( void)                                         | string          |                     |
+>| getModifiers( void)                                          | int             |                     |
+>| getName( void)                                               | string          |                     |
+>| getValue( void)                                              | mixed           |                     |
+>| isPrivate( void)                                             | bool            |                     |
+>| isProtected( void )                                          | bool            |                     |
+>| isPublic( void)                                              | bool            |                     |
+>| static export( mixed \$class, string \$name[, bool $return] ) | string          |                     |
+
+### 4、ReflectionMethod/Function
+
+#### (1)、ReflectionFunctionAbstract
+
+>| method                               | return              | 功能                         |
+>| ------------------------------------ | ------------------- | ---------------------------- |
+>| getClosureScopeClass( void)          | ReflectionClass     |                              |
+>| getClosureThis( void)                | object              | 返回本身的匿名函数           |
+>| getDocComment( void)                 | string              | 返回注释                     |
+>| getEndLine( void)                    | int                 |                              |
+>| getStartLine( void)                  | int                 |                              |
+>| getExtension( void)                  | ReflectionExtension |                              |
+>| getExtensionName( void)              | string              |                              |
+>| getFileName( void)                   | string              | 文件名字                     |
+>| getName( void)                       | string              | 获取函数名称                 |
+>| getShortName( void)                  | string              |                              |
+>| getNamespaceName( void)              | string              | 获取命名空间                 |
+>| inNamespace( void)                   | bool                | 是否使用命名空间             |
+>| getNumberOfParameters( void)         | int                 | 获取参数数目                 |
+>| getNumberOfRequiredParameters( void) | int                 | 获取必须输入参数个数         |
+>| getParameters( void)                 | array(k=>RefParam)  | 获取参数                     |
+>| getReturnType( void)                 | ReflectionType      | 返回类型                     |
+>| hasReturnType( void)                 | bool                |                              |
+>| getStaticVariables( void)            | array               | 获取静态变量                 |
+>| isClosure( void)                     | bool                | 检查是否是匿名函数           |
+>| isDeprecated( void)                  | bool                | 检查是否已经弃用             |
+>| isGenerator( void)                   | bool                | 判断函数是否是一个生成器函数 |
+>| isInternal( void)                    | bool                | 判断函数是否是内置函数       |
+>| isUserDefined( void)                 | bool                | 检查是否是用户定义           |
+>| isVariadic( void)                    | bool                |                              |
+>| returnsReference( void)              | bool                | 检查是否返回参考信息         |
+
+#### (2)、ReflectionMethod
+
+>```php
+>public ReflectionMethod::__construct( mixed $class, string $name)
+>public ReflectionMethod::__construct( string $class_method)
+>    
+>class Counter
+>{
+>    private static $c = 0;
+>    final public static function increment()
+>    {
+>        return ++self::$c;
+>    }
+>}
+>$method = new ReflectionMethod('Counter', 'increment');
+>```
+
+
+
+* method修饰符（和const一样）
+  * ReflectionMethod::IS_STATIC            指示一个方法是静态（static）的。
+  * ReflectionMethod::IS_PUBLIC           指示一个方法是 public 的。
+  * ReflectionMethod::IS_PROTECTED  指示一个方法是 protected 的。
+  * ReflectionMethod::IS_PRIVATE         指示一个方法是 private 的。
+  * ReflectionMethod::IS_ABSTRACT     指示一个方法是 abstract 的。
+  * ReflectionMethod::IS_FINAL             指示一个方法是 final 的。
+
+>| method                                                       | return           | 功能                     |
+>| ------------------------------------------------------------ | ---------------- | ------------------------ |
+>| getDeclaringClass( void)                                     | ReflectionClass  | 在哪个class中            |
+>| getClosure( object $object)                                  | Closure          | 获取这个method的匿名函数 |
+>| getModifiers( void)                                          | int              | 修饰符                   |
+>| getPrototype( void)                                          | ReflectionMethod | 返回方法原型 (如果存在)  |
+>| invoke( object \$object[, mixed \$parameter[, mixed $...]] ) | mixed            |                          |
+>| invokeArgs( object \$object, array $args)                    |                  |                          |
+>| isAbstract( void)                                            | bool             |                          |
+>| isConstructor( void)                                         | bool             |                          |
+>| isDestructor( void)                                          | bool             |                          |
+>| isFinal( void)                                               | bool             |                          |
+>| isPrivate( void)                                             | bool             |                          |
+>| isProtected( void)                                           | bool             |                          |
+>| isPublic( void)                                              | bool             |                          |
+>| isStatic( void)                                              | bool             |                          |
+>| setAccessible( bool $accessible)                             | void             |                          |
+
+#### (3)、ReflectionFunction
+
+>
+>
+>```php
+>public ReflectionFunction::__construct( mixed $name)
+>    
+>    
+>function counter1()
+>{
+>    static $c = 0;
+>    return ++$c;
+>} 
+>$ref = new ReflectionFunction('counter1'));
+>```
+
+
+
+>| method                                           | return  | 功能                     |
+>| ------------------------------------------------ | ------- | ------------------------ |
+>| getClosure( void)                                | Closure | 获取这个method的匿名函数 |
+>| invoke([ mixed $...] )                           | mixed   |                          |
+>| invokeArgs( array $args)                         | mixed   |                          |
+>| isDisabled( void)                                | bool    |                          |
+>| static export( string \$name[, string $return] ) |         |                          |
+
+#### (4)、ReflectionParameter（5.6.0）
+
+>```php
+>public ReflectionParameter::__construct( callable $function, mixed $parameter)
+>    
+>$ref = new ReflectionParameter(array('className', 'methodName'), 'property');
+>```
+
+ 
+
+
+
+> | method                                                       | return                     | 功能                                                  |
+> | ------------------------------------------------------------ | -------------------------- | ----------------------------------------------------- |
+> | getClass( void)                                              | ReflectionClass            | 获得类型提示类                                        |
+> | getDeclaringClass( void)                                     | ReflectionClass            | 这个参数是哪个类的                                    |
+> | getDeclaringFunction( void)                                  | ReflectionFunctionAbstract | 这个参数是哪个method的                                |
+> | getDefaultValue( void)                                       | mixed                      | 获取默认值                                            |
+> | getDefaultValueConstantName( void)                           | string/exception           | 如果默认值是常量(全局或类常量)，返回value，否则抛异常 |
+> | getName( void)                                               | string                     | 参数名                                                |
+> | getPosition( void)                                           | int                        | 这个参数是第几个参数。0开始                           |
+> | getType( void)                                               | ReflectionType             | 数据类型                                              |
+> | hasType( void)                                               | bool                       | 是否强制类型                                          |
+> | isArray( void)                                               | bool                       | 强制数组类型                                          |
+> | isCallable( void)                                            | bool                       | 强制callable类型                                      |
+> | isDefaultValueAvailable( void)                               | bool                       | 是否有默认值。                                        |
+> | isDefaultValueConstant( void)                                | bool                       | 默认值是否是常量                                      |
+> | allowsNull( void)                                            | bool                       | 是否允许null                                          |
+> | canBePassedByValue( void)                                    | bool                       | 是否可传值                                            |
+> | isOptional( void)                                            | bool                       | 是否是可选的                                          |
+> | isPassedByReference( void)                                   | bool                       | 是否引用传值                                          |
+> | isVariadic( void)                                            | bool                       | 是否是可变参数                                        |
+> | export( string \$function, string \$parameter[, bool $return] ) | string                     |                                                       |
+>
+> 
+
+### 5、ReflectionType/NameType
+
+#### (1)、ReflectionType(7.0.0)
+
+>类用于获取函数、类方法的参数或者返回值的类型。 
+>
+>| method            | return | 功能                       |
+>| ----------------- | ------ | -------------------------- |
+>| allowsNull( void) | bool   | 是否允许null               |
+>| isBuiltin( void)  | bool   | 检查它是否为内置类型(或类) |
+
+
+
+#### (2)、ReflectionNamedType(7.1.0)
+
+>| method        | return | 功能             |
+>| ------------- | ------ | ---------------- |
+>| getName(void) | string | 返回类型提示文本 |
+
+### 6、extension
+
+#### (1)、ReflectionExtension
+
+#### (2)、ReflectionZendExtension
+
+### 7、ReflectionGenerator(7.0.0)
+
+### 8、ReflectionReference(7.4.0)
+
 ## (九)、验证图和二维码
 
 ### 1、验证图
@@ -2756,7 +3314,7 @@ ob_flush
 
 ### 10、MySQL
 
-# 五、常用系统函数/常量
+# 五、扩展
 
 ## (一)、操作系统相关
 
@@ -2791,6 +3349,47 @@ ob_flush
 | 4    | PHP_EOL             | `\r\n` | `\r`  | 换行标识         |
 
 * PATH_SEPARATOR：include多个路径使用，在windows下，当你要include多个路径的话，你要用”;”隔开，但在linux下就使用”:”隔开的。
+
+## amqp/rabbitmq
+
+下载服务端： https://www.rabbitmq.com/download.html
+
+下载客服端：https://www.rabbitmq.com/devtools.html
+
+>- [php-amqplib](https://github.com/php-amqplib/php-amqplib)一个纯PHP，功能齐全的RabbitMQ客户端
+>- [RabbitMqBundle](https://github.com/php-amqplib/rabbitmqbundle)将RabbitMQ消息传递与Symfony2 Web框架结合在一起
+>- [PECL AMQP library](https://github.com/alanxz/rabbitmq-c)之上构建的[PECL AMQP库](http://pecl.php.net/package/amqp)
+>- [VorpalBunny](https://github.com/myYearbook/VorpalBunny)使用[Rabbitmq_jsonrpc_channel](https://www.rabbitmq.com/plugins.html#rabbitmq_jsonrpc_channel)的PHP客户端库
+>- [Thumper](https://github.com/php-amqplib/Thumper)消息传递模式库
+>- [CAMQP](http://www.yiiframework.com/extension/amqp/)是Yii框架的扩展，为RabbitMQ消息传递提供了网关
+>- [AMQP Interop](https://github.com/queue-interop/queue-interop#amqp-interop)是PHP中一组统一的AMQP 0-9-1接口及其实现
+
+
+
+## opcode/APC/APCu/opcache
+
+* 参考文档：
+  * https://www.cnblogs.com/zhaoyixing/p/12635269.html
+  * https://zhuanlan.zhihu.com/p/161441311
+  * 
+
+
+
+
+
+APC = APCu_bc,APC是旧名称，APCu_bc是当前名称
+
+APC已经不维护了
+
+
+
+APCu = APC User
+
+APCu就是APC，但剔除了opcode缓存功能
+
+
+
+Opcache通过将 PHP 脚本预编译的字节码存储到共享内存中来提升 PHP 的性能， 存储预编译字节码的好处就是 省去了每次加载和解析 PHP 脚本的开销
 
 # 分门别类
 
