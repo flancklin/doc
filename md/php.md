@@ -3251,13 +3251,7 @@ constant修饰符（和class.method一样）
 
 ob_flush
 
-## (十二)、文件读写
-
-### 1、读
-
-### 2、写
-
-## (十三)、socket
+## (十二)、socket
 
 ![微信图片_20200901182937](static/php/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20200901182937.jpg)
 
@@ -3284,37 +3278,29 @@ ob_flush
 >　　Sec-WebSocket-Accept: HSmrc0sMlYUkAGmm5OPpG2HaGWk= //这个则是经过服务器确认，并且加密过后的 Sec-WebSocket-Key,也就是client要求建立WebSocket验证的凭证
 >　　Sec-WebSocket-Protocol: chat
 
+# 五、swoole
 
+## (一)、HTTP Server
 
+## (二)、WebSocket Server
 
+## (三)、TCP Server
 
+## (四)、UDP Server
 
+## (五)、Task
 
+## (六)、Coroutine
 
+## (七)、Channel
 
-## (十四)、swoole
+## (八)、Socket
 
-### 1、HTTP Server
+## (九)、Stream
 
-### 2、WebSocket Server
+## (十)、MySQL
 
-### 3、TCP Server
-
-### 4、UDP Server
-
-### 5、Task
-
-### 6、Coroutine
-
-### 7、Channel
-
-### 8、Socket
-
-### 9、Stream
-
-### 10、MySQL
-
-# 五、扩展
+# 六、扩展
 
 ## (一)、操作系统相关
 
