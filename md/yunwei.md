@@ -2786,26 +2786,6 @@ split_nginx_log.sh         加入定时器，每小时跑
 
 # 一、docker
 
-## (一)、image
-
-## (二)、container
-
-### 进入正在运行得容器内部
-
-https://www.cnblogs.com/-wenli/p/13307542.html
-
-attach  会阻塞，不建议开发环境使用
-
-exec               docker exec -it containerID /bin/bash 
-
-ssh
-
-nsenter
-
-## (三)、dockerfile
-
-## (四)、hub
-
 ## 示例
 
 ### 拉取nginx

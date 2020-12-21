@@ -886,6 +886,10 @@ breake
 >
 >```
 >
+>```
+>
+>```
+>
 >
 >
 >```
@@ -897,6 +901,10 @@ breake
 > static $a = function(){echo 'hello!';}  //不可以callback
 > static $a = new stdClass();             //不可以object
 >```
+>```
+>
+>```
+>
 >```
 >
 >```
@@ -1474,8 +1482,11 @@ __construct()
 >const myConstant='abcd';
 >const myConstant=['a','b','c'];
 >const myConstant=<<<'label'//php>=5.3.0
->   abcd
->   label;
+>  abcd
+>  label;
+>
+>public const myConstant='aaa';
+>//const public myConstant='aaa';//这个写法会报错
 >```
 >
 >
@@ -1609,6 +1620,24 @@ abstract class MyClass{
 ### 3、trait
 
 只是一种==代码复用机制==。与对象概念无关。
+
+
+
+|            | 成员                                            | 是否支持 |
+| ---------- | ----------------------------------------------- | -------- |
+| 变量       | `private $a;`                                   |          |
+|            | `protected $b1;`<br>`public $b2;`               |          |
+| static变量 | `privatre static $c`                            |          |
+|            | `protected static $d; `<br>`public static $d; ` |          |
+| const常量  | `p`                                             |          |
+|            |                                                 |          |
+|            |                                                 |          |
+
+> ```php
+> priv
+> ```
+>
+> 
 
 
 
@@ -2699,6 +2728,47 @@ Warning: session_set_save_handler(): Cannot change save handler when session is 
 >    return $result;
 >}
 >```
+
+
+
+##### 更多案例
+
+###### onesignal-create-app
+
+>官方文档：https://documentation.onesignal.com/reference/create-an-app
+>
+>```php
+>    public function actionTt(){
+>        $url = "https://onesignal.com/api/v1/apps";
+>        $headers = [
+>            'host:onesignal.com',
+>            'Accept:application/json',
+>            'Authorization:Basic OTg1M2MzMDgtYjBlNS00N2I2LTliOWEtZWU0N2FhYjQzOWRm'
+>        ];
+>        $data = [
+>            'name' => 'test-20201211-104',
+>            'site_name' => 'shopping',
+>            'chrome_web_origin' => 'https://shopping-now-now.myshopify.com',
+>            'chrome_web_default_notification_icon' => 'https://cdn.shopifycdn.net/s/files/1/0013/2710/4049/files/banner_45aeda53-2d1d-4f5e-a593-b04e51405228_1080x.png?v=1547635011',
+>            'organization_id' => 'd0f61b1c-7dce-4a23-8ae7-aa73093b1e20'
+>        ];
+>        $ch1 = curl_init ();
+>        curl_setopt($ch1, CURLOPT_URL, $url);
+>        curl_setopt($ch1, CURLOPT_POST, 1);
+>        curl_setopt($ch1, CURLOPT_RETURNTRANSFER, 1);
+>        curl_setopt($ch1, CURLOPT_CONNECTTIMEOUT, 60);
+>        curl_setopt($ch1, CURLOPT_HTTPHEADER, $headers);
+>        curl_setopt($ch1, CURLOPT_SSL_VERIFYPEER, FALSE);
+>        curl_setopt($ch1, CURLOPT_SSL_VERIFYHOST, FALSE);
+>        curl_setopt($ch1, CURLOPT_POSTFIELDS, $data);
+>        $img_info = curl_exec($ch1);
+>        curl_close($ch1);
+>        $res = json_decode($img_info,true);
+>        var_dump($res);
+>    }
+>```
+>
+>
 
 ## (五)、邮件发送
 

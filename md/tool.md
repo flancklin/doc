@@ -1,5 +1,9 @@
 # git
 
+本地文档  file:///C:/Program%20Files/Git/mingw64/share/doc/git-doc
+
+git --version    2.24
+
 ![git](static/tool/git.jpeg)
 
 
@@ -65,6 +69,10 @@ git reflog
 
  
 
+## 撤销
+
+https://www.cnblogs.com/yangsg/p/13267246.html
+
 ## .gitignore文件
 
  
@@ -90,6 +98,25 @@ git reflog
 > ```
 
  
+
+
+
+https://www.cnblogs.com/code-changeworld/p/4779145.html
+
+> ```shell
+> Pushing to http://47.94.230.43:3000/weshare/ExitIntent.git
+> To http://47.94.230.43:3000/weshare/ExitIntent.git
+>  ! [rejected]        message_1110 -> message_1110 (non-fast-forward)
+> error: failed to push some refs to 'http://47.94.230.43:3000/weshare/ExitIntent.git'
+> hint: Updates were rejected because the tip of your current branch is behind
+> hint: its remote counterpart. Integrate the remote changes (e.g.
+> hint: 'git pull ...') before pushing again.
+> hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+> ```
+>
+> 
+
+
 
 # composer
 
