@@ -1386,6 +1386,10 @@ simple_expr:
 >
 > ```
 >
+>```
+>
+>```
+>
 >
 >在controller中设置默认action
 >
@@ -1394,6 +1398,10 @@ simple_expr:
 >   	public $defaultAction = 'say-hello';//设置默认方法
 >   }
 >  ```
+>```
+>
+>```
+>
 >```
 >
 >```
@@ -1934,7 +1942,15 @@ Event::trigger(Foo::className(), Foo::EVENT_HELLO);
 
 https://www.yiiframework.com/doc/guide/2.0/en/security-authorization#role-based-access-control-rbac
 
-# 四、功能
+# 四、vendor
+
+## (一)、yiisoft/yii2-gii
+
+## (二)、yiisoft/yii2-redis
+
+## (三)、yiisoft/yii2-queue
+
+# 五、功能
 
 ## (一)、session和cookie
 
@@ -1984,21 +2000,59 @@ https://www.yiiframework.com/doc/guide/2.0/en/security-authorization#role-based-
 
 
 
-## (三)、文件上传
+## (三)、文件
+
+### 1、创建
+
+### 2、读取
+
+### 3、写入
+
+### 4、删除
+
+### 5、上传
+
+### 6、下载(访问)
+
+#### (1)、静态文件（web服务器）
+
+>比如/root/static/a.png
+>
+>通过web服务器把www.a.com域名执行/roo/static
+>
+>则访问https://www.a.com/a.png
+
+#### (2)、api接口访问
+
+>举例：通过php的api生成相关的excel或者验证图片，然后直接输出给浏览器
+
+##### (a)、示例
+
+>```php
+>public function actionEmailImage(){
+>    $filepath = \Yii::getAlias("@common") . DIRECTORY_SEPARATOR . 'static'.DIRECTORY_SEPARATOR . '1x1.png';
+>    \Yii::$app->getResponse()->getHeaders()
+>        ->set('Pragma', 'public')
+>        ->set('Expires', '0')
+>        ->set('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
+>        //            ->set('Content-Transfer-Encoding', 'binary')
+>        ->set('Content-type', 'image/png');
+>    \Yii::$app->response->format = Response::FORMAT_RAW;
+>    return file_get_contents($filepath);
+>}
+>```
 
 ## (四)、web和restfull
 
-## (五)、图片验证
+## (五)、发送邮件
 
-## (六)、发送邮件
+## (六)、支持跨域请求
 
-## (七)、支持跨域请求
-
-## (八)、CSRF
+## (七)、CSRF
 
 ()、()、()、()、()、()、()、()、()、()、
 
-# 五、源码分析
+# 六、源码分析
 
 ## 基类
 

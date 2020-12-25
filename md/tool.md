@@ -10,6 +10,10 @@ git --version    2.24
 
 
 
+ git switch message_manage from origin
+
+
+
 | 步骤   | 位置 | 简称 | 英文       |
 | ------ | ---- | ---- | ---------- |
 | 工作区 | 本地 | 工作 | workspace  |
