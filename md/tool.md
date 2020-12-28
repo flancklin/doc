@@ -1,10 +1,71 @@
 # git
 
+官方文档：https://git-scm.com/docs
+
+==获取帮助文档：==在git命令框中：git help 指令。比如git help stash
+
+![git](static/tool/git.jpeg)
+
+## (一)、git
+
+>
+>
+>```shell
+>git [--version]                   //查看git版本信息：git version 2.24.0.windows.2
+>	[--help]                      //获取git指令列表。加--all或者-a展示全部指令 
+>	[-C <path>] 
+>	[-c <name>=<value>]
+>    [--exec-path[=<path>]] 
+>    [--html-path] 
+>    [--man-path] 
+>    [--info-path]
+>    [-p|--paginate|-P|--no-pager] 
+>    [--no-replace-objects] 
+>    [--bare]
+>    [--git-dir=<path>] 
+>    [--work-tree=<path>] 
+>    [--namespace=<name>]
+>    [--super-prefix=<path>]
+>    <command> [<args>]
+>```
+>
+>
+
+| 指令 | 参数       | 功能 |
+| ---- | ---------- | ---- |
+| git  | --version  |      |
+|      | --help     |      |
+|      | -C \<path> |      |
+
+
+
+stash
+
+## 提交过程
+
+commit
+
+push
+
+## 拉取过程
+
+pull
+
+fetch
+
+## 撤回
+
+checkout
+
+reset
+
+
+
 本地文档  file:///C:/Program%20Files/Git/mingw64/share/doc/git-doc
 
 git --version    2.24
 
-![git](static/tool/git.jpeg)
+
 
 
 
