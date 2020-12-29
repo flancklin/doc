@@ -232,7 +232,11 @@ index.php
 
 #### (3)、array
 
-==array中key严格区分大小写==            `['a'=>1, 'A'=>2]`数组中由两个不同元素
+==array中key严格区分大小写==                    `['a'=>1] != ['A'=>2]`
+
+==array中key数字和字符型数字完全等同== `[2 => 'a']===['2'=>'a']`
+
+`array_unique([1,'1'])===['1']`
 
 ##### a、定义方式有两种
 
@@ -272,6 +276,24 @@ index.php
 >      true => "d",
 >  );//结果为[1=>'d']
 >  ```
+
+##### c、判断两个数组是否相同
+
+>
+>
+>```php
+>var_dump(['1'] == [1]);//true
+>var_dump(['1'] === [1]);//false
+>
+>var_dump(['1'=>'a'] === [1=>'a']);//true
+>
+>var_dump(['1' =>2] == ['1' => '2']);//true
+>var_dump(['1' =>2] === ['1' => '2']);//false
+>```
+>
+>===会严格区分value的类型，而\==不会
+>
+>至于key，`[2 => 'a']===['2'=>'a']`，故没有顾虑的
 
 ##### c、把object强转化为array
 
@@ -832,27 +854,29 @@ breake
 >正确的初始化举例
 >
 >* ```php
-> static $a;                    //不初始化，默认是null
-> static $a = null;             //null类型   
-> static $a = false;            //boolean类型
-> static $a = 100;              //integer类型
-> static $a = 100.23;           //float类型
-> static $a = ['a' => 'a'];     //array类型
-> static $a = PHP_VERSION;      //调用已定义的常量
-> static $a = "abcd";           //string类型
-> //string的nowdoc
-> static $a = <<<'label'
-> abcd
-> label;
-> //string的heredoc
-> static $a=<<<label
-> abcd
-> label;
-> static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
-> ```
-> ```
+>  static $a;                    //不初始化，默认是null
+>  static $a = null;             //null类型   
+>  static $a = false;            //boolean类型
+>  static $a = 100;              //integer类型
+>  static $a = 100.23;           //float类型
+>  static $a = ['a' => 'a'];     //array类型
+>  static $a = PHP_VERSION;      //调用已定义的常量
+>  static $a = "abcd";           //string类型
+>  //string的nowdoc
+>  static $a = <<<'label'
+>  abcd
+>  label;
+>  //string的heredoc
+>  static $a=<<<label
+>  abcd
+>  label;
+>  static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
+>  ```
+>```
 >
-> ```
+>```
+>
+>```
 >
 >```
 >
@@ -897,10 +921,14 @@ breake
 >错误的初始化举例
 >
 >* ```php
-> static $a = bcadd(1,2);                 //不可以调用函数
-> static $a = function(){echo 'hello!';}  //不可以callback
-> static $a = new stdClass();             //不可以object
+>  static $a = bcadd(1,2);                 //不可以调用函数
+>  static $a = function(){echo 'hello!';}  //不可以callback
+>  static $a = new stdClass();             //不可以object
+>  ```
 >```
+>
+>```
+>
 >```
 >
 >```
@@ -1113,7 +1141,44 @@ breake
 > }
 > ```
 
-### 4、强制函数返回数据类型
+### 4、变参函数的定义与使用
+
+>定义
+>
+>```php
+>function myFun($a, $b, ...$r){
+>    var_dump($a, $b, $r);
+>}
+>
+>myFun(1,2,3,4,5,6);
+>/**
+>$a = 1;
+>$b = 2;
+>$r = [4,5,6];
+>*/
+>```
+>
+>使用
+>
+>==在一维非关联数组前加三个点号==
+>
+>```php
+>$a = [
+>    ['a'=>1,'b'=>2,'c'=>3],
+>    ['a'=>21,'b'=>22,'c'=>23],
+>];
+>
+>array_map(function (...$p){
+>    var_dump($p);
+>}, ...[array_column($a, 'a'), array_column($a, 'b')]);
+>
+>```
+>
+>
+>
+>
+
+### 5、强制函数返回数据类型
 
 >* ==php5.6不支持==
 >
@@ -1124,7 +1189,7 @@ breake
 > }
 >```
 
-### 5、重载和递归
+### 6、重载和递归
 
 #### (1)、函数重载
 
@@ -1151,7 +1216,7 @@ breake
 >
 >
 
-### 6、相关函数
+### 7、相关函数
 
 | 函数                       | 功能 | 参数 | 返回值版本 | 备注 |
 | -------------------------- | ---- | ---- | ---------- | ---- |
