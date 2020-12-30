@@ -914,6 +914,10 @@ breake
 >
 >```
 >
+>```
+>
+>```
+>
 >
 >
 >```
@@ -925,6 +929,10 @@ breake
 >  static $a = function(){echo 'hello!';}  //不可以callback
 >  static $a = new stdClass();             //不可以object
 >  ```
+>```
+>
+>```
+>
 >```
 >
 >```
@@ -1710,26 +1718,30 @@ abstract class MyClass{
 
 ### 相关函数
 
-| 函数                     | 功能 | 参数 | 返回值版本 | 备注 |
-| ------------------------ | ---- | ---- | ---------- | ---- |
-| `__autoload`             |      |      |            |      |
-| `call_user_method_array` |      |      |            |      |
-| `call_user_method`       |      |      |            |      |
-| `class_exists`           |      |      |            |      |
-| `get_called_class`       |      |      |            |      |
-| `get_class_methods`      |      |      |            |      |
-| `get_class_vars`         |      |      |            |      |
-| `get_class`              |      |      |            |      |
-| `get_declared_classes`   |      |      |            |      |
-| `get_declared_interface` |      |      |            |      |
-| get_object_vars          |      |      |            |      |
-| get_parent_class         |      |      |            |      |
-| interface_exists         |      |      |            |      |
-| is_a                     |      |      |            |      |
-| is_subclass_of           |      |      |            |      |
-| method_exists            |      |      |            |      |
-| property_exists          |      |      |            |      |
-| trait_exists             |      |      |            |      |
+| 函数                     | 功能              | 参数 | 返回值版本 | 备注 |
+| ------------------------ | ----------------- | ---- | ---------- | ---- |
+|                          | 类名              |      |            |      |
+|                          | 类名(带namespace) |      |            |      |
+|                          | method名          |      |            |      |
+|                          | method名(带类名)  |      |            |      |
+| `__autoload`             |                   |      |            |      |
+| `call_user_method_array` |                   |      |            |      |
+| `call_user_method`       |                   |      |            |      |
+| `class_exists`           |                   |      |            |      |
+| `get_called_class`       |                   |      |            |      |
+| `get_class_methods`      |                   |      |            |      |
+| `get_class_vars`         |                   |      |            |      |
+| `get_class`              |                   |      |            |      |
+| `get_declared_classes`   |                   |      |            |      |
+| `get_declared_interface` |                   |      |            |      |
+| get_object_vars          |                   |      |            |      |
+| get_parent_class         |                   |      |            |      |
+| interface_exists         |                   |      |            |      |
+| is_a                     |                   |      |            |      |
+| is_subclass_of           |                   |      |            |      |
+| method_exists            |                   |      |            |      |
+| property_exists          |                   |      |            |      |
+| trait_exists             |                   |      |            |      |
 
 ## (七)、进程性指令
 
@@ -1822,7 +1834,200 @@ exit();sleep();die;
 >}
 >```
 >
+
+### 2、namespace
+
+#### 同一个文件中多个namespace
+
+> ```php
+> <?php
+> namespace a\b\c\d {
+>     class Aa{
+>         public function aa(){
+>             echo __FILE__;
+>         }
+>     }
+> }
+> namespace aa{
+>     $o = new \a\b\c\d\Aa();
+>     $o->aa();
+> }
+> 
+> $o = new \a\b\c\d\Aa();//这样写会报错
+> $o->aa();
+> ```
+
+## (十)、语法层次的判断与获取
+
+### 1、判断数据类型
+
 >
+>
+>| 序号 | 功能             | 示例                                                | 备注               |
+>| ---- | ---------------- | --------------------------------------------------- | ------------------ |
+>| 1    | 是否是bool       | `is_bool($var)`                                     |                    |
+>| 2    | 是否是integer    | `is_int($var)`或`is_integer($var)`或`is_long($var)` | `is_numeric($var)` |
+>| 3    | 是否是float      | `is_float($var)`或`is_real($var)`                   | `is_numeric($var)` |
+>| 4    | 是否是string     | `is_string($var)`                                   |                    |
+>| 5    | 是否是null       | `is_null($var)`                                     |                    |
+>| 6    | 是否是array      | `is_array($var)`                                    |                    |
+>| 7    | 是否是object     | `is_object($var)`                                   |                    |
+>| 8    | 是否是callback   | `is_callable($var)`                                 |                    |
+>| 9    | 是否是resource   | `is_resource($var)`                                 |                    |
+>|      |                  |                                                     |                    |
+>|      | 是否是标量       | `is_scalar($var)`                                   |                    |
+>|      | 判断不是合法数值 | `is_nan($var)`                                      | NAN                |
+
+#### (1)、is_numeric
+
+ >判断变量是否是数字(int+float)或者字符型数字
+
+#### (2)、is_callable
+
+>* `is_callable( callable $name[, bool $syntax_only = false[, string &$callable_name]] ) : bool`
+
+#### (3)、is_scalar
+
+>判断是否为标量。
+>
+>==什么是标量？
+
+>```php
+>var_dump(is_scalar(false));//true
+>var_dump(is_scalar(1));    //true
+>var_dump(is_scalar(1.2));  //true 
+>var_dump(is_scalar('a'));  //true
+>var_dump(is_scalar(null));          //false
+>var_dump(is_scalar(new stdClass()));//false
+>var_dump(is_scalar([]));            //false
+>var_dump(is_scalar(function(){}));  //false
+>var_dump(is_scalar(NAN));         //true 
+>var_dump(is_scalar(acos(8)));     //true
+>```
+
+#### (4)、is_nan
+
+> ```php
+> var_dump(is_nan(acos(0.6)));//false  结果是合法数值
+> var_dump(is_nan(acos(6.6)));//true   acos最大为1.
+> var_dump(is_nan(NAN));//true
+> ```
+
+### 2、获取代码位置相关信息
+
+#### (1)、获取代码相关物理信息
+
+> | 序号                    | 示例                                            | 备注           |
+> | ----------------------- | ----------------------------------------------- | -------------- |
+> | 代码所在文件            | `__DIR__`                                       | 仅路径         |
+> |                         | `basename(__FILE__)`                            | 仅文件名       |
+> |                         | `__FILE__`                                      | 路径+文件名    |
+> | 代码所在行数            | `__LINE__`                                      |                |
+> | 代码所在namespace       | `__NAMESPACE__`                                 |                |
+> | 代码所在类名            | `(new \ReflectionClass($this))->getShortName()` | 仅类名         |
+> |                         | `__CLASS__`                                     | namespace+类名 |
+> | 代码所在method/function | `__FUNCTION__`                                  | 仅method名     |
+> |                         | `__METHOD__`                                    | 类名::method名 |
+
+动态的。根据继承关系。输出结果不同 
+
+> | 序号         | 示例                 | 备注          |
+> | ------------ | -------------------- | ------------- |
+> | 代码所在类名 | `get_called_class()` | 继承.静态绑定 |
+
+
+
+> 文件   c:\code\test.php
+>
+> ```php
+> <?php
+> namespace my_namespace1\tab1 {
+> 
+>     class MyClassBase{
+>         public function myMethod(){
+>             echo __FILE__.PHP_EOL;           //c:\code\test.php
+>             echo basename(__FILE__).PHP_EOL; //test.php
+>             echo __DIR__.PHP_EOL;            //c:\code
+>             echo  __LINE__.PHP_EOL;          //10
+> 
+>             echo __NAMESPACE__.PHP_EOL;             //my_namespace1\tab1
+>             echo __CLASS__.PHP_EOL;                 //my_namespace1\tab1\MyClassBase
+>             echo get_called_class().PHP_EOL;        //my_namespace1\tab1\MyClass
+>             echo __TRAIT__.PHP_EOL;                 //与class差不多
+>             echo (new \ReflectionClass($this))->getShortName().PHP_EOL;//Myclass
+> 
+>             echo __METHOD__.PHP_EOL;     //my_namespace1\tab1\MyClass::myMethod
+>             echo __FUNCTION__.PHP_EOL;   //myMethod
+>         }
+>     }
+>     class MyClass extends MyClassBase {
+>     }
+> }
+> 
+> namespace my_namespace2\tab2{
+>     use my_namespace1\tab1\MyClass;
+>     $object = new MyClass();
+>     $object->myMethod();
+> }
+> ```
+>
+> 
+
+#### (2)、获取代码相关逻辑信息
+
+>
+>
+>| 序号 | 功能                       | 示例 | 备注 |
+>| ---- | -------------------------- | ---- | ---- |
+>|      | 哪个文件在调用这个method   |      |      |
+>|      | 文件的哪行在调用这个method |      |      |
+>|      | 哪个class在调用这个method  |      |      |
+>|      | 哪个method在调用这个method |      |      |
+
+
+
+> 共两个文件【c:\code\test.php】和【c:\code\test2.php】
+>
+> c:\code\test.php
+>
+> ```php
+> <?php
+> 
+> 
+> namespace my_namespace1\tab1 {
+> 
+>     class MyClass{
+>         public function myMethod(){
+> 
+>         }
+>     }
+> }
+> ```
+>
+> c:\code\test2.php
+>
+> ```php
+> <?php
+> 
+> namespace my_namespace2\tab2 {
+> 
+>     use my_namespace1\tab1\MyClass;
+> 
+>     include __DIR__.DIRECTORY_SEPARATOR.'test.php';
+> 
+>     class MyClass2{
+>         public function myMethod2(){
+>             $object = new MyClass();
+>             $object->myMethod();
+>         }
+>     }
+> 
+> 
+>     (new MyClass2())->myMethod2();
+> }
+> ```
+>
+> 
 
 # 三、预定义
 
@@ -2389,6 +2594,39 @@ Warning: session_set_save_handler(): Cannot change save handler when session is 
 
 ## (二)、文件
 
+### 1、基础
+
+#### (1)、当前路径问题(./)
+
+==./==代表的是当前cli所在目录路径，而不是当前文件目录路径
+
+>
+>
+>c:\code\helper\test\t.php
+>
+>```php
+><?php
+>    echo realpath('.');
+>```
+>
+>***
+>
+>cli：c:\code\helper
+>
+>```shell
+>> php test/t.php
+>//输出结果是   c:\code\helper
+>```
+>
+>***
+>
+>cli:c:\code\helper\test
+>
+>```shell
+>> php t.php
+>//输出结果是   c:\code\helper\testr
+>```
+
 
 
 
@@ -2433,11 +2671,11 @@ Warning: session_set_save_handler(): Cannot change save handler when session is 
 
 
 
-### 1、读文件
+### 2、读文件
 
-### 2、写文件
+### 3、写文件
 
-### 3、从浏览器上传到我方服务器
+### 4、从浏览器上传到我方服务器
 
 #### (1)、post上传
 
@@ -2591,9 +2829,9 @@ Warning: session_set_save_handler(): Cannot change save handler when session is 
 
 
 
-### 4、我方服务器从第三方拉取文件
+### 5、我方服务器从第三方拉取文件
 
-### 5、我方服务器向浏览器提供下载文件
+### 6、我方服务器向浏览器提供下载文件
 
 ## (三)、数学精度计算
 
