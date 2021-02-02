@@ -918,6 +918,14 @@ breake
 >
 >```
 >
+>```
+>
+>```
+>
+>```
+>
+>```
+>
 >
 >
 >```
@@ -929,6 +937,14 @@ breake
 >  static $a = function(){echo 'hello!';}  //不可以callback
 >  static $a = new stdClass();             //不可以object
 >  ```
+>```
+>
+>```
+>
+>```
+>
+>```
+>
 >```
 >
 >```
@@ -1224,7 +1240,136 @@ breake
 >
 >
 
-### 7、相关函数
+### 7、可变函数
+
+>核心：把函数名传给一个变量，通过变量实现调用函数
+>
+>==可变函数不能用于例如 echo，print，unset()，isset()，empty()，include，require 以及类似的语言结构==
+
+#### (1)、示例一：普通函数
+
+>```php
+>function myFun($p1){
+>	echo "test:".__FUNCTION__."。param:".$p1.PHP_EOL;    
+>}
+>//【步骤一】、定义可变函数【把函数名给变量】
+>$var = "myFun";
+>//【步骤二】、调用可变函数
+>$var("param1");//输出test:myFun
+>```
+
+
+
+> ##### 变量名与函数名相同
+>
+> 好像完全没影响
+>
+> ```php
+> $myFun = "I am a var";
+> function myFun($p1){
+> 	echo "test:".__FUNCTION__."。param:".$p1.PHP_EOL;    
+> }
+> //【步骤一】、定义可变函数【把函数名给变量】
+> $var = "myFun";
+> //【步骤二】、调用可变函数
+> $var("param1");//输出test:myFun
+> ```
+>
+> 
+
+
+
+#### (2)、示例二：类静态方法
+
+>```php
+>namespace a\b\c\d{
+>    class MyClass{
+>        public static function myStaticFun($p1){
+>            echo "test:".__METHOD__."。param:".$p1.PHP_EOL;
+>        }
+>    }
+>}
+>
+>namespace namespace2{
+>    //【步骤一】、定义可变函数【把函数名给变量】【支持命名空间】
+>    $var = "a\b\c\d\MyClass::myStaticFun";
+>    //【步骤二】、调用可变函数
+>    $var("param1");//
+>}
+>
+>   
+>```
+
+>
+>
+>##### 类静态方法名与类属性名重复
+>
+>```php
+>class MyClass{
+>public static $var = "I am static property";
+>public static function myStaticFun(){
+>   echo "I am class::static-method";
+>}
+>}
+>
+>$var = "myStaticFun";
+>
+>echo MyClass::$var; //I am static property
+>echo PHP_EOL;
+>echo MyClass::$var();//I am class::static-method
+>```
+>
+>
+
+#### (3)、示例三：类方法
+
+>这里有两个情况：
+>
+>* ✔仅仅是方法成了可变函数
+>* ✘【类+类方法】这个整体成为可变函数
+>
+
+
+
+
+
+##### (a)、仅方法成可变函数
+
+>```php
+>class MyClass{
+>   public function myFun($p1){
+>       echo "test:".__METHOD__."。param:".$p1.PHP_EOL;
+>   }
+>}
+>
+>$obj = new MyClass();
+>$var = "myFun";
+>$obj->$var("param1");//test:MyClass::myFun。param:param1
+>```
+>
+>##### 类方法名与类属性名重名情况
+>
+>>```php
+>>class MyClass{
+>>public $myFun = "I am property";
+>>public function myFun($p1){
+>>   echo "I am class::method";
+>>}
+>>}
+>>
+>>$obj = new MyClass();
+>>$var = "myFun";
+>>echo $obj->$var;//输出 I am property
+>>echo $obj->$var();//输出 I am class::method
+>>```
+
+##### (b)、【类+类方法】整体成可变函数
+
+>```php
+>好像压根儿不支持
+>```
+
+### 8、相关函数
 
 | 函数                       | 功能 | 参数 | 返回值版本 | 备注 |
 | -------------------------- | ---- | ---- | ---------- | ---- |
@@ -1751,9 +1896,26 @@ exit();sleep();die;
 
 ## (八)、错误与异常
 
->
->
+### 1、错误
+
 >**Error** 类并非继承自 [Exception](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/class.exception.html)   类，所以不能用 `catch (Exception $e) { ... }` 来捕获   **Error**。你可以用   `catch (Error $e) { ... }`，或者通过注册异常处理函数（   [set_exception_handler()](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/function.set-exception-handler.html)）来捕获 **Error**。 
+
+#### (1)、错误控制符@
+
+>PHP 手册>>语言参考>>运算符
+>
+>
+>
+>@。当将其放置在一个 PHP 表达式之前，该表达式可能产生的任何错误信息都被忽略掉
+>
+>**注意**: 
+>
+>* @ 运算符只对[表达式](https://www.php.net/manual/zh/language.expressions.php)有效。
+>* 对新手来说一个简单的规则就是：如果能从某处得到值，就能在它前面加上 @ 运算符。
+>* 例如，可以把它放在变量，函数和 [include](https://www.php.net/manual/zh/function.include.php) 调用，常量，等等之前。
+>* 不能把它放在函数或类的定义之前，也不能用于条件结构例如 `if` 和 [foreach](https://www.php.net/manual/zh/control-structures.foreach.php) 等。
+
+
 
 
 
@@ -1800,7 +1962,24 @@ exit();sleep();die;
 >    }
 >```
 >
+
+
+
+
+
 >
+>
+>- **Throwable**
+>  - **Error**
+>    - **ArithmeticError**
+>      - **DivisionByZeroError**          
+>    - **AssertionError**        
+>    - **CompileError**
+>      - **ParseError**          
+>    - **TypeError**
+>      - **ArgumentCountError**          
+>  - [Exception](mk:@MSITStore:C:\Users\EDZ\Desktop\php74_zh(2020).chm::/res/class.exception.html)
+>    - ... 
 
 ## (九)、其他语法
 
@@ -2031,9 +2210,25 @@ exit();sleep();die;
 
 # 三、预定义
 
+## 预定义基础class或interface
+
+>
+>
+>- [Traversable](https://www.php.net/manual/en/class.traversable.php)
+>- [Iterator](https://www.php.net/manual/en/class.iterator.php)
+>- [IteratorAggregate](https://www.php.net/manual/en/class.iteratoraggregate.php)
+>- [Throwable](https://www.php.net/manual/en/class.throwable.php)
+>- [ArrayAccess](https://www.php.net/manual/en/class.arrayaccess.php)
+>- [Serializable](https://www.php.net/manual/en/class.serializable.php)
+>- [Closure](https://www.php.net/manual/en/class.closure.php)
+>- [Generator](https://www.php.net/manual/en/class.generator.php)
+>- [WeakReference](https://www.php.net/manual/en/class.weakreference.php)
+
 (一)、预定义数据载体
 
 (二)、预定义异常
+
+
 
 
 
@@ -4354,6 +4549,8 @@ get_class_methods ($class_name)
 
 ## (一)、isset 判断是否存在且不为null
 
+判断是否定义并初始化变量。
+
 >```php
 >$a;
 >$b =null;
@@ -4378,6 +4575,46 @@ get_class_methods ($class_name)
 > ```
 >
 > 
+
+
+
+## (三)、urlencode与rawurlencode
+
+>
+>
+>为什么回去区分这个？
+>
+>因为js得urlencode与php要前后一致。不然解不出来
+>
+>| 函数         | 协议                                         | 功能                                                         |
+>| ------------ | -------------------------------------------- | ------------------------------------------------------------ |
+>| urlencode    |                                              | *-_.*    之外的所有非字母数字字符都将被替换成百分号（*%*）后跟两位十六进制数，空格则编码为加号（*+*）。 |
+>| rawurlencode | [RFC 3986](http://www.faqs.org/rfcs/rfc3986) | *-_.*    之外的所有非字母数字字符都将被替换成百分号（*%*）后跟两位十六进制数 |
+>
+>* urlencode
+>  * 此编码与 WWW    表单 POST 数据的编码方式是一样的，同时与    *application/x-www-form-urlencoded*    的媒体类型编码方式一样
+>
+>```php
+><?php
+>    $str = "a-b_c.d e*f/g=h?i&j,k ";
+>echo urlencode($str);//a-b_c.d+e%2Af%2Fg%3Dh%3Fi%26j%2Ck
+>echo rawurlencode($str);//a-b_c.d%20e%2Af%2Fg%3Dh%3Fi%26j%2Ck
+>//只有空格得处理不同
+>```
+
+
+
+(四)、方法参数是callable.
+
+>
+>
+>```php
+>function myTest(callabel $f){
+>    $f();
+>}
+>```
+>
+>
 
 ## call_user_func/call_user_func_array()
 

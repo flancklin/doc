@@ -1358,7 +1358,7 @@ simple_expr:
 
 
 
-### 1、配置与设置
+### 1、配置与获取
 
 #### (1)、命名规则
 
@@ -1390,6 +1390,10 @@ simple_expr:
 >
 >```
 >
+>```
+>
+>```
+>
 >
 >在controller中设置默认action
 >
@@ -1405,8 +1409,25 @@ simple_expr:
 >```
 >
 >```
+>
+>```
+>
+>```
 
 
+
+#### (3)、相关变量获取
+
+> ```php
+> public function beforeAction($action){}
+> ```
+>
+> | 调用                          | 示例           | 备注 |
+> | ----------------------------- | -------------- | ---- |
+> | `$this->action->actionMethod` | actionBindShop |      |
+> | `$this->action->id`           | bind-shop      |      |
+>
+> 
 
 ### 2、web-controller
 

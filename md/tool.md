@@ -1,188 +1,3 @@
-# git
-
-官方文档：https://git-scm.com/docs
-
-==获取帮助文档：==在git命令框中：git help 指令。比如git help stash
-
-![git](static/tool/git.jpeg)
-
-## (一)、git
-
->
->
->```shell
->git [--version]                   //查看git版本信息：git version 2.24.0.windows.2
->	[--help]                      //获取git指令列表。加--all或者-a展示全部指令 
->	[-C <path>] 
->	[-c <name>=<value>]
->    [--exec-path[=<path>]] 
->    [--html-path] 
->    [--man-path] 
->    [--info-path]
->    [-p|--paginate|-P|--no-pager] 
->    [--no-replace-objects] 
->    [--bare]
->    [--git-dir=<path>] 
->    [--work-tree=<path>] 
->    [--namespace=<name>]
->    [--super-prefix=<path>]
->    <command> [<args>]
->```
->
->
-
-| 指令 | 参数       | 功能 |
-| ---- | ---------- | ---- |
-| git  | --version  |      |
-|      | --help     |      |
-|      | -C \<path> |      |
-
-
-
-stash
-
-## 提交过程
-
-commit
-
-push
-
-## 拉取过程
-
-pull
-
-fetch
-
-## 撤回
-
-checkout
-
-reset
-
-
-
-本地文档  file:///C:/Program%20Files/Git/mingw64/share/doc/git-doc
-
-git --version    2.24
-
-
-
-
-
-
-
- git switch message_manage from origin
-
-
-
-| 步骤   | 位置 | 简称 | 英文       |
-| ------ | ---- | ---- | ---------- |
-| 工作区 | 本地 | 工作 | workspace  |
-| 暂存区 | 本地 | 暂存 | index      |
-| 仓库   | 本地 | 本仓 | repository |
-| 仓库   | 远程 | 远仓 | remote     |
-
-
-
-
-
-## 正序
-
-### 工作-暂存
-
-### 工作-本仓
-
-### 工作-远仓
-
-
-
-## 反序
-
-### 暂存-工作
-
-### 本仓-工作
-
-### 远仓-工作
-
-## 分支合并与冲突处理
-
-### 分支合并
-
-### 冲突
-
-#### 文件相交、行相交
-
-#### 文件相交，行不相交
-
-​			ab当前是同一个版本。a改了10行，提交至远程仓库。b在a提交后改了20行，也往远程仓库提交。
-
-#### 文件不相交
-
-
-
-## 其他指令
-
-### 查看命令执行记录
-
-前后执行了哪些命令
-
-git reflog
-
-
-
-
-
- 
-
-## 撤销
-
-https://www.cnblogs.com/yangsg/p/13267246.html
-
-## .gitignore文件
-
- 
-
-> ```
-> # 忽略所有的 .a 文件
-> *.a
-> 
-> # 但跟踪所有的 lib.a，即便你在前面忽略了 .a 文件
-> !lib.a
-> 
-> # 只忽略当前目录下的 TODO 文件，而不忽略 subdir/TODO
-> /TODO
-> 
-> # 忽略任何目录下名为 build 的文件夹
-> build/
-> 
-> # 忽略 doc/notes.txt，但不忽略 doc/server/arch.txt
-> doc/*.txt
-> 
-> # 忽略 doc/ 目录及其所有子目录下的 .pdf 文件
-> doc/**/*.pdf
-> ```
-
- 
-
-
-
-https://www.cnblogs.com/code-changeworld/p/4779145.html
-
-> ```shell
-> Pushing to http://47.94.230.43:3000/weshare/ExitIntent.git
-> To http://47.94.230.43:3000/weshare/ExitIntent.git
->  ! [rejected]        message_1110 -> message_1110 (non-fast-forward)
-> error: failed to push some refs to 'http://47.94.230.43:3000/weshare/ExitIntent.git'
-> hint: Updates were rejected because the tip of your current branch is behind
-> hint: its remote counterpart. Integrate the remote changes (e.g.
-> hint: 'git pull ...') before pushing again.
-> hint: See the 'Note about fast-forwards' in 'git push --help' for details.
-> ```
->
-> 
-
-
-
 # composer
 
 ## 安装
@@ -243,6 +58,24 @@ composer clear
 查看composer配置
 
 5、composer config -l
+
+
+
+
+
+
+
+
+
+### could not be found in any version
+
+![image-20210111164911706](static/tool/image-20210111164911706.png)
+
+### Continue as root/super user [yes]?
+
+![image-20210111170233498](static/tool/image-20210111170233498.png)
+
+
 
 ## 执行composer.json
 

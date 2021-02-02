@@ -3784,6 +3784,24 @@ https://dev.mysql.com/doc/refman/5.7/en/sql-replication-statements.html
 >
 >
 
+
+
+# 有点问题
+
+## 先where还是group
+
+>这个是先根据where筛选再进行group？
+>
+>还是先group再进行where？
+>
+>```
+>$edm = RecartStrategyData::find()
+>    ->where(['shop' => $shop, "plat" => MessageService::PLAT_EDM])
+>    ->select(['SUM(`order_amount`) as `order_cp_money`', 'date'])
+>    ->andWhere([">", "date", $beforeDay30])
+>    ->groupBy("date")->asArray()->one();
+>```
+
 ## 后续提升
 
 ### NDB
