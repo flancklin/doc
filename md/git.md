@@ -3,10 +3,20 @@
 ## (一)、版本号
 
 > ```shell
-> git version
+> git --version
 > ```
 
-## (二)、帮助文档
+## (二)、帮助文档及查看全部指令
+
+> 查看全部指令
+>
+
+> ```shelll
+> git help
+> git help -a #查看全部命令（包括子命令）
+> ```
+
+
 
 > 不是cli显示文档，是本地html文档
 >
@@ -14,6 +24,8 @@
 > git command --help
 > git help command
 > ```
+
+
 
 ## (三)、签名
 
@@ -72,6 +84,21 @@
 #### (1)、git init
 
 #### (2)、git clone
+
+##### (a)、git clone直接使用账号密码
+
+>格式
+>
+>```shell
+>git clone https://username:password@链接
+>```
+>
+>示例
+>
+>```shell
+>#复制下来的链接为： https://gitee.com/flancklin/flancklin.git
+>$ git clone https://flancklin:Feng1234@gitee.com/flancklin/flancklin.git
+>```
 
 ### 2、分支内
 
@@ -169,3 +196,169 @@ version:2.24.0 windows.2
 fetch+merge=pull
 
 git remote -v
+
+# 问题解决
+
+## (一)、GUI界面显示乱码
+
+>![image-20210202161627716](static/git/image-20210202161627716.png)
+>
+>
+
+### 解决方法：
+
+>在乱码的区域点击鼠标右键，选择Encoding，然后选择Unicode（UTF-8），乱码问题解决：
+
+## (二)、查询历史执行过的git指令
+
+## (三)、一台电脑保存多个git账号
+
+场景：
+
+>```shell
+>在github.com有账号；
+>在gitee.com有账号；
+>还有公司账号，还有其他外包业务账号。。。。
+>```
+
+### 1、方法1(ssh)
+
+#### (1)、思路方向
+
+>```
+>每个账号创建一套ssh密钥
+>在github/gitee上绑定个自的ssh.pub
+>把所有创建的密钥加入到ssh中
+>为ssh创建config
+>```
+
+#### (2)、步骤
+
+>1.准备工作
+>
+>> ```shell
+>> $ ssh-add -l #出现下面的需要执行 $ ssh-agent bash
+>> Could not open a connection to your authentication agent.
+>> 
+>> $ ssh-agent bash
+>> 
+>> $ ssh-add -l #查看当前有哪些密钥
+>> The agent has no identities.
+>> 
+>> $ ssh-add -d my_id_rsa #删除某个密钥。文件的绝对路径或相对路径
+>> Identity removed: my_id_rsa (475185283@qq.com)
+>> 
+>> 找到.ssh文件路径。后面是基于.ssh路径操作的
+>> ```
+>
+>2.生成密钥
+>
+>> ```shell
+>> #                     密钥的备注名称         密钥的文件名称 
+>> $ ssh-keygen -t rsa -C "github" -f ~/.ssh/id_rsa_github
+>> $ ssh-keygen -t rsa -C "gitee" -f ~/.ssh/id_rsa_gitee
+>> ```
+>
+>3.登录gitee，把id_rsa_gitee.pub绑定；登录github，把id_rsa_github.pub绑定
+>
+>> ```shell
+>> 账号 > setting > ssh
+>> ```
+>
+>4.把新创建的密钥加入到ssh
+>
+>> ```shell
+>> $ ssh-add ~/.ssh/id_rsa_github
+>> Identity added: /c/Users/EDZ/.ssh/id_rsa_github (github)
+>> 
+>> $ ssh-add ~/.ssh/id_rsa_gitee
+>> Identity added: /c/Users/EDZ/.ssh/id_rsa_gitee (gitee)
+>> 
+>> $ ssh-add -l
+>> 3072 SHA256:kZQ/ePScCm+yQb8r9WBkCZ6zHd/GZsmCb4z1hugcmm0 github (RSA)
+>> 3072 SHA256:Cer6J7DsgqEVfdr1gWvuN/JcKoLVFl/xTmudHiMdLhE gitee (RSA)
+>> ```
+>
+>5.把密钥配置到config文件
+>
+>> ```shell
+>> $ vim ~/.ssh/config
+>> #内容
+>> host 标签(别名)
+>> hostname 网站地址
+>> IdentityFile rsa文件路径
+>> #--------------------------------------
+>> 
+>> # gitee
+>> Host gitee
+>> Hostname gitee.com
+>> #User
+>> IdentityFile ~/.ssh/id_rsa_gitee
+>> 
+>> # github
+>> Host github
+>> Hostname github.com
+>> #User
+>> IdentityFile ~/.ssh/id_rsa_github
+>> ```
+>
+>6.测试是否正确
+>
+>> ```shell
+>> $  ssh -T git@github
+>> The authenticity of host 'github.com (52.74.223.119)' can't be established.
+>> RSA key fingerprint is SHA256:nThbg6kXUpJWGl7E1IGOCspRomTxdCARLviKw6E5SY8.
+>> Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+>> Warning: Permanently added 'github.com,52.74.223.119' (RSA) to the list of known hosts.
+>> Hi flancklin! You've successfully authenticated, but GitHub does not provide shell access.
+>> 
+>> EDZ@DESKTOP-OBUBLTV MINGW64 ~/.ssh
+>> $  ssh -T git@gitee
+>> The authenticity of host 'gitee.com (180.97.125.228)' can't be established.
+>> ECDSA key fingerprint is SHA256:FQGC9Kn/eye1W8icdBgrQp+KkGYoFgbVr17bmjey0Wc.
+>> Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+>> Warning: Permanently added 'gitee.com,180.97.125.228' (ECDSA) to the list of known hosts.
+>> Hi 百里杨周! You've successfully authenticated, but GITEE.COM does not provide shell access.
+>> ```
+
+#### (3)、后续问题
+
+判断git remote使用的是否有ssh链接
+
+> ```shell
+> EDZ@DESKTOP-OBUBLTV MINGW64 /c/code/flancklin-note/doc (master)
+> $ git remote -v
+> origin  https://github.com/flancklin/doc.git (fetch)
+> origin  https://github.com/flancklin/doc.git (push)
+> ```
+>
+> ===这个是https链接。不是ssh链接==
+
+添加ssh链接
+
+> ```shell
+> EDZ@DESKTOP-OBUBLTV MINGW64 /c/code/mayun/flancklin (master)
+> $ git remote add origin_ssh git@gitee.com:flancklin/flancklin.git
+> origin  https://flancklin:Feng1234my@gitee.com/flancklin/flancklin.git (fetch)
+> origin  https://flancklin:Feng1234my@gitee.com/flancklin/flancklin.git (push)
+> 
+> EDZ@DESKTOP-OBUBLTV MINGW64 /c/code/mayun/flancklin (master)
+> $ git remote -v
+> origin  https://flancklin:Feng1234my@gitee.com/flancklin/flancklin.git (fetch)
+> origin  https://flancklin:Feng1234my@gitee.com/flancklin/flancklin.git (push)
+> origin_ssh      git@gitee.com:flancklin/flancklin.git (fetch)
+> origin_ssh      git@gitee.com:flancklin/flancklin.git (push)
+> 
+> ```
+
+删除多余的remote
+
+> ```shell
+> $ git remote rm origin
+> ```
+
+## (四)、
+
+## (五)、
+
+## (六)、
