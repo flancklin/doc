@@ -1,3 +1,5 @@
+# 官网：https://git-scm.com/docs
+
 # 一、安装及信息
 
 ## (一)、版本号
@@ -197,6 +199,34 @@ fetch+merge=pull
 
 git remote -v
 
+# git config
+
+## (一)、查看【当前项目配置】与【全局配置】
+
+当前项目配置
+
+>```shell
+>git config --list
+>```
+
+全局配置
+
+> ```shell
+> git config --global --list
+> ```
+
+## (二)、增加修改参数
+
+> ```shell
+> git config [--global] key value
+> ```
+
+## (三)、删除参数--unset
+
+> ```shell
+> git config [--global] --unset key
+> ```
+
 # 问题解决
 
 ## (一)、GUI界面显示乱码
@@ -209,9 +239,17 @@ git remote -v
 
 >在乱码的区域点击鼠标右键，选择Encoding，然后选择Unicode（UTF-8），乱码问题解决：
 
-## (二)、查询历史执行过的git指令
+git bash界面乱码问题
 
-## (三)、一台电脑保存多个git账号
+## (二)、BASH界面显示乱码
+
+>![image-20210303115148698](static/git/image-20210303115148698.png)
+>
+>1、在bash框内。右键->options->text->character set->GBK（windows不是utf8,而是GBK）
+
+## (三)、查询历史执行过的git指令
+
+## (四)、一台电脑保存多个git账号
 
 场景：
 
@@ -357,8 +395,83 @@ git remote -v
 > $ git remote rm origin
 > ```
 
-## (四)、
+## (五)、gitHub
 
-## (五)、
+### 1、git clone https(443:Timed out)
 
-## (六)、
+>
+>
+>![image-20210303145426265](static/git/image-20210303145426265.png)
+>
+>尝试了网上的【git config --global http.proxy "localhost:1080”】，但没有效果。
+>
+>最终没有用http链接了。专用SSH下载
+
+### 2、ping github.com找不到主机
+
+>![image-20210303114124010](static/git/image-20210303114124010.png)
+>
+>1、打开网址 https://www.ipaddress.com/
+>
+>​		输入 github.com 或者 github.global.ssl.fastly.net
+>
+> 
+>
+>2、将得到的ip地址放入到host文件中
+>
+> 
+>
+>3、用管理员权限(Win10)打开 C:\Windows\System32\drivers\etc 目录下的 host文件
+>
+>在文件末尾加上
+>
+> 
+>
+>192.30.253.112 github.com
+>151.101.88.249 github.global.ssl.fastly.net
+>
+> 
+>
+>4、然后再win+r,输入ipconfig刷新即可
+
+### 3、Your requirements could not be resolved to an installable set of packages
+
+>
+>
+>![image-20210331160952873](static/git/image-20210331160952873.png)
+
+解决方法：
+
+>
+>
+>一、先确定当前使用得是那个仓库源
+>
+>```
+>1、查看composer.json中是否设置了repositories.url
+>2、查看当前项目环境是否设置了repositories.url
+>3、查看全局环境是否设置了repositories.url
+>```
+>
+>二、去当前得仓库源得官网查看这些项目是否真实存在
+>
+>
+
+
+
+## (六)、gitee
+
+## （七)、gitignore
+
+### 1、问题1：a文件以前在版本控制，现在想移除
+
+>
+>
+>1、把需要移除的文件放在.gitignore文件中
+>
+>2、执行git update-index --assume-unchanged 文件
+>
+>3、执行commit-push（这里提交的是.gitignore文件）
+>
+>* 被移除的文件，在步骤3中就已经不会出现了。
+>* 本地可以只执行1、2.不用去提交影响线上
+
