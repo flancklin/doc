@@ -11,7 +11,6 @@
 ## (二)、帮助文档及查看全部指令
 
 > 查看全部指令
->
 
 > ```shelll
 > git help
@@ -84,6 +83,19 @@
 ### 1、创建本地库
 
 #### (1)、git init
+
+>
+>
+>```sh
+>cd baidu
+>git init
+>git remote add origin https://github.com/yourName/baidu.git
+>touch a.txt    #不能创建空文件夹，git status搜不到
+>git commit -a "第一次提交" 
+>git push origin master
+>```
+>
+>
 
 #### (2)、git clone
 
@@ -191,6 +203,14 @@ version:2.24.0 windows.2
 
 #### (2)、合并分支
 
+##### 撤销合并操作
+
+> ```sh
+>  git merge --abort 
+> ```
+>
+> 
+
 #### (3)、恢复已删除得分支
 
 # 三、远程库
@@ -277,16 +297,17 @@ git bash界面乱码问题
 >> ```shell
 >> $ ssh-add -l #出现下面的需要执行 $ ssh-agent bash
 >> Could not open a connection to your authentication agent.
->> 
+>
 >> $ ssh-agent bash
->> 
+>
 >> $ ssh-add -l #查看当前有哪些密钥
 >> The agent has no identities.
->> 
+>
 >> $ ssh-add -d my_id_rsa #删除某个密钥。文件的绝对路径或相对路径
 >> Identity removed: my_id_rsa (475185283@qq.com)
->> 
+>
 >> 找到.ssh文件路径。后面是基于.ssh路径操作的
+>>
 >> ```
 >
 >2.生成密钥
@@ -308,13 +329,14 @@ git bash界面乱码问题
 >> ```shell
 >> $ ssh-add ~/.ssh/id_rsa_github
 >> Identity added: /c/Users/EDZ/.ssh/id_rsa_github (github)
->> 
+>
 >> $ ssh-add ~/.ssh/id_rsa_gitee
 >> Identity added: /c/Users/EDZ/.ssh/id_rsa_gitee (gitee)
->> 
+>
 >> $ ssh-add -l
 >> 3072 SHA256:kZQ/ePScCm+yQb8r9WBkCZ6zHd/GZsmCb4z1hugcmm0 github (RSA)
 >> 3072 SHA256:Cer6J7DsgqEVfdr1gWvuN/JcKoLVFl/xTmudHiMdLhE gitee (RSA)
+>>
 >> ```
 >
 >5.把密钥配置到config文件
@@ -326,18 +348,19 @@ git bash界面乱码问题
 >> hostname 网站地址
 >> IdentityFile rsa文件路径
 >> #--------------------------------------
->> 
+>
 >> # gitee
 >> Host gitee
 >> Hostname gitee.com
 >> #User
 >> IdentityFile ~/.ssh/id_rsa_gitee
->> 
+>
 >> # github
 >> Host github
 >> Hostname github.com
 >> #User
 >> IdentityFile ~/.ssh/id_rsa_github
+>>
 >> ```
 >
 >6.测试是否正确
@@ -349,7 +372,7 @@ git bash界面乱码问题
 >> Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
 >> Warning: Permanently added 'github.com,52.74.223.119' (RSA) to the list of known hosts.
 >> Hi flancklin! You've successfully authenticated, but GitHub does not provide shell access.
->> 
+>
 >> EDZ@DESKTOP-OBUBLTV MINGW64 ~/.ssh
 >> $  ssh -T git@gitee
 >> The authenticity of host 'gitee.com (180.97.125.228)' can't be established.
@@ -357,6 +380,7 @@ git bash界面乱码问题
 >> Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
 >> Warning: Permanently added 'gitee.com,180.97.125.228' (ECDSA) to the list of known hosts.
 >> Hi 百里杨周! You've successfully authenticated, but GITEE.COM does not provide shell access.
+>>
 >> ```
 
 #### (3)、后续问题

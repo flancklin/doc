@@ -791,16 +791,48 @@
 
 > ```php
 > foreach ($query->batch() as $users) {
->     // $users 是一个包含100条或小于100条用户表数据的数组
+>   //$user是array,是二维数组，是100条记录的集合
 > }
 > 
 > // or to iterate the row one by one
 > foreach ($query->each() as $user) {
->     // 数据从服务端中以 100 个为一组批量获取，数据对象 yii\db\BatchQueryResult
+>  //$user是array,是关联数组，是一条记录
+>  //yii\db\BatchQueryResult
 > }
 > ```
 >
 > 
+
+#### (7)、子查询
+
+>
+>
+>```php
+>//拼接sub sql切记不要写asArray\all\one等
+>$subSql = CollectStrategy::find()->andWhere(["shop"=> $shop, "category"=> $collectCategory])->select(["id"]);
+>CollectStrategyData::find()->andWhere(["strategy_id"=>$subSql])->all();
+>```
+>
+>
+
+#### (8)、queryScalar
+
+>sub
+>
+>average
+>
+>min
+>
+>max
+>
+>count
+>
+>```php
+>
+>CollectStrategyData::find()->andWhere(["strategy_id"=>$subSql])->sum("subscribe")
+>```
+>
+>
 
 ### 2、where
 
@@ -1380,11 +1412,13 @@ simple_expr:
 >config/main.php
 >
 >* ```php
-> 'defaultRoute' => 'hello-world',///或者hello-world/say-hello
-> ```
-> ```
+>  'defaultRoute' => 'hello-world',///或者hello-world/say-hello
+>  ```
+>```
 >
-> ```
+>```
+>
+>```
 >
 >```
 >
@@ -1398,10 +1432,10 @@ simple_expr:
 >在controller中设置默认action
 >
 >* ```php
->  class HelloWorldController extends \yii\web\Controller{
->   	public $defaultAction = 'say-hello';//设置默认方法
->   }
->  ```
+> class HelloWorldController extends \yii\web\Controller{
+>  	public $defaultAction = 'say-hello';//设置默认方法
+>  }
+>```
 >```
 >
 >```

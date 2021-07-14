@@ -630,10 +630,13 @@ index.php
 >   label;
 >   static $a = 1+2;              //简单的数学运算，支持加/减/乘/除/求模/求幂
 >  ```
+>  ```
 >
 > ```
 >
-> ```
+>```
+>
+>```
 >
 >```
 >
@@ -700,6 +703,9 @@ index.php
 > static $a = bcadd(1,2);                 //不可以调用函数
 > static $a = function(){echo 'hello!';}  //不可以callback
 > static $a = new stdClass();             //不可以object
+>```
+>```
+>
 >```
 >
 >```
@@ -860,7 +866,6 @@ index.php
 >| 序号 | 符号 | 作用 | 举例    | 备注 |
 >| ---- | ---- | ---- | ------- | ---- |
 >| 1    | =    | 赋值 | `$x=1;` |      |
->
 
 ### 2、算术运算符
 
@@ -1387,7 +1392,6 @@ breake
 >
 >* ✔仅仅是方法成了可变函数
 >* ✘【类+类方法】这个整体成为可变函数
->
 
 
 
@@ -1397,9 +1401,9 @@ breake
 
 >```php
 >class MyClass{
->   public function myFun($p1){
->       echo "test:".__METHOD__."。param:".$p1.PHP_EOL;
->   }
+>public function myFun($p1){
+>  echo "test:".__METHOD__."。param:".$p1.PHP_EOL;
+>}
 >}
 >
 >$obj = new MyClass();
@@ -1416,11 +1420,12 @@ breake
 >>   echo "I am class::method";
 >>}
 >>}
->>
+>
 >>$obj = new MyClass();
 >>$var = "myFun";
 >>echo $obj->$var;//输出 I am property
 >>echo $obj->$var();//输出 I am class::method
+>>
 >>```
 
 ##### (b)、【类+类方法】整体成可变函数
@@ -2021,7 +2026,6 @@ exit();sleep();die;
 >        }
 >    }
 >```
->
 
 
 
@@ -2072,7 +2076,6 @@ exit();sleep();die;
 >    return $obj;
 >}
 >```
->
 
 ### 2、namespace
 
@@ -2972,7 +2975,6 @@ Warning: session_set_save_handler(): Cannot change save handler when session is 
 >   ]
 >]
 >```
->
 
 
 
@@ -4699,7 +4701,6 @@ get_class_methods ($class_name)
 >var_dump(isset($b));//false
 >var_dump(isset($c));//true
 >```
->
 
 ## (二)、file_exists和is_file文件明明在，确不存在
 
@@ -4876,13 +4877,92 @@ get_class_methods ($class_name)
 >     return "shop_info:{$shop}";
 > }
 > ```
+
+
+
+
+
+# 易错坑位
+
+## http_build_query
+
+>空数组会被过滤
 >
-> 
+>```php
+>echo "xxx".http_build_query(["a"=>[]]);
+>//输出结果:xxx
+>echo "xxx".http_build_query(["a"=>""]);
+>//输出结果:xxxa=
+>
+>```
 
+## 数组+运算和merge区别
 
+>
+>
+>+运算，是对key求和，不是value
+>
+>```
+>
+>$a = ["b"];
+>$b = ["c","d"];
+>var_dump($a+$b);// b d
+>```
+>
+>
 
+## 函数array_merge小注意
 
+>**array_merge()** 将一个或多个数组的单元合并起来，一个数组中的值附加在前一个数组的后面。返回作为结果的数组。     
+>
+>* 如果输入的数组中有相同的字符串键名，则该键名后面的值将覆盖前一个值。(后面的覆盖前面的)
+>* 然而，如果数组包含数字键名，后面的值将*不会*覆盖原来的值，而是附加到后面。     
+>* 如果只给了一个数组并且该数组是数字索引的，则键名会以连续方式重新索引。(数字索引会重排---字符串型数字也是数字索引)
+>
+>```php
+>    $a = ["a"=>"b"];
+>    $b = ["44"=>"c"];
+>    var_dump(array_merge($a,$b));die;
+>/**
+>array(2) {
+>  ["a"]=>
+>  string(1) "b"
+>  [0]=>
+>  string(1) "c"
+>}
+>*/
+>
+>    $a = [3=>"a"];
+>    $b = [3=>"d"];
+>    var_dump(array_merge($a,$b));die;
+>/**
+>array(2) {
+>  [0]=>
+>  string(1) "a"
+>  [1]=>
+>  string(1) "d"
+>}
+>*/
+>```
+>
+>
 
+## strtotime[last month|-1 month]
+
+>```php
+>$day = "2021-07-31 12:12:12";
+>echo date("Y-m-d H:i:s", strtotime("-1 month", strtotime($day))).PHP_EOL;
+>echo date("Y-m-d H:i:s", strtotime("last month", strtotime($day))).PHP_EOL;
+>echo date("Y-m-d H:i:s", strtotime("first day of last month", strtotime($day))).PHP_EOL;
+>
+>/*
+>2021-07-01 12:12:12
+>2021-07-01 12:12:12
+>2021-06-01 12:12:12
+>*/
+>```
+>
+>
 
 
 
