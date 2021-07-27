@@ -2,7 +2,15 @@
 
 
 
+# composer存储库
 
+https://packagist.org/
+
+账号：flancklin
+
+邮件：47@qq.com
+
+密码：F4composer
 
 ```json
 {

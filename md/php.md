@@ -2309,6 +2309,8 @@ exit();sleep();die;
 
 #### (1)、存入cookie
 
+##### a、setcookie
+
 >setcookie和setrawcookie
 >
 >* setcookie发送的value会被URL 编码（urlencode）。
@@ -2350,6 +2352,18 @@ exit();sleep();die;
 >| \$domain   | cookie对指定域名有效                                         |
 >| \$secure   |                                                              |
 >| \$httponly | httponly                                                     |
+
+
+
+##### b、header
+
+>```php
+>header("Set-Cookie: $cookieName=$cookieValue; expires=$cookieExpire; path=/; domain=$cookieDomain;  SameSite=None; Secure");
+>//$cookieExpire = date("Wdy, DD-Mon-YYYY HH:MM:SS GMT", strtotime("2999-12-12 00:00:00"));
+>
+>```
+>
+>
 
 #### (2)、从cookie中获取
 

@@ -247,6 +247,53 @@ git remote -v
 > git config [--global] --unset key
 > ```
 
+# git stash
+
+## (一)、增(save/空)
+
+> ```sh
+> git stash save "name1"   #执行存储时，并添加备注
+> ```
+>
+> 
+
+## (二)、删(drop/clear)
+
+> ```sh
+> git stash drop stash@{0} #删除某次存储
+> git stash clear          #删除所有本地存储
+> ```
+
+## (三)、改()
+
+## (四)、查(show/list)
+
+> ```sh
+> git stash list              #查看stash列表
+> 
+> git stash show              #查看最新一次存储的变更文件 
+> git stash show stash@{0}    #查看最新一次存储的变更文件 
+> git stash show stash@{0} -p #查看某次存储的具体内容 
+> ```
+
+## (五)、应用(apply/pop)
+
+apply 应用但不会删除
+
+> ```sh
+> git stash apply            #应用最近的存储    
+> git stash apply stash@{0}  #应用最近的存储
+> ```
+
+
+
+pop 应用并删除
+
+> ```sh
+> git stash pop             #应用
+> git stash pop stash@{0}
+> ```
+
 # 问题解决
 
 ## (一)、GUI界面显示乱码
