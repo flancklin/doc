@@ -330,7 +330,6 @@
 >        'post/<id:\d+>' => 'post/view',
 >];
 >```
->
 
 ##### a、命名参数
 
@@ -528,7 +527,6 @@
 > //            $this->isSent = true;
 > //        }
 > ```
->
 
 
 
@@ -1412,9 +1410,9 @@ simple_expr:
 >config/main.php
 >
 >* ```php
->  'defaultRoute' => 'hello-world',///或者hello-world/say-hello
->  ```
->```
+> 'defaultRoute' => 'hello-world',///或者hello-world/say-hello
+> ```
+> ```
 >
 >```
 >
@@ -1432,9 +1430,10 @@ simple_expr:
 >在controller中设置默认action
 >
 >* ```php
-> class HelloWorldController extends \yii\web\Controller{
->  	public $defaultAction = 'say-hello';//设置默认方法
->  }
+>class HelloWorldController extends \yii\web\Controller{
+>
+> 	public $defaultAction = 'say-hello';//设置默认方法
+> }
 >```
 >```
 >
@@ -2005,6 +2004,22 @@ https://www.yiiframework.com/doc/guide/2.0/en/security-authorization#role-based-
 
 ## (三)、yiisoft/yii2-queue
 
+>
+>
+>![image-20210803094529285](C:\Users\EDZ\Desktop\doc\md\frame-php\yii2.assets\image-20210803094529285.png)
+
+
+
+>
+>
+>![image-20210803095120217](C:\Users\EDZ\Desktop\doc\md\frame-php\yii2.assets\image-20210803095120217.png)
+
+
+
+>
+>
+>![image-20210803095455761](C:\Users\EDZ\Desktop\doc\md\frame-php\yii2.assets\image-20210803095455761.png)
+
 # 五、功能
 
 ## (一)、session和cookie
@@ -2106,6 +2121,141 @@ https://www.yiiframework.com/doc/guide/2.0/en/security-authorization#role-based-
 ## (七)、CSRF
 
 ()、()、()、()、()、()、()、()、()、()、
+
+# 六、疑难杂症
+
+## (一)、如何获取sql
+
+### 1、->createCommand()->getRawSql()
+
+>这个能应对一般的
+
+### 2、再源码中打出sql
+
+>比如::findOne()这种，是没法调用->createCommand()->getRawSql()的
+>
+> 怎么办？
+>
+>找到执行语句并打出
+>
+>最底层的执行文件是Command  vendor\yiisoft\yii2\db\Command.php
+>
+>***有两个地方执行***
+
+#### (1)、execute(1078行)
+
+>vendor\yiisoft\yii2\db\Command.php
+>
+>```php
+>public function execute()
+>    {
+>        $sql = $this->getSql();
+>        list($profile, $rawSql) = $this->logQuery(__METHOD__);
+>
+>        if ($sql == '') {
+>            return 0;
+>        }
+>
+>        $this->prepare(false);
+>
+>        try {
+>            $profile and Yii::beginProfile($rawSql, __METHOD__);
+>
+>            $this->internalExecute($rawSql);
+>            $n = $this->pdoStatement->rowCount();
+>
+>            $profile and Yii::endProfile($rawSql, __METHOD__);
+>
+>            $this->refreshTableSchema();
+>
+>            return $n;
+>        } catch (Exception $e) {
+>            $profile and Yii::endProfile($rawSql, __METHOD__);
+>            throw $e;
+>        }
+>    }
+>```
+
+#### (2)、internalExecute(1277行)
+
+>vendor\yiisoft\yii2\db\Command.php
+>
+>```php
+>protected function internalExecute($rawSql)
+>    {
+>        var_dump($rawSql);
+>        $attempt = 0;
+>        while (true) {
+>            try {
+>                if (
+>                    ++$attempt === 1
+>                    && $this->_isolationLevel !== false
+>                    && $this->db->getTransaction() === null
+>                ) {
+>                    $this->db->transaction(function () use ($rawSql) {
+>                        $this->internalExecute($rawSql);
+>                    }, $this->_isolationLevel);
+>                } else {
+>                    $this->pdoStatement->execute();
+>                }
+>                break;
+>            } catch (\Exception $e) {
+>                $rawSql = $rawSql ?: $this->getRawSql();
+>                $e = $this->db->getSchema()->convertException($e, $rawSql);
+>                if ($this->_retryHandler === null || !call_user_func($this->_retryHandler, $e, $attempt)) {
+>                    throw $e;
+>                }
+>            }
+>        }
+>    }
+>```
+>
+>
+
+## (二)、如何写::findOne中的条件
+
+
+
+>这个写法正确吗
+>
+>```php
+>GzDetail::findOne(['and', ["id"=>$ids], ["<>", "settle_time", 0]])
+>//findOne 中能否用and拼接？？？
+>```
+>
+>打出sql
+>
+>```sql
+>SELECT * FROM `gz_detail` WHERE `id` IN ('and', NULL, NULL)
+>```
+>
+>结论
+>
+>仅仅支持primary 和关联数组，别无它法
+>
+>```php
+>1、GzDetail::findOne(333);//仅传递一个值，自动和primary key匹配
+>2、GzDetail::findOne(["a"=>"v1","b"=>"v2"]);//传递关联数组。进行字段映射
+>```
+>
+>如何支持更复杂的条件呢？？
+>
+>如何支持更复杂的条件呢？？
+>
+>如何支持更复杂的条件呢？？
+>
+>```php
+>$r = GzDetail::findOne(new AndCondition([["a"=>"v1"], ["<>","b","v2"],["or",["c"=>"v3"],["<>","d","v4"]]]));
+>//SELECT * FROM `gz_detail` WHERE `id`=(`shop`='v1') AND (`time
+>zone` <> 'v2') AND ((`strategy_id`=2) OR (`log_id` <> 0))
+>//依旧错误	
+>```
+>
+>
+>
+>![image-20210804162602287](C:\Users\EDZ\Desktop\doc\md\frame-php\yii2.assets\image-20210804162602287.png)
+>
+>
 
 # 六、源码分析
 
@@ -3055,7 +3205,6 @@ https://www.yiiframework.com/doc/guide/2.0/en/security-authorization#role-based-
 >private function normalizeRelations($model, $with){}    
 >}
 >```
->
 
 ##### b、yii\db\ActiveRelationTrait
 
@@ -3087,7 +3236,6 @@ https://www.yiiframework.com/doc/guide/2.0/en/security-authorization#role-based-
 >private function findJunctionRows($primaryModels){}
 >}
 >```
->
 
 #### (3)、核心代码
 
@@ -3108,7 +3256,6 @@ https://www.yiiframework.com/doc/guide/2.0/en/security-authorization#role-based-
 >         return $command;
 >     }
 > ```
->
 
 
 

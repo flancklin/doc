@@ -220,6 +220,8 @@ index.php
 
 ##### c、关于nowdoc和heredoc
 
+文档位置：php手册>>>语言参考>>>类型>>>String字符串(语法：heredoc,nowdoc语法结构)
+
 ###### (I)、规则
 
 * 只能包含字母、数字和下划线。不能以数字开头。
@@ -4978,7 +4980,265 @@ get_class_methods ($class_name)
 >
 >
 
+## 数据类型乱赋值
 
+>```php
+>$str = '';
+>$str["a"] = "b";
+>var_dump($str);
+>var_dump($str["a"]);
+>/*
+>Warning: Illegal string offset 'a' in C:\code\company\stream\ExitIntent\yii on line 8
+>string(1) "b"
+>
+>Warning: Illegal string offset 'a' in C:\code\company\stream\ExitIntent\yii on line 10
+>string(1) "b"
+>
+>*/
+>
+>```
+
+
+
+# 7.2到7.3
+
+## (一)、新增
+
+## (二)、变更
+
+## (三)、删除
+
+### 1、数组分解
+
+类似list()用法
+
+>```php
+>list($a,$b,$c)=["v1","v2","v3"];
+>[$a, [$b, [$c]]] = ["v1", ["v2", ["v3"]]];
+>[$a, [$b, [&$c]]] = ["v1", ["v2", ["v3"]]];//支持引用，怎么理解？？
+>```
+
+# 5.6到7.0
+
+## (一)、新增
+
+## (二)、变更(兼容)
+
+### 1、yeid变更为右联结运算符?
+
+>方向都被改了，还兼容？
+
+### 2、移除了ASP和script标签
+
+>| 开标签                    | 闭标签      |
+>| ------------------------- | ----------- |
+>| `<%`                      | `%>`        |
+>| `<%=`                     | `%>`        |
+>| `<script language="php">` | `</script>` |
+
+### 3、参数名和default重复
+
+> php7触发    **`E_COMPILE_ERROR`** 错误
+>
+> ```php
+> function fff($a, $b, $unused, $unused) {
+>     var_dump(func_get_args());//php5 1,2,3,4
+>     var_dump($unused);        //php5 4
+> }
+> fff(1,2,3,4);
+> ```
+>
+>  
+>
+> ```php
+> $a=9;
+> switch ($a){
+>     default:
+>         echo 3;
+>         break;
+>     default:
+>         echo 4;
+>         break;
+> }
+> //php5 输出4
+> ```
+
+### 4、func_get_args和func_get_arg会被引用追踪
+
+>```php
+>function test($a, $b){
+>    $a =99;
+>    var_dump(func_get_args());
+>}
+>
+>test(1,2);
+>//php5 1 2
+>//php7 99 2  因为$a变更过
+>```
+>
+>
+
+## (三)、变更(不兼容)
+
+### 1、error和exception
+
+>
+>
+>|           | php5 | php7 | 备注               |
+>| --------- | ---- | ---- | ------------------ |
+>| Eception  | 有   | 有   | 继承于接口Thowable |
+>| Error     | 无   | 新增 | 继承于接口Thowable |
+>| Throwable | 无   | 新增 |                    |
+>
+>* set_exception_handler() 不再保证收到的一定是 Exception对象
+>  * 因为有可能还有Error对象了
+>* 对于 [eval()](mk:@MSITStore:C:\Users\EDZ\Desktop\川流科技\chm\php74_zh(2020).chm::/res/function.eval.html) 函数，需要将其包含到一个    [*catch*](mk:@MSITStore:C:\Users\EDZ\Desktop\川流科技\chm\php74_zh(2020).chm::/res/language.exceptions.html#language.exceptions.catch) 代码块中来处理解析错误。 解析错误会抛出 **ParseError** 异常
+
+### 2、错误提示：E_STRICT
+
+>
+>
+>原有的 **`E_STRICT`** 警告都被迁移到其他级别。    **`E_STRICT`** 常量会被保留，所以调用     *error_reporting(E_ALL|E_STRICT)* 不会引发错误。 
+>
+>* 这句话就是空有其壳，内容已变
+>* 原本内容被其他瓜分
+>
+>| 场景                                     | 新的级别/行为        |
+>| ---------------------------------------- | -------------------- |
+>| 将资源类型的变量用作键来进行索引         | **`E_NOTICE`**       |
+>| 抽象静态方法                             | 不再警告，会引发错误 |
+>| 重复定义构造器函数                       | 不再警告，会引发错误 |
+>| 在继承的时候，方法签名不匹配             | **`E_WARNING`**      |
+>| 在两个 trait 中包含相同的（兼容的）属性  | 不再警告，会引发错误 |
+>| 以非静态调用的方式访问静态属性           | **`E_NOTICE`**       |
+>| 变量应该以引用的方式赋值                 | **`E_NOTICE`**       |
+>| 变量应该以引用的方式传递（到函数参数中） | **`E_NOTICE`**       |
+>| 以静态方式调用实例方法                   | **`E_DEPRECATED`**   |
+
+### 3、解析可变变量
+
+>[php手册]>>>[语言参考]>>>[变量]>>>[可变变量]
+>
+>| 表达式                | PHP 5 的解析方式        | PHP 7 的解析方式        |
+>| --------------------- | ----------------------- | ----------------------- |
+>| `$$foo['bar']['baz']` | `${$foo['bar']['baz']}` | `($$foo)['bar']['baz']` |
+>| `$foo->$bar['baz']`   | `$foo->{$bar['baz']}`   | `($foo->$bar)['baz']`   |
+>| `$foo->$bar['baz']()` | `$foo->{$bar['baz']}()` | `($foo->$bar)['baz']()` |
+>| `Foo::$bar['baz']()`  | `Foo::{$bar['baz']}()`  | `(Foo::$bar)['baz']()`  |
+
+### 4、list()函数，不可为空,不倒序,不解string
+
+>为空情况
+>
+>```php
+>list(,,,) = ["v1","v2","v3"];
+>//php5
+>//php7   Fatal error: Cannot use empty list in
+>```
+>
+>倒序情况
+>
+>```php
+>list($a[], $a[], $a[]) = [1, 2, 3];
+>var_dump($a);
+>//php5  3  2  1
+>//php7  1  2  3
+>```
+>
+>不解string
+>
+>```php
+>//list() 不再能解开字符串（string）变量。你可以使用str_split()来代替它。 
+>$arr = "v1,v2,v3";
+>list($a,$b,$c) = $arr;
+>//php5  v  1  ,
+>//php7  null null null
+>```
+
+### 5、数组元素顺序
+
+> ```php
+> $array = [];
+> $array["a"] =& $array["b"];
+> var_dump($array);
+> $array["b"] = 1;
+> var_dump($array);
+> //php5  ["b"=>null,"a"=>null]  ["b"=>1, "a"=>1]
+> //php7  ["a"=>null,"b"=>null]  ["a"=>1, "b"=>1]
+> ```
+
+### 6、foreach完全不再影响指针了
+
+> 不带引用&
+>
+> ```php
+> $arr = ["v1","v2","v3","vv4"];
+> echo current($arr);      //php5 v1        php7 v1
+> foreach ($arr as $v){
+>     echo current($arr);  //php5 v2,v2.v2
+> }
+> ```
+>
+> 带引用&
+>
+> ```php
+> $arr = ["v1","v2","v3","vv4"];
+> echo current($arr);    //php5  v1        php7 v1
+> foreach ($arr as &$v){
+>     echo current($arr);//php5  v2,v3,v4  php7 v1
+> }
+> ```
+
+### 7、位运算不再支持负数
+
+> ```php
+> var_dump(1>>-1);
+> //php5  0
+> //php7  Fatal error: Uncaught ArithmeticError: Bit shift by negative number in
+> ```
+
+### 8、16进制字符串不再认为是数字
+
+> ```php
+> var_dump("0x123" == "291");
+> //php5  true
+> //php7  false
+> var_dump(substr("foo", "0x1"));
+> //php5  'oo'
+> //php7  'foo'    intval("0x1")=0
+> ```
+
+### 9、*\u{* 可能引起错误?
+
+## (四)、删除
+
+### 1、INI 文件中 # 注释格式被移除
+
+>在 INI 文件中，不再支持以 # 开始的注释行，请使用 ;（分号）来表示注释。
+>
+>此变更适用于 php.ini 以及用 parse_ini_file() 和 parse_ini_string() 函数来处理的文件。 
+
+### 2、$HTTP_RAW_POST_DATA被移除
+
+>不再提供 $HTTP_RAW_POST_DATA 变量。 请使用 php://input 作为替代。
+
+### 3、JSON 扩展已经被 JSOND 取代
+
+>JSON 扩展已经被 JSOND 扩展取代。
+>
+>对于数值的处理，有以下两点需要注意的：
+>
+>* 第一，数值不能以点号（.）结束（例如，数值 34. 必须写作 34.0 或 34）。
+>* 第二，如果使用科学计数法表示数值，e 前面必须不是点号（.）（例如，3.e3 必须写作 3.0e3 或 3e3）。
+>* 另外，空字符串不再被视作有效的 JSON 字符串。 
+>
+>
+
+# try..catch..throwable与die,exit,continue
+
+>
+>
+>会被拦截吗？
 
 
 

@@ -1,6 +1,46 @@
+# 运行php和包要求php版本不一致
+
+>
+>
+>linux环境运行php：7.3.5
+>
+>项目中composer.json定义php：>=5.4.0
+>
+> 
+>
+>问题：运行项目，提示出现了php8版本的语法，不支持
+>
+>![image-20210812093757045](C:\Users\EDZ\Desktop\doc\md\composer.assets\image-20210812093757045.png)
+>
+>  
+>
+>解决：
+>
+>改掉composer.json中指定的版本号即可
+
+# 包冲突
+
+>
+>
+>在项目中用到a和b两个包
+>
+>* a包引用包c：~1.2.0
+>* b包引用包c：~2.1.0
+>
+>怎么解决？
 
 
 
+
+
+# 降低到指定版本
+
+> ```sh
+> composer self-update --help
+> composer self-update --1
+> ```
+>
+> 
 
 # composer存储库
 

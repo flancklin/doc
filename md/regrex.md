@@ -5,7 +5,6 @@
 ## (一)、文档
 
 >PHP Manual -> 函数参考 -> 文本处理 -> PCRE -> PCRE模式 -> 语法
->
 
 ## (二)、函数
 
@@ -226,6 +225,23 @@
 ### 、预搜索
 
 
+
+# 1、不包含stream且不包含account
+
+>
+>
+>```php
+>/^((?!stream).)*$/
+>    
+>    不包含stream且account的
+>```
+>
+
+# 2、不包含stream或不包含account
+
+# 3、包含stream且包含account
+
+# 4、包含stream或包含account
 
 # POSIX regex(php7已移除)
 
